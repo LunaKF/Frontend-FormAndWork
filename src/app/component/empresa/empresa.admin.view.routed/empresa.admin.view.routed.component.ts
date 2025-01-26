@@ -1,0 +1,15 @@
+import { Component, OnInit } from '@angular/core';
+
+@Component({
+  selector: 'app-empresa.admin.view.routed',
+  templateUrl: './empresa.admin.view.routed.component.html',
+  styleUrls: ['./empresa.admin.view.routed.component.css']
+})
+export class Empresa.admin.view.routedComponent implements OnInit {
+
+  constructor() { }
+
+  ngOnInit() {
+  }
+
+}

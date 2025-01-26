@@ -1,0 +1,108 @@
+<div class="container mt-5 d-flex align-items-center justify-content-center">
+  <div class="row">
+    <div class="col text-center">
+      <h2 class="my-2">
+        <i class="bi bi-plus-square"></i>
+        Creación de Empresa
+        <i class="bi bi-person-circle"></i>
+      </h2>
+      <form [formGroup]="oEmpresaForm" (ngSubmit)="onSubmit()" novalidate>
+        <div class="row mt-4">
+          <mat-form-field>
+            <mat-label>Nombre</mat-label>
+            <input
+              matInput
+              formControlName="nombre"
+              placeholder="Pon aquí tu nombre"
+            />
+            <mat-hint align="start">De 3 caracteres a 50 caracteres</mat-hint>
+            @if (oEmpresaForm?.get('nombre')?.hasError('required')){
+            <mat-error> El campo nombre es obligatorio </mat-error>
+            } @if (oEmpresaForm?.get('nombre')?.hasError('minlength')){
+            <mat-error> El nombre debe ser mas largo </mat-error>
+            } @if (oEmpresaForm?.get('nombre')?.hasError('maxlength')){
+            <mat-error> El nombre debe ser mas corto </mat-error>
+            }
+          </mat-form-field>
+        </div>
+        <div class="row mt-4">
+          <mat-form-field>
+            <mat-label>Primer Apellido</mat-label>
+            <input
+              matInput
+              formControlName="apellido1"
+              placeholder="Escribe tu primer apellido"
+            />
+            <mat-hint align="start">De 3 caracteres a 50 caracteres</mat-hint>
+            @if (oEmpresaForm?.get('apellido1')?.hasError('required')) {
+            <mat-error>Debes introducir un primer apellido</mat-error>
+            } @if (oEmpresaForm?.get('apellido1')?.hasError('minlength')) {
+            <mat-error>Debes introducir un apellido mas largo</mat-error>
+            } @if (oEmpresaForm?.get('nombre')?.hasError('maxlength')) {
+            <mat-error>Debes introducir un apellido mas corto</mat-error>
+            }
+          </mat-form-field>
+        </div>
+        <div class="row mt-4">
+          <mat-form-field>
+            <mat-label>Segundo Apellido</mat-label>
+            <input
+              matInput
+              formControlName="apellido2"
+              placeholder="Escribe tu segundo apellido"
+            />
+          </mat-form-field>
+        </div>
+        <div class="row mt-4">
+          <mat-form-field>
+            <mat-label>Email</mat-label>
+            <input
+              matInput
+              formControlName="email"
+              placeholder="Pon aquí tu email"
+              required
+            />
+            <mat-hint align="start">Formato email</mat-hint>
+            @if (oEmpresaForm?.get('email')?.hasError('required')) {
+            <mat-error>Debes introducir un email</mat-error>
+            } @if (oEmpresaForm?.get('email')?.hasError('email')) {
+            <mat-error>Debes introducir un email correcto</mat-error>
+            }
+          </mat-form-field>
+          <div class="row mt-4">
+            <mat-form-field>
+              <mat-label>TipoEmpresa</mat-label>
+              <input
+                matInput
+                formControlName="id_tipoEmpresa"
+                placeholder="Escribe el tipo de Empresa"
+              />
+            </mat-form-field>
+          </div>
+        </div>
+        <br />
+        <button
+          class="btn btn-warning mt-4 mx-1"
+          [routerLink]="['/admin', 'Empresa', 'plist']"
+        >
+          <i class="bi bi-list"></i>
+          Ir a listado de Empresas
+        </button>
+
+        <button class="btn btn-secondary mt-4 mx-1" (click)="onReset()">
+          <i class="bi bi-x-lg"></i>
+          Reset
+        </button>
+
+        <button
+          class="btn btn-primary mt-4 mx-1"
+          type="submit"
+          [disabled]="!oEmpresaForm?.valid"
+        >
+        <i class="bi bi-floppy"></i>
+          Guardar
+        </button>
+      </form>
+    </div>
+  </div>
+</div>

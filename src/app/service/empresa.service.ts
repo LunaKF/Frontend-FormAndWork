@@ -8,7 +8,7 @@ import { httpOptions, serverURL } from '../enviroment/enviroment';
 @Injectable({
   providedIn: 'root',
 })
-export class empresaService {
+export class EmpresaService {
   serverURL: string = serverURL + '/empresa';
 
   constructor(private oHttp: HttpClient) { }

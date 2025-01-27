@@ -5,7 +5,7 @@ import { Component, OnInit } from '@angular/core';
   templateUrl: './empresa.admin.delete.routed.component.html',
   styleUrls: ['./empresa.admin.delete.routed.component.css']
 })
-export class Empresa.admin.delete.routedComponent implements OnInit {
+export class EmpresaAdminDeleteRoutedComponent implements OnInit {
 
   constructor() { }
 

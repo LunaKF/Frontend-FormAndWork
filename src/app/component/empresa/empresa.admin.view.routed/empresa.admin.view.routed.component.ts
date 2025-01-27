@@ -5,7 +5,7 @@ import { Component, OnInit } from '@angular/core';
   templateUrl: './empresa.admin.view.routed.component.html',
   styleUrls: ['./empresa.admin.view.routed.component.css']
 })
-export class Empresa.admin.view.routedComponent implements OnInit {
+export class EmpresaAdminViewRoutedComponent implements OnInit {
 
   constructor() { }
 
@@ -13,3 +13,4 @@ export class Empresa.admin.view.routedComponent implements OnInit {
   }
 
 }
+

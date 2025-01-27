@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { NavigationEnd , Router} from '@angular/router';
 
 @Component({
-  selector: 'shared.menu.unrouted',
+  selector: 'app-shared-menu-unrouted',
   templateUrl: './shared.menu.unrouted.component.html',
   styleUrls: ['./shared.menu.unrouted.component.css'],
   standalone: true,

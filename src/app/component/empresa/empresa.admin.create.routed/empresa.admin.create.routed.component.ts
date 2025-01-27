@@ -10,7 +10,7 @@ import {
   Validators,
 } from '@angular/forms';
 import { IEmpresa } from '../../../model/empresa.interface';
-import { empresaService } from '../../../service/empresa.service';
+import { EmpresaService } from '../../../service/empresa.service';
 
 declare let bootstrap: any;
 
@@ -40,7 +40,7 @@ export class EmpresaAdminCreateRoutedComponent implements OnInit {
   form: FormGroup = new FormGroup({});
 
   constructor(
-    private oEmpresaService: empresaService,
+    private oEmpresaService: EmpresaService,
     private oRouter: Router
   ) {}
 

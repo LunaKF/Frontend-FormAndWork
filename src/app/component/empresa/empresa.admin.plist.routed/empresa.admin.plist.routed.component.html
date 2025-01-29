@@ -90,6 +90,13 @@
                 <i class="bi bi-caret-up-fill"></i>} }
               </th>
 
+              <th (click)="sort('email')" class="bg-primary text-white">
+                Correo @if (strField === 'email') { @if (strDir === 'desc') {
+                <i class="bi bi-caret-down-fill"></i>
+                } @else {
+                <i class="bi bi-caret-up-fill"></i>} }
+              </th>
+
               <th (click)="sort('sector')" class="bg-primary text-white">
                 sector @if (strField === 'sector') { @if (strDir
                 === 'desc') {
@@ -97,8 +104,10 @@
                 } @else {
                 <i class="bi bi-caret-up-fill"></i>} }
               </th>
-              <th (click)="sort('email')" class="bg-primary text-white">
-                Correo @if (strField === 'email') { @if (strDir === 'desc') {
+
+              <th (click)="sort('acciones')" class="bg-primary text-white">
+                Acciones
+                 @if (strField === 'accipones') { @if (strDir === 'desc') {
                 <i class="bi bi-caret-down-fill"></i>
                 } @else {
                 <i class="bi bi-caret-up-fill"></i>} }
@@ -111,11 +120,14 @@
             @for (empresa of oPage?.content; track empresa.id) {
             <tr>
               <td class="text-center">{{ empresa.id }}</td>
-              <td class="text-start">{{ empresa.nombre | trim : 10 }}</td>
+              <td class="text-start">{{ empresa.nombre | trim : 20 }}</td>
               <td class="text-start" style="font-size: small">
                 {{ empresa.email }}
               </td>
 
+              <td class="text-start" style="font-size: small">
+                {{ empresa.sector }}
+              </td>
 
               <td>
                 <div class="btn-group" role="group" aria-label="Basic example">

@@ -11,9 +11,9 @@ import {
 } from '@angular/forms';
 import { IEmpresa } from '../../../model/empresa.interface';
 import { EmpresaService } from '../../../service/empresa.service';
+import { SectorAdminSelectorUnroutedComponent } from '../../sector/sector.admin.selector.unrouted/sector.admin.selector.unrouted.component';
 
 declare let bootstrap: any;
-
 
 @Component({
   standalone: true,
@@ -31,25 +31,27 @@ declare let bootstrap: any;
 export class EmpresaAdminCreateRoutedComponent implements OnInit {
 
   id: number = 0;
-  oEmpresaForm: FormGroup | undefined = undefined;
+  oEmpresaForm: FormGroup;
   oEmpresa: IEmpresa | null = null;
   strMessage: string = '';
 
   myModal: any;
 
   form: FormGroup = new FormGroup({});
+  arrSectores: string[] = [
+    "Administración y gestión", "Agraria", "Artes gráficas", "Artes y artesanías", 
+    "Comercio y marketing", "Electricidad y electrónica", "Energía y agua", 
+    "Fabricación mecánica", "Hostelería y turismo", "Imagen personal", 
+    "Imagen y sonido", "Informática y comunicaciones", "Instalación y mantenimiento", 
+    "Madera, mueble y corcho", "Marítimo-pesquera", "Química", "Sanidad", 
+    "Seguridad y medio ambiente", "Servicios socioculturales y a la comunidad", 
+    "Textil, confección y piel", "Transporte y mantenimiento de vehículos", "Vidrio y cerámica"
+  ];
 
   constructor(
     private oEmpresaService: EmpresaService,
     private oRouter: Router
-  ) {}
-
-  ngOnInit() {
-    this.createForm();
-    this.oEmpresaForm?.markAllAsTouched();
-  }
-
-  createForm() {
+  ) {
     this.oEmpresaForm = new FormGroup({
       id: new FormControl(''),
 
@@ -58,6 +60,7 @@ export class EmpresaAdminCreateRoutedComponent implements OnInit {
         Validators.minLength(3),
         Validators.maxLength(50),
       ]),
+      sector: new FormControl('', Validators.required),
       telefono: new FormControl('', [
         Validators.required,
         Validators.minLength(9),
@@ -69,15 +72,43 @@ export class EmpresaAdminCreateRoutedComponent implements OnInit {
         Validators.minLength(5),
         Validators.maxLength(100),
       ]),
-  });
+    });
+  }
+
+  ngOnInit() {
+    this.createForm();
+    this.oEmpresaForm.markAllAsTouched();
+  }
+
+  createForm() {
+    this.oEmpresaForm = new FormGroup({
+      id: new FormControl(''),
+
+      nombre: new FormControl('', [
+        Validators.required,
+        Validators.minLength(3),
+        Validators.maxLength(50),
+      ]),
+      sector: new FormControl('', Validators.required),
+      telefono: new FormControl('', [
+        Validators.required,
+        Validators.minLength(9),
+        Validators.maxLength(9),
+      ]),
+      email: new FormControl('', [
+        Validators.required,
+        Validators.email,
+        Validators.minLength(5),
+        Validators.maxLength(100),
+      ]),
+    });
   }
 
   updateForm() {
-    this.oEmpresaForm?.controls['nombre'].setValue('');
-    this.oEmpresaForm?.controls['apellido1'].setValue('');
-    this.oEmpresaForm?.controls['apellido2'].setValue('');
-    this.oEmpresaForm?.controls['email'].setValue('');
-    this.oEmpresaForm?.controls['id_tipoEmpresa'].setValue('');
+    this.oEmpresaForm.controls['nombre'].setValue('');
+    this.oEmpresaForm.controls['sector'].setValue('');
+    this.oEmpresaForm.controls['telefono'].setValue('');
+    this.oEmpresaForm.controls['email'].setValue('');
   }
 
   showModal(mensaje: string) {
@@ -99,21 +130,44 @@ export class EmpresaAdminCreateRoutedComponent implements OnInit {
   }
 
   onSubmit() {
-    if (this.oEmpresaForm?.invalid) {
-      this.showModal('Formulario inválido');
+    if (this.oEmpresaForm.invalid) {
+      this.showModal('Formulario inválido');
       return;
     } else {      
-      this.oEmpresaService.create(this.oEmpresaForm?.value).subscribe({
+      this.oEmpresaService.create(this.oEmpresaForm.value).subscribe({
         next: (oEmpresa: IEmpresa) => {
           this.oEmpresa = oEmpresa;
-          this.showModal('Empresa creado con el id: ' + this.oEmpresa.id);
+          this.showModal('Empresa creada con el id: ' + this.oEmpresa.id);
         },
         error: (err) => {
-          this.showModal('Error al crear el Empresa');
+          this.showModal('Error al crear la Empresa');
           console.log(err);
         },
       });
     }
+  }
+
+  showSectorSelectorModal() {
+    const dialogRef = this.dialog.open(SectorAdminSelectorUnroutedComponent, {
+      height: '800px',
+      maxHeight: '1200px',
+      width: '80%',
+      maxWidth: '90%',
+      data: { origen: '', idBalance: '' },
+
+
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      console.log('The dialog was closed');
+      if (result !== undefined) {
+        console.log(result);
+        this.oCuentaForm?.controls['tipocuenta'].setValue(result);
+        this.oTipocuenta = result;
+        //this.animal.set(result);
+      }
+    });
+    return false;
   }
 
 }

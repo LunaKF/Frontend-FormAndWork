@@ -1,1 +1,24 @@
-/* You can add global styles to this file, and also import other style files */
+
+@import "bootstrap-icons/font/bootstrap-icons.css";
+@import "primeng/resources/themes/lara-light-blue/theme.css";
+@import "primeng/resources/primeng.css";
+
+html, body { height: 100%; font-size: 0.9rem;}
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif;}
+
+.icon-10 { font-size: 10px; }
+.icon-15 { font-size: 15px; }
+.icon-20 { font-size: 20px; }
+.icon-50 { font-size: 50px; }
+
+.table tr th  { padding: 0.5rem 0.3rem; }
+.table tr td { padding: 0 0.5rem; align-content: center;}
+.table-totales tr th { padding: 0.8rem 2rem; border-width: 1px; border-color: #dee2e6; }
+.table-totales tr td { padding: 0.8rem 2rem; align-content: center; border-width: 1px;border-color: #dee2e6; font-size: large; }
+
+
+
+.navbar-nav .nav-link.active {
+    color: #fff !important;
+    background-color: #884599;
+}

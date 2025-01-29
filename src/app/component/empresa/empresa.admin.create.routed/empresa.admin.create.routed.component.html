@@ -6,79 +6,54 @@
         Creación de Empresa
         <i class="bi bi-person-circle"></i>
       </h2>
-      <form [formGroup]="oEmpresaForm!" (ngSubmit)="onSubmit()" novalidate>
+      <form [formGroup]="oEmpresaForm" (ngSubmit)="onSubmit()" novalidate>
         <div class="row mt-4">
           <mat-form-field>
-            <mat-label>Nombre</mat-label>
+            <mat-label>Nombre de la Empresa</mat-label>
             <input
               matInput
               formControlName="nombre"
-              placeholder="Pon aquí tu nombre"
+              placeholder="Nombre de la Empresa..."
             />
             <mat-hint align="start">De 3 caracteres a 50 caracteres</mat-hint>
-            @if (oEmpresaForm?.get('nombre')?.hasError('required')){
-            <mat-error> El campo nombre es obligatorio </mat-error>
-            } @if (oEmpresaForm?.get('nombre')?.hasError('minlength')){
-            <mat-error> El nombre debe ser mas largo </mat-error>
-            } @if (oEmpresaForm?.get('nombre')?.hasError('maxlength')){
-            <mat-error> El nombre debe ser mas corto </mat-error>
-            }
+            <mat-error *ngIf="oEmpresaForm?.get('nombre')?.hasError('required')">Este campo es obligatorio</mat-error>
+            <mat-error *ngIf="oEmpresaForm?.get('nombre')?.hasError('minlength')">El nombre debe ser más largo</mat-error>
+            <mat-error *ngIf="oEmpresaForm?.get('nombre')?.hasError('maxlength')">El nombre debe ser más corto</mat-error>
           </mat-form-field>
         </div>
-        <div class="row mt-4">
-          <mat-form-field>
-            <mat-label>Primer Apellido</mat-label>
-            <input
-              matInput
-              formControlName="apellido1"
-              placeholder="Escribe tu primer apellido"
-            />
-            <mat-hint align="start">De 3 caracteres a 50 caracteres</mat-hint>
-            @if (oEmpresaForm?.get('apellido1')?.hasError('required')) {
-            <mat-error>Debes introducir un primer apellido</mat-error>
-            } @if (oEmpresaForm?.get('apellido1')?.hasError('minlength')) {
-            <mat-error>Debes introducir un apellido mas largo</mat-error>
-            } @if (oEmpresaForm?.get('nombre')?.hasError('maxlength')) {
-            <mat-error>Debes introducir un apellido mas corto</mat-error>
-            }
-          </mat-form-field>
+        
+        /* Sector */
+        <div formGroupName="sector">
+          <div class="row mt-4">
+            <mat-form-field>
+              <mat-label>SECTORES</mat-label>
+              <div class="d-flex justify-content-end">
+                <button class="btn btn-primary" (click)="showSectorSelectorModal()">
+                  <i class="bi bi-search"></i>
+                  Buscar
+                </button>
+              </div>
+              <div class="d-flex justify-content-start">
+              </div>
+
+              <input matInput formControlName="id" placeholder="Tipo Cuenta" />
+            </mat-form-field>
+          </div>
         </div>
-        <div class="row mt-4">
-          <mat-form-field>
-            <mat-label>Segundo Apellido</mat-label>
-            <input
-              matInput
-              formControlName="apellido2"
-              placeholder="Escribe tu segundo apellido"
-            />
-          </mat-form-field>
-        </div>
+        <br />
         <div class="row mt-4">
           <mat-form-field>
             <mat-label>Email</mat-label>
             <input
               matInput
               formControlName="email"
-              placeholder="Pon aquí tu email"
+              placeholder="Email de la empresa"
               required
             />
             <mat-hint align="start">Formato email</mat-hint>
-            @if (oEmpresaForm?.get('email')?.hasError('required')) {
-            <mat-error>Debes introducir un email</mat-error>
-            } @if (oEmpresaForm?.get('email')?.hasError('email')) {
-            <mat-error>Debes introducir un email correcto</mat-error>
-            }
+            <mat-error *ngIf="oEmpresaForm?.get('email')?.hasError('required')">Debes introducir un email</mat-error>
+            <mat-error *ngIf="oEmpresaForm?.get('email')?.hasError('email')">Debes introducir un email correcto</mat-error>
           </mat-form-field>
-          <div class="row mt-4">
-            <mat-form-field>
-              <mat-label>TipoEmpresa</mat-label>
-              <input
-                matInput
-                formControlName="id_tipoEmpresa"
-                placeholder="Escribe el tipo de Empresa"
-              />
-            </mat-form-field>
-          </div>
         </div>
         <br />
         <button

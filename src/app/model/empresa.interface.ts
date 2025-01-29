@@ -1,6 +1,6 @@
 export interface IEmpresa {
     id: number;
     nombre: string;
-    telefono: string;
+    sector: string;
     email: string;
 }

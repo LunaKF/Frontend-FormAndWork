@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -12,6 +12,8 @@ import {
 import { IEmpresa } from '../../../model/empresa.interface';
 import { EmpresaService } from '../../../service/empresa.service';
 import { SectorAdminSelectorUnroutedComponent } from '../../sector/sector.admin.selector.unrouted/sector.admin.selector.unrouted.component';
+import { MatDialog } from '@angular/material/dialog';
+import { ISector } from '../../../model/sector.interface';
 
 declare let bootstrap: any;
 
@@ -31,13 +33,15 @@ declare let bootstrap: any;
 export class EmpresaAdminCreateRoutedComponent implements OnInit {
 
   id: number = 0;
-  oEmpresaForm: FormGroup;
+  oEmpresaForm: FormGroup | undefined = undefined;
   oEmpresa: IEmpresa | null = null;
   strMessage: string = '';
-
+  readonly dialog = inject(MatDialog);
+  oSector: ISector={}as ISector;
   myModal: any;
 
   form: FormGroup = new FormGroup({});
+
   arrSectores: string[] = [
     "Administración y gestión", "Agraria", "Artes gráficas", "Artes y artesanías", 
     "Comercio y marketing", "Electricidad y electrónica", "Energía y agua", 
@@ -77,7 +81,7 @@ export class EmpresaAdminCreateRoutedComponent implements OnInit {
 
   ngOnInit() {
     this.createForm();
-    this.oEmpresaForm.markAllAsTouched();
+    this.oEmpresaForm?.markAllAsTouched();
   }
 
   createForm() {
@@ -105,10 +109,10 @@ export class EmpresaAdminCreateRoutedComponent implements OnInit {
   }
 
   updateForm() {
-    this.oEmpresaForm.controls['nombre'].setValue('');
-    this.oEmpresaForm.controls['sector'].setValue('');
-    this.oEmpresaForm.controls['telefono'].setValue('');
-    this.oEmpresaForm.controls['email'].setValue('');
+    this.oEmpresaForm?.controls['nombre'].setValue('');
+    this.oEmpresaForm?.controls['sector'].setValue('');
+    this.oEmpresaForm?.controls['telefono'].setValue('');
+    this.oEmpresaForm?.controls['email'].setValue('');
   }
 
   showModal(mensaje: string) {
@@ -130,11 +134,11 @@ export class EmpresaAdminCreateRoutedComponent implements OnInit {
   }
 
   onSubmit() {
-    if (this.oEmpresaForm.invalid) {
+    if (this.oEmpresaForm?.invalid) {
       this.showModal('Formulario inválido');
       return;
     } else {      
-      this.oEmpresaService.create(this.oEmpresaForm.value).subscribe({
+      this.oEmpresaService.create(this.oEmpresaForm?.value).subscribe({
         next: (oEmpresa: IEmpresa) => {
           this.oEmpresa = oEmpresa;
           this.showModal('Empresa creada con el id: ' + this.oEmpresa.id);
@@ -162,12 +166,15 @@ export class EmpresaAdminCreateRoutedComponent implements OnInit {
       console.log('The dialog was closed');
       if (result !== undefined) {
         console.log(result);
-        this.oCuentaForm?.controls['tipocuenta'].setValue(result);
-        this.oTipocuenta = result;
-        //this.animal.set(result);
+        this.oEmpresaForm?.controls['tipousuario'].setValue({
+          id: result.id,
+          descripcion: result.descripcion,
+        });
       }
     });
     return false;
   }
+
+
 
 }

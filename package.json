@@ -25,6 +25,7 @@
     "primeng": "^17.18.11",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
+    "userges": "file:",
     "zone.js": "~0.14.10"
   },
   "devDependencies": {

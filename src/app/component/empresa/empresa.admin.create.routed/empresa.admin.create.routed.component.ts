@@ -5,7 +5,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import {
   FormControl,
-  FormGroup,  
+  FormGroup,
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
@@ -14,6 +14,9 @@ import { EmpresaService } from '../../../service/empresa.service';
 import { SectorAdminSelectorUnroutedComponent } from '../../sector/sector.admin.selector.unrouted/sector.admin.selector.unrouted.component';
 import { MatDialog } from '@angular/material/dialog';
 import { ISector } from '../../../model/sector.interface';
+import { CommonModule } from '@angular/common';
+import { SectorService } from '../../../service/sector.service';
+import { interval } from 'rxjs';
 
 declare let bootstrap: any;
 
@@ -27,6 +30,7 @@ declare let bootstrap: any;
     MatSelectModule,
     ReactiveFormsModule,
     RouterModule,
+    CommonModule
   ],
   styleUrls: ['./empresa.admin.create.routed.component.css'],
 })
@@ -37,23 +41,24 @@ export class EmpresaAdminCreateRoutedComponent implements OnInit {
   oEmpresa: IEmpresa | null = null;
   strMessage: string = '';
   readonly dialog = inject(MatDialog);
-  oSector: ISector={}as ISector;
+  oSector: ISector = {} as ISector;
   myModal: any;
 
   form: FormGroup = new FormGroup({});
 
   arrSectores: string[] = [
-    "Administración y gestión", "Agraria", "Artes gráficas", "Artes y artesanías", 
-    "Comercio y marketing", "Electricidad y electrónica", "Energía y agua", 
-    "Fabricación mecánica", "Hostelería y turismo", "Imagen personal", 
-    "Imagen y sonido", "Informática y comunicaciones", "Instalación y mantenimiento", 
-    "Madera, mueble y corcho", "Marítimo-pesquera", "Química", "Sanidad", 
-    "Seguridad y medio ambiente", "Servicios socioculturales y a la comunidad", 
+    "Administración y gestión", "Agraria", "Artes gráficas", "Artes y artesanías",
+    "Comercio y marketing", "Electricidad y electrónica", "Energía y agua",
+    "Fabricación mecánica", "Hostelería y turismo", "Imagen personal",
+    "Imagen y sonido", "Informática y comunicaciones", "Instalación y mantenimiento",
+    "Madera, mueble y corcho", "Marítimo-pesquera", "Química", "Sanidad",
+    "Seguridad y medio ambiente", "Servicios socioculturales y a la comunidad",
     "Textil, confección y piel", "Transporte y mantenimiento de vehículos", "Vidrio y cerámica"
   ];
 
   constructor(
     private oEmpresaService: EmpresaService,
+    private oSectorService: SectorService,
     private oRouter: Router
   ) {
     this.oEmpresaForm = new FormGroup({
@@ -82,6 +87,25 @@ export class EmpresaAdminCreateRoutedComponent implements OnInit {
   ngOnInit() {
     this.createForm();
     this.oEmpresaForm?.markAllAsTouched();
+
+    this.oEmpresaForm?.controls['sector'].valueChanges.subscribe(value => {
+      if (value) {
+        if (value.id) {
+          this.oSectorService.get(value.id).subscribe({
+            next: (oSector: ISector) => {
+              this.oSector = oSector;
+            },
+            error: (error) => {
+              console.error(error);
+              this.oSector = {} as ISector;
+              this.oEmpresaForm?.controls['sector'].setErrors({ invalid: true });
+            }
+          });
+      } else {
+        this.oSector = {} as ISector;
+      }
+    }
+  });
   }
 
   createForm() {
@@ -93,24 +117,28 @@ export class EmpresaAdminCreateRoutedComponent implements OnInit {
         Validators.minLength(3),
         Validators.maxLength(50),
       ]),
-      sector: new FormControl('', Validators.required),
-      telefono: new FormControl('', [
-        Validators.required,
-        Validators.minLength(9),
-        Validators.maxLength(9),
-      ]),
+      
       email: new FormControl('', [
         Validators.required,
         Validators.email,
         Validators.minLength(5),
         Validators.maxLength(100),
       ]),
+
+      sector: new FormControl({
+        id: new FormControl('', Validators.required),
+        nombre: new FormControl('', Validators.required),
+      }),
+    
     });
   }
 
   updateForm() {
     this.oEmpresaForm?.controls['nombre'].setValue('');
-    this.oEmpresaForm?.controls['sector'].setValue('');
+    this.oEmpresaForm?.controls['sector'].setValue({
+      id: null,
+      nombre: null,
+    });
     this.oEmpresaForm?.controls['telefono'].setValue('');
     this.oEmpresaForm?.controls['email'].setValue('');
   }
@@ -137,7 +165,8 @@ export class EmpresaAdminCreateRoutedComponent implements OnInit {
     if (this.oEmpresaForm?.invalid) {
       this.showModal('Formulario inválido');
       return;
-    } else {      
+    } else {
+      console.log(this.oEmpresaForm?.value);
       this.oEmpresaService.create(this.oEmpresaForm?.value).subscribe({
         next: (oEmpresa: IEmpresa) => {
           this.oEmpresa = oEmpresa;
@@ -157,7 +186,7 @@ export class EmpresaAdminCreateRoutedComponent implements OnInit {
       maxHeight: '1200px',
       width: '80%',
       maxWidth: '90%',
-      data: { origen: '', idBalance: '' },
+      data: { origen: '', sector: '' },
 
 
     });
@@ -166,10 +195,9 @@ export class EmpresaAdminCreateRoutedComponent implements OnInit {
       console.log('The dialog was closed');
       if (result !== undefined) {
         console.log(result);
-        this.oEmpresaForm?.controls['tipousuario'].setValue({
-          id: result.id,
-          descripcion: result.descripcion,
-        });
+        this.oSector = result;
+        this.oEmpresaForm?.controls['sector'].setValue(this.oSector);
+        console.log(this.oEmpresaForm?.value);
       }
     });
     return false;

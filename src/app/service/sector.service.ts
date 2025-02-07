@@ -11,7 +11,7 @@ import { httpOptions, serverURL } from '../enviroment/enviroment';
 })
 export class SectorService {
 
-serverURL: string = serverURL + '/tipousuario';
+serverURL: string = serverURL + '/sector';
 
   constructor(private oHttp: HttpClient) {}
 

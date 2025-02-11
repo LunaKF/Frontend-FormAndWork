@@ -12,11 +12,10 @@ import { ISector } from '../../../model/sector.interface';
 import { SectorService } from '../../../service/sector.service';
 
 @Component({
-  selector: 'app-sector.admin.selector.unrouted',
-  templateUrl: './sector.admin.selector.unrouted.component.html',
-  styleUrls: ['./sector.admin.selector.unrouted.component.css'],
-  standalone: true,
-  imports: [CommonModule, FormsModule, TrimPipe, RouterModule],
+    selector: 'app-sector.admin.selector.unrouted',
+    templateUrl: './sector.admin.selector.unrouted.component.html',
+    styleUrls: ['./sector.admin.selector.unrouted.component.css'],
+    imports: [CommonModule, FormsModule, TrimPipe, RouterModule]
 })
 export class SectorAdminSelectorUnroutedComponent implements OnInit {
   oPage: IPage<ISector> | null = null;

@@ -11,11 +11,10 @@ import { TrimPipe } from '../../../pipe/trim.pipe';
 
 
 @Component({
-  selector: 'app-empresa.admin.plist.routed',
-  templateUrl: './empresa.admin.plist.routed.component.html',
-  styleUrls: ['./empresa.admin.plist.routed.component.css'] ,
-  standalone: true,
-  imports: [CommonModule, FormsModule, TrimPipe, RouterModule],
+    selector: 'app-empresa.admin.plist.routed',
+    templateUrl: './empresa.admin.plist.routed.component.html',
+    styleUrls: ['./empresa.admin.plist.routed.component.css'],
+    imports: [CommonModule, FormsModule, TrimPipe, RouterModule]
 })
 
 export class EmpresaAdminPlistRoutedComponent implements OnInit {

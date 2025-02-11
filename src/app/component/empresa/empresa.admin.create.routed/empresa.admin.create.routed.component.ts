@@ -21,18 +21,17 @@ import { interval } from 'rxjs';
 declare let bootstrap: any;
 
 @Component({
-  standalone: true,
-  selector: 'app-empresa.admin.create.routed',
-  templateUrl: './empresa.admin.create.routed.component.html',
-  imports: [
-    MatFormFieldModule,
-    MatInputModule,
-    MatSelectModule,
-    ReactiveFormsModule,
-    RouterModule,
-    CommonModule
-  ],
-  styleUrls: ['./empresa.admin.create.routed.component.css'],
+    selector: 'app-empresa.admin.create.routed',
+    templateUrl: './empresa.admin.create.routed.component.html',
+    imports: [
+        MatFormFieldModule,
+        MatInputModule,
+        MatSelectModule,
+        ReactiveFormsModule,
+        RouterModule,
+        CommonModule
+    ],
+    styleUrls: ['./empresa.admin.create.routed.component.css']
 })
 export class EmpresaAdminCreateRoutedComponent implements OnInit {
 

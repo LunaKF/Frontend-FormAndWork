@@ -5,6 +5,7 @@ import { SharedHomeRoutedComponent } from "./component/shared/shared.home.routed
 import { EmpresaAdminPlistRoutedComponent } from './component/empresa/empresa.admin.plist.routed/empresa.admin.plist.routed.component';
 import { EmpresaAdminDeleteRoutedComponent } from './component/empresa/empresa.admin.delete.routed/empresa.admin.delete.routed.component';
 import { EmpresaAdminViewRoutedComponent } from './component/empresa/empresa.admin.view.routed/empresa.admin.view.routed.component';
+import { SectorAdminPlistRoutedComponent } from './component/sector/sector.admin.plist.routed/sector.admin.plist.routed.component';
 
 
 export const routes: Routes = [
@@ -16,6 +17,8 @@ export const routes: Routes = [
     {path: 'admin/empresa/view/:id', component: EmpresaAdminViewRoutedComponent, pathMatch: 'full', },
     {path: 'admin/empresa/delete/:id', component: EmpresaAdminDeleteRoutedComponent, pathMatch: 'full', },
     {path: 'admin/empresa/plist', component: EmpresaAdminPlistRoutedComponent, pathMatch: 'full', },
+
+    {path: 'admin/sector/plist', component: SectorAdminPlistRoutedComponent, pathMatch: 'full', },
     
 
 ];

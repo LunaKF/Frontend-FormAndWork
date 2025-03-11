@@ -143,11 +143,21 @@ export class EmpresaAdminCreateRoutedComponent implements OnInit {
   }
 
   showModal(mensaje: string) {
-    this.strMessage = mensaje;
-    this.myModal = new bootstrap.Modal(document.getElementById('mimodal'), {
-      keyboard: false,
+    this.strMessage = mensaje;  // Verifica si el modal existe en el DOM antes de inicializarlo
+    const modalElement = document.getElementById('mimodal');
+    if (!modalElement) {
+      console.error('Error: No se encontró el modal en el DOM');
+      return;
+    }
+  
+    // Inicializa el modal con backdrop definido explícitamente
+    this.myModal = new bootstrap.Modal(modalElement, {
+      backdrop: 'static', // Evita que se cierre al hacer clic fuera
+      keyboard: false
     });
+  
     this.myModal.show();
+
   }
 
   onReset() {
@@ -186,7 +196,6 @@ export class EmpresaAdminCreateRoutedComponent implements OnInit {
       width: '80%',
       maxWidth: '90%',
       data: { origen: '', sector: '' },
-
 
     });
 

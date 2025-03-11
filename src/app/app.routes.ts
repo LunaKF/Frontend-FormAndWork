@@ -18,6 +18,7 @@ export const routes: Routes = [
     {path: 'admin/empresa/delete/:id', component: EmpresaAdminDeleteRoutedComponent, pathMatch: 'full', },
     {path: 'admin/empresa/plist', component: EmpresaAdminPlistRoutedComponent, pathMatch: 'full', },
 
+    //sectores    
     {path: 'admin/sector/plist', component: SectorAdminPlistRoutedComponent, pathMatch: 'full', },
     
 

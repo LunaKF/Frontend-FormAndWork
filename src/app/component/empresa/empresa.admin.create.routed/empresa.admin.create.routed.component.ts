@@ -23,6 +23,7 @@ declare let bootstrap: any;
 @Component({
     selector: 'app-empresa.admin.create.routed',
     templateUrl: './empresa.admin.create.routed.component.html',
+    standalone: true,
     imports: [
         MatFormFieldModule,
         MatInputModule,

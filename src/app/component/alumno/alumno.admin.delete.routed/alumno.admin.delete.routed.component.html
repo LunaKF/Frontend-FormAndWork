@@ -1,0 +1,91 @@
+<div class="row justify-content-center m-3">
+  <div class="col-lg-7 col-md-10 col-sm-12">
+    <h1 class="my-5 text-center">
+      <i class="bi bi-trash"></i>
+      Borrar alumno
+      <i class="bi bi-person-circle"></i>
+    </h1>
+    <br />
+    <table class="table table-striped table-bordered my-5 text-center">
+      <tbody>
+        <tr class="text-center">
+          <th scope="row" class="bg-danger text-white text-end pe-5">Id</th>
+          <td class="text-start ps-5">{{ oAlumno!.id }}</td>
+        </tr>
+        <tr class="text-center">
+          <th scope="row" class="bg-primary text-white text-end pe-5">
+            Nombre
+          </th>
+          <td class="text-start ps-5">{{ oAlumno!.nombre }}</td>
+        </tr>
+        <tr class="text-center">
+          <th scope="row" class="bg-primary text-white text-end pe-5">
+            Correo
+          </th>
+          <td class="text-start ps-5">{{ oAlumno!.email }}</td>
+        </tr>
+
+        <tr class="text-center">
+          <th scope="row" class="bg-primary text-white text-end pe-5">
+            Sector
+          </th>
+          <td class="text-start ps-5">{{ oAlumno!.sector?.nombre }}</td>
+        </tr>
+
+      </tbody>
+    </table>
+  </div>
+
+  <div class="d-flex justify-content-center mt-4">
+    <p class="fs-3">¿Seguro que desea borrar la alumno con nombre "{{ oAlumno!.nombre }}"?</p>
+  </div>
+
+  <div class="d-flex justify-content-center mt-4">
+    <button
+      class="btn btn-warning mt-4 mx-1"
+      [routerLink]="['/admin', 'alumno', 'plist']"
+    >
+      <i class="bi bi-list"></i>
+      Ir a listado de Alumnos
+    </button>
+    <button class="btn btn-danger mt-4 mx-1" (click)="delete()">
+      <i class="bi bi-trash"></i>
+      Borrar alumno
+    </button>
+  </div>
+</div>
+
+<div
+  class="modal fade"
+  [id]="'mimodal'"
+  tabindex="-1"
+  aria-labelledby="exampleModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+          (click)="hideModal()"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <p>{{ strMessage }}</p>
+      </div>
+      <div class="modal-footer">
+        <button
+          type="button"
+          class="btn btn-primary"
+          data-bs-dismiss="modal"
+          (click)="hideModal()"
+        >
+          Cerrar
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

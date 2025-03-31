@@ -65,7 +65,7 @@ export class EmpresaAdminPlistRoutedComponent implements OnInit {
 
   edit(oEmpresa: IEmpresa) {
     //navegar a la página de edición
-    this.oRouter.navigate(['admin/Empresa/edit', oEmpresa.id]);
+    this.oRouter.navigate(['admin/empresa/edit', oEmpresa.id]);
   }
 
   view(oEmpresa: IEmpresa) {

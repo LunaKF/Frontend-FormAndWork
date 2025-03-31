@@ -51,16 +51,16 @@ export class EmpresaService {
     return this.oHttp.get<IEmpresa>(URL);
   }
 
-  create(oempresa: IEmpresa): Observable<IEmpresa> {
+  create(oEmpresa: IEmpresa): Observable<IEmpresa> {
     let URL: string = '';
     URL += this.serverURL;
-    return this.oHttp.put<IEmpresa>(URL, oempresa);
+    return this.oHttp.put<IEmpresa>(URL, oEmpresa);
   }
 
-  update(oempresa: IEmpresa): Observable<IEmpresa> {
+  update(oEmpresa: IEmpresa): Observable<IEmpresa> {
     let URL: string = '';
     URL += this.serverURL;
-    return this.oHttp.put<IEmpresa>(URL, oempresa);
+    return this.oHttp.put<IEmpresa>(URL, oEmpresa);
   }
 
   getOne(id: number): Observable<IEmpresa> {

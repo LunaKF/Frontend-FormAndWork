@@ -1,3 +1,120 @@
-<p>
-  alumno.admin.edit.routed works!
-</p>
+<div class="container mt-5 d-flex align-items-center justify-content-center">
+  <div class="row">
+    <div class="col text-center">
+      <h2 class="my-5">
+        <i class="bi bi-pencil"></i>
+        Edición del alumno {{ oAlumno?.nombre }} {{ oAlumno?.ape1 }} {{ oAlumno?.ape2 }}
+        <i class="bi bi-person-circle"></i>
+      </h2>
+
+      <form [formGroup]="oAlumnoForm!" (ngSubmit)="onSubmit()" novalidate>
+        <div class="row mt-4">
+          <mat-form-field>
+            <mat-label>Id </mat-label>
+            <input matInput formControlName="id" placeholder="Id" readonly />
+            <mat-hint align="end">No se puede cambiar</mat-hint>
+          </mat-form-field>
+        </div>
+
+        <div class="row mt-4">
+          <mat-form-field>
+            <mat-label>Nombre de la Alumno</mat-label>
+            <input matInput formControlName="nombre" placeholder="Nombre de la Alumno..." />
+            <mat-hint align="start">De 3 caracteres a 50 caracteres</mat-hint>
+            <mat-error *ngIf="oAlumnoForm?.get('nombre')?.hasError('required')">Este campo es obligatorio</mat-error>
+            <mat-error *ngIf="oAlumnoForm?.get('nombre')?.hasError('minlength')">El nombre debe ser más
+              largo</mat-error>
+            <mat-error *ngIf="oAlumnoForm?.get('nombre')?.hasError('maxlength')">El nombre debe ser más
+              corto</mat-error>
+          </mat-form-field>
+        </div>
+
+        <div class="row mt-4">
+          <mat-form-field>
+            <mat-label>Apellido 1</mat-label>
+            <input matInput formControlName="ape1" placeholder="Apellido 1 del Alumno..." />
+            <mat-hint align="start">De 3 caracteres a 50 caracteres</mat-hint>
+            <mat-error *ngIf="oAlumnoForm?.get('ape1')?.hasError('required')">Este campo es obligatorio</mat-error>
+            <mat-error *ngIf="oAlumnoForm?.get('ape1')?.hasError('minlength')">El apellido debe ser más
+              largo</mat-error>
+            <mat-error *ngIf="oAlumnoForm?.get('ape1')?.hasError('maxlength')">El apellido debe ser más
+              corto</mat-error>
+          </mat-form-field>
+        </div>
+
+        <div class="row mt-4">
+          <mat-form-field>
+            <mat-label>Apellido 2</mat-label>
+            <input matInput formControlName="ape2" placeholder="Apellido 2 del Alumno..." />
+            <mat-hint align="start">De 3 caracteres a 50 caracteres</mat-hint>
+            <mat-error *ngIf="oAlumnoForm?.get('ape2')?.hasError('required')">Este campo es obligatorio</mat-error> 
+            <mat-error *ngIf="oAlumnoForm?.get('ape2')?.hasError('minlength')">El apellido debe ser más
+              largo</mat-error>
+            <mat-error *ngIf="oAlumnoForm?.get('ape2')?.hasError('maxlength')">El apellido debe ser más
+              corto</mat-error>
+          </mat-form-field>
+        </div>
+
+        <div formGroupName="sector">
+          <div class="row mt-4">
+            <mat-form-field>
+              <mat-label>SECTORES</mat-label>
+              <div class="d-flex justify-content-end">
+                <button class="btn btn-primary" (click)="showSectorSelectorModal()">
+                  <i class="bi bi-search"></i>
+                  Buscar
+                </button>
+              </div>
+              <div class="d-flex justify-content-start">
+              </div>
+              {{ oSector?.id }} {{ oSector?.nombre }}
+              <input matInput formControlName="id" placeholder="Sector" />
+            </mat-form-field>
+          </div>
+        </div>
+        <div class="row mt-4">
+          <mat-form-field>
+            <mat-label>Email</mat-label>
+            <input matInput formControlName="email" placeholder="Email de la alumno" required />
+            <mat-hint align="start">Formato email</mat-hint>
+            <mat-error *ngIf="oAlumnoForm?.get('email')?.hasError('required')">Debes introducir un email</mat-error>
+            <mat-error *ngIf="oAlumnoForm?.get('email')?.hasError('email')">Debes introducir un email
+              correcto</mat-error>
+          </mat-form-field>
+        </div>
+        <br />
+
+        <button class="btn btn-warning mt-4 mx-1" [routerLink]="['/admin', 'alumno', 'plist']">
+          <i class="bi bi-list"></i>
+          Ir a listado de Alumnos
+        </button>
+
+        <button class="btn btn-secondary mt-4 mx-1" (click)="onReset()">
+          <i class="bi bi-x-lg"></i>
+          Reset
+        </button>
+
+        <button class="btn btn-primary mt-4 mx-1" type="submit" [disabled]="!oAlumnoForm?.valid">
+          <i class="bi bi-floppy"></i>
+          Guardar
+        </button>
+
+        <div class="modal fade" [id]="'mimodal'" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">FormAndWork</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
+                  (click)="hideModal()"></button>
+              </div>
+              <div class="modal-body">
+                <p>{{ strMessage }}</p>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal" (click)="hideModal()">
+                  Cerrar
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>

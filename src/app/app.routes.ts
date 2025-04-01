@@ -14,6 +14,10 @@ import { SectorAdminPlistRoutedComponent } from './component/sector/sector.admin
 import { AlumnoAdminPlistComponent } from './component/alumno/alumno.admin.plist.routed/alumno.admin.plist.routed.component';
 import { AlumnoAdminCreateComponent } from './component/alumno/alumno.admin.create.routed/alumno.admin.create.routed.component';
 import { AlumnoAdminDeleteRoutedComponent } from './component/alumno/alumno.admin.delete.routed/alumno.admin.delete.routed.component';
+import { AlumnoAdminEditRoutedComponent } from './component/alumno/alumno.admin.edit.routed/alumno.admin.edit.routed.component';
+import { AlumnoAdminViewRoutedComponent } from './component/alumno/alumno.admin.view.routed/alumno.admin.view.routed.component';
+import { CandidaturaAdminPlistRoutedComponent } from './component/candidatura/candidatura.admin.plist.routed/candidatura.admin.plist.routed.component';
+import { OfertaAdminPlistRoutedComponent } from './component/oferta/oferta.admin.plist.routed/oferta.admin.plist.routed.component';
 
 export const routes: Routes = [
     { path: '', component: SharedHomeRoutedComponent },
@@ -23,7 +27,7 @@ export const routes: Routes = [
     {path: 'admin/sector/plist', component: SectorAdminPlistRoutedComponent, pathMatch: 'full', },
 
     {path: 'admin/empresa/plist', component: EmpresaAdminPlistRoutedComponent, pathMatch: 'full', },
-    { path: 'admin/empresa/create', component: EmpresaAdminCreateRoutedComponent, pathMatch: 'full', },
+    {path: 'admin/empresa/create', component: EmpresaAdminCreateRoutedComponent, pathMatch: 'full', },
     {path: 'admin/empresa/edit/:id', component: EmpresaAdminEditRoutedComponent, pathMatch: 'full', },
     {path: 'admin/empresa/view/:id', component: EmpresaAdminViewRoutedComponent, pathMatch: 'full', },
     {path: 'admin/empresa/delete/:id', component: EmpresaAdminDeleteRoutedComponent, pathMatch: 'full', },
@@ -31,8 +35,14 @@ export const routes: Routes = [
     
     {path: 'admin/alumno/plist', component: AlumnoAdminPlistComponent, pathMatch: 'full', },
     {path: 'admin/alumno/create', component: AlumnoAdminCreateComponent, pathMatch: 'full', },
-    {path: 'admin/alumno/edit/:id', component: AlumnoAdminCreateComponent, pathMatch: 'full', },
-    {path: 'admin/alumno/view/:id', component: AlumnoAdminCreateComponent, pathMatch: 'full', },
+    {path: 'admin/alumno/edit/:id', component: AlumnoAdminEditRoutedComponent, pathMatch: 'full', },
+    {path: 'admin/alumno/view/:id', component: AlumnoAdminViewRoutedComponent, pathMatch: 'full', },
     {path: 'admin/alumno/delete/:id', component: AlumnoAdminDeleteRoutedComponent, pathMatch: 'full', },
 
+
+    {path: 'admin/oferta/plist', component: OfertaAdminPlistRoutedComponent, pathMatch: 'full', },
+
+
+    {path: 'admin/candidatura/plist', component: CandidaturaAdminPlistRoutedComponent, pathMatch: 'full', },
+    
 ];

@@ -32,7 +32,7 @@ export class AlumnoAdminDeleteRoutedComponent implements OnInit {
          this.oAlumno = oAlumno;
        },
        error: (err) => {
-         this.showModal('Error al cargar los datos de la alumno');
+         this.showModal('Error al cargar los datos del alumno');
        },
      });
    }
@@ -53,7 +53,7 @@ export class AlumnoAdminDeleteRoutedComponent implements OnInit {
          );
        },
        error: (error) => {
-         this.showModal('Error al borrar la alumno');
+         this.showModal('Error al borrar al alumno');
        },
      });
    }

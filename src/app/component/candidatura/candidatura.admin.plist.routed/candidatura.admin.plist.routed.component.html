@@ -121,8 +121,8 @@
             <tr>
               <td class="text-center">{{ candidatura.id }}</td>
               <td class="text-start">{{ candidatura.fecha }}</td>
-              <td class="text-start">{{ candidatura.oferta }}</td>
-              <td class="text-start">{{ candidatura.alumno }}</td>
+              <td class="text-start">{{ candidatura.oferta.titulo}}</td>
+              <td class="text-start">{{ candidatura.alumno.nombre + " " +candidatura.alumno.ape1 + " " +candidatura.alumno.ape2 }}</td>
 
               <td>
                 <div class="btn-group" role="group" aria-label="Basic example">

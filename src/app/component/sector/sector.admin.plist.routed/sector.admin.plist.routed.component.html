@@ -43,7 +43,12 @@
                 } @else {
                 <i class="bi bi-caret-up-fill"></i>} }
               </th>
- 
+              <th class="bg-success text-white">
+                Empresas
+              </th>
+              <th class="bg-success text-white">
+                Alumnos
+              </th>
             </tr>
           </thead>
 
@@ -52,6 +57,12 @@
             <tr>
               <td class="text-center">{{ sector.id }}</td>
               <td class="text-center">{{ sector.nombre }}</td>
+              <td class="text-center">
+                <a href="admin/empresa/list/sector/{{ sector.id }}">{{sector.empresas }}</a>
+              </td>
+              <td class="text-center">
+                <a href="admin/alumno/xsector/plist/{{ sector.id }}">{{sector.alumnos}}</a>
+              </td>
             </tr>
 
             } @empty {
@@ -59,7 +70,7 @@
               <td colspan="11">No hay sectores</td>
             </tr>
             }
-            </tbody>
+          </tbody>
         </table>
 
       </div>

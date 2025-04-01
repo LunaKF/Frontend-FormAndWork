@@ -18,6 +18,7 @@ import { AlumnoAdminEditRoutedComponent } from './component/alumno/alumno.admin.
 import { AlumnoAdminViewRoutedComponent } from './component/alumno/alumno.admin.view.routed/alumno.admin.view.routed.component';
 import { CandidaturaAdminPlistRoutedComponent } from './component/candidatura/candidatura.admin.plist.routed/candidatura.admin.plist.routed.component';
 import { OfertaAdminPlistRoutedComponent } from './component/oferta/oferta.admin.plist.routed/oferta.admin.plist.routed.component';
+import { AlumnoXsectorAdminPlistComponent } from './component/alumno/alumno.xsector.admin.plist.routed copy/alumno.xsector.admin.plist.routed.component';
 
 export const routes: Routes = [
     { path: '', component: SharedHomeRoutedComponent },
@@ -34,6 +35,7 @@ export const routes: Routes = [
    
     
     {path: 'admin/alumno/plist', component: AlumnoAdminPlistComponent, pathMatch: 'full', },
+    {path: 'admin/alumno/xsector/plist/:id', component: AlumnoXsectorAdminPlistComponent, pathMatch: 'full', },
     {path: 'admin/alumno/create', component: AlumnoAdminCreateComponent, pathMatch: 'full', },
     {path: 'admin/alumno/edit/:id', component: AlumnoAdminEditRoutedComponent, pathMatch: 'full', },
     {path: 'admin/alumno/view/:id', component: AlumnoAdminViewRoutedComponent, pathMatch: 'full', },

@@ -16,7 +16,7 @@ export class AlumnoAdminViewRoutedComponent implements OnInit {
    //
    id: number = 0;
    route: string = '';
-   oAlumno: IAlumno = { id: 0, nombre: '', ape1: '', ape2: '', email: '', sector: { id: 0, nombre: '' } };
+   oAlumno: IAlumno = { id: 0, nombre: '', ape1: '', ape2: '', email: '', sector: { id: 0, nombre: '' , alumnos: 0, empresas: 0 } };
  
    //
    constructor(private oActivatedRoute: ActivatedRoute, private oAlumnoService: AlumnoService) { }

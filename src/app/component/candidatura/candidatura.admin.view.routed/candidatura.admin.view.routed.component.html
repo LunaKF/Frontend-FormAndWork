@@ -1,0 +1,52 @@
+<div class="row justify-content-center m-3">
+  <div class="col-lg-7 col-md-10 col-sm-12">
+    <h1 class="my-5 text-center">
+      Vista de la Candidatura con Id: {{ oCandidatura.id }}
+    </h1>
+    
+    <br />
+    <table *ngIf="oCandidatura" class="table table-striped table-bordered my-5 text-center">
+      <tbody>
+        <tr class="text-center">
+          <th scope="row" class="bg-danger text-white text-end pe-5">Id</th>
+          <td class="text-start ps-5">{{ oCandidatura.id }}</td>
+        </tr>
+        <tr class="text-center">
+          <th scope="row" class="bg-primary text-white text-end pe-5">
+            Alumno
+          </th>
+          <td class="text-start ps-5">{{ oCandidatura.alumno.id }}</td>
+        </tr>
+        <tr class="text-center">
+          <th scope="row" class="bg-primary text-white text-end pe-5">
+            Oferta
+          </th>
+          <td class="text-start ps-5">{{ oCandidatura.oferta.id }}</td>
+
+        </tr>
+        <tr class="text-center">
+          <th scope="row" class="bg-primary text-white text-end pe-5">
+            Fecha
+          </th>
+          <td class="text-start ps-5">{{ oCandidatura.fecha }}</td>
+        </tr>
+
+    </table>
+    
+  </div>
+
+  <div class="d-flex justify-content-center mt-4">
+    <a class="btn btn-warning mt-4 mx-1" href="admin/candidatura/plist">
+      <i class="bi bi-list"></i>
+      Ir a listado de Candidaturas
+    </a>
+    <a class="btn btn-primary mt-4 mx-1" href="admin/candidatura/edit/{{ oCandidatura.id }}">
+      <i class="bi bi-pencil"></i>
+      Editar
+    </a>
+    <a class="btn btn-danger mt-4 mx-1" href="admin/candidatura/delete/{{ oCandidatura.id }}">
+      <i class="bi bi-trash"></i>
+      Borrar
+    </a>
+  </div>
+</div>

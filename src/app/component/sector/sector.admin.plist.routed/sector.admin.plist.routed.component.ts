@@ -20,51 +20,37 @@ import { TrimPipe } from "../../../pipe/trim.pipe";
 })
 export class SectorAdminPlistRoutedComponent implements OnInit {
 
-  oPage: IPage<ISector> | null = null;
-  //
-  nPage: number = 0; // 0-based server count
-  nRpp: number = 10;
-  //
-  strField: string = '';
-  strDir: string = '';
-  //
-  strFiltro: string = '';
-  //
-  arrBotonera: string[] = [];
-  
-  //
-  private debounceSubject = new Subject<string>();
+  oSector: ISector[] = [];
 
 
   constructor(
     private oSectorService: SectorService,
-    private oBotoneraService: BotoneraService,
     private oRouter: Router
-  ) { 
-    this.debounceSubject.pipe(debounceTime(10)).subscribe((value) => {
-      this.getPage();
+  ) {}
+  ngOnInit() {
+    this.oSectorService.getAll().subscribe({
+      next: (data: ISector[]) => {
+        this.oSector = data;
+      },
+      error: (err) => {
+        console.log(err);
+      }
     });
   }
 
-  ngOnInit() {
-    this.getPage();
+  getAll() {
+    this.oSectorService.getAll().subscribe({
+      next: (data: ISector[]) => {
+        this.oSector = data;
+      },
+      error: (err) => {
+        console.error(err);
+      },
+    });
   }
 
-  getPage() {
-    this.oSectorService
-      .getPage(this.nPage, this.nRpp, this.strField, this.strDir, this.strFiltro)
-      .subscribe({
-        next: (oPageFromServer: IPage<ISector>) => {
-          this.oPage = oPageFromServer;
-          this.arrBotonera = this.oBotoneraService.getBotonera(
-            this.nPage,
-            oPageFromServer.totalPages
-          );
-        },
-        error: (err) => {
-          console.log(err);
-        },
-      });
+  trackById(index: number, item: ISector): number {
+    return item.id;
   }
 
   edit(oSector: ISector) {
@@ -78,42 +64,5 @@ export class SectorAdminPlistRoutedComponent implements OnInit {
 
   view(oSector: ISector) {
     this.oRouter.navigate(['sector', 'view', oSector.id]);
-  }
-
-  goToPage(p: number) {
-    if (p) {
-      this.nPage = p - 1;
-      this.getPage();
-    }
-    return false;
-  }
-
-  goToNext() {
-    this.nPage++;
-    this.getPage();
-    return false;
-  }
-
-  goToPrev() {
-    this.nPage--;
-    this.getPage();
-    return false;
-  }
-
-  sort(field: string) {
-    this.strField = field;
-    this.strDir = this.strDir === 'asc' ? 'desc' : 'asc';
-    this.getPage();
-  }
-
-  goToRpp(nrpp: number) {
-    this.nPage = 0;
-    this.nRpp = nrpp;
-    this.getPage();
-    return false;
-  }
-
-  filter(event: KeyboardEvent) {
-    this.debounceSubject.next(this.strFiltro);
   }
 }

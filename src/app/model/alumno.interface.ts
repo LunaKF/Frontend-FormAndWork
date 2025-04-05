@@ -1,6 +1,6 @@
 import { ISector } from "./sector.interface";
 
-export interface IAlumno {
+export interface  IAlumno {
     id: number;
     nombre: string;
     ape1: string;

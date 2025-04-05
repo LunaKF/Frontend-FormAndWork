@@ -6,42 +6,18 @@
         Lista de Sectores
         <i class="bi bi-person-circle"></i>
       </h2>
-      <a href="admin/sector/create"><button class="btn btn-primary my-2 mx-2">
-          <i class="bi bi-plus-square"></i>
-          Crear nuevo sector
-        </button></a>
-      <div class="d-inline-flex mx-2">
-        <nav class="my-4">
-          <ul class="pagination justify-content-center">
-            <li class="page-item" [class.active]="nRpp === 10">
-              <a class="page-link" (click)="goToRpp(10)" href="#">10</a>
-            </li>
-            <li class="page-item" [class.active]="nRpp === 50">
-              <a class="page-link" (click)="goToRpp(50)" href="#">50</a>
-            </li>
-            <li class="page-item" [class.active]="nRpp === 100">
-              <a class="page-link" (click)="goToRpp(100)" href="#">100</a>
-            </li>
-          </ul>
-        </nav>
-      </div>
+
 
       <div class="d-flex flex-column">
         <table class="table table-striped table-bordered my-2"
           style="table-layout: fixed; width: 100%; word-break: break-all">
           <thead>
             <tr>
-              <th (click)="sort('id')" class="bg-danger text-white">
-                ID @if (strField === 'id') { @if (strDir === 'desc') {
-                <i class="bi bi-caret-down-fill"></i>
-                } @else {
-                <i class="bi bi-caret-up-fill"></i>} }
+              <th class="bg-danger text-white">
+                ID
               </th>
-              <th (click)="sort('nombre')" class="bg-primary text-white">
-                Nombre empresa @if (strField === 'nombre') { @if (strDir === 'desc') {
-                <i class="bi bi-caret-down-fill"></i>
-                } @else {
-                <i class="bi bi-caret-up-fill"></i>} }
+              <th class="bg-danger text-white">
+                Nombre empresa
               </th>
               <th class="bg-success text-white">
                 Empresas
@@ -53,23 +29,16 @@
           </thead>
 
           <tbody>
-            @for (sector of oPage?.content; track sector.id) {
-            <tr>
+            <tr *ngFor="let sector of oSector; trackBy: trackById">
               <td class="text-center">{{ sector.id }}</td>
               <td class="text-center">{{ sector.nombre }}</td>
               <td class="text-center">
-                <a href="admin/empresa/list/sector/{{ sector.id }}">{{sector.empresas }}</a>
+                <a href="admin/empresa/list/sector/{{ sector.id }}">{{ sector.empresas }}</a>
               </td>
               <td class="text-center">
-                <a href="admin/alumno/xsector/plist/{{ sector.id }}">{{sector.alumnos}}</a>
+                <a href="admin/alumno/xsector/plist/{{ sector.id }}">{{ sector.alumnos }}</a>
               </td>
             </tr>
-
-            } @empty {
-            <tr>
-              <td colspan="11">No hay sectores</td>
-            </tr>
-            }
           </tbody>
         </table>
 

@@ -80,7 +80,9 @@ serverURL: string = serverURL + '/sector';
     return this.oHttp.get<number>(this.serverURL + "/subcuenta/" + id);
   }
 
-
+  getAll() {
+    return this.oHttp.get<ISector[]>(this.serverURL + '/all');
+  }
   getXBalance(id: number): Observable<ISector> {
     let URL: string = '';
     URL += this.serverURL;

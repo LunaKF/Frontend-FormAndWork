@@ -7,7 +7,6 @@ import { ISector } from '../../../model/sector.interface';
 import { IPage } from '../../../model/model.interface';
 import { BotoneraService } from '../../../service/botonera.service';
 import { SectorService } from '../../../service/sector.service';
-import { TrimPipe } from "../../../pipe/trim.pipe";
 
 
 
@@ -16,7 +15,7 @@ import { TrimPipe } from "../../../pipe/trim.pipe";
   templateUrl: './sector.admin.plist.routed.component.html',
   styleUrls: ['./sector.admin.plist.routed.component.css'],
   standalone: true,
-  imports: [TrimPipe, CommonModule, FormsModule, RouterModule],
+  imports: [ CommonModule, FormsModule, RouterModule],
 })
 export class SectorAdminPlistRoutedComponent implements OnInit {
 

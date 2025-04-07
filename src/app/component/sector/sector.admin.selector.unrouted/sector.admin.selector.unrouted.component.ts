@@ -12,116 +12,66 @@ import { ISector } from '../../../model/sector.interface';
 import { SectorService } from '../../../service/sector.service';
 
 @Component({
-    selector: 'app-sector.admin.selector.unrouted',
-    templateUrl: './sector.admin.selector.unrouted.component.html',
-    styleUrls: ['./sector.admin.selector.unrouted.component.css'],
-    imports: [CommonModule, FormsModule, TrimPipe, RouterModule]
+  selector: 'app-sector.admin.selector.unrouted',
+  templateUrl: './sector.admin.selector.unrouted.component.html',
+  styleUrls: ['./sector.admin.selector.unrouted.component.css'],
+  imports: [CommonModule, FormsModule, RouterModule]
 })
 export class SectorAdminSelectorUnroutedComponent implements OnInit {
-  oPage: IPage<ISector> | null = null;
-  //
-  nPage: number = 0; // 0-based server count
-  nRpp: number = 10;
-  //
-  strField: string = '';
-  strDir: string = 'desc';
-  //
-  strFiltro: string = '';
-  //
-  arrBotonera: string[] = [];
-  //
-  private debounceSubject = new Subject<string>();
-  //
-  oSector: ISector = {} as ISector;
-  //
+
+  oSector: ISector[] = [];
+  filteredSectors: ISector[] = []; // Array para los sectores filtrados
+  searchText: string = ''; // Campo para almacenar el texto de búsqueda
+
+
   readonly dialogRef = inject(MatDialogRef<SectorAdminSelectorUnroutedComponent>);
   readonly data = inject(MAT_DIALOG_DATA);
 
   constructor(
     private oSectorService: SectorService,
-    private oBotoneraService: BotoneraService,
     private oRouter: Router
-  ) {
-    this.debounceSubject.pipe(debounceTime(10)).subscribe((value) => {
-      this.getPage();
+  ) { }
+
+  ngOnInit() {
+    this.oSectorService.getAll().subscribe({
+      next: (data: ISector[]) => {
+        this.oSector = data;
+        this.filteredSectors = data; // Inicializamos con todos los sectores
+      },
+      error: (err) => {
+        console.error('Error al obtener sectores:', err.message || err);
+      }
     });
   }
-  ngOnInit() {
-    this.getPage();
+  getAll() {
+    this.oSectorService.getAll().subscribe({
+      next: (data: ISector[]) => {
+        this.oSector = data;
+      },
+      error: (err) => {
+        console.error(err);
+      },
+    });
+  }
+  // Método para filtrar sectores por nombre
+  filterSectors() {
+    if (this.searchText) {
+      this.filteredSectors = this.oSector.filter(sector =>
+        sector.nombre.toLowerCase().includes(this.searchText.toLowerCase())
+      );
+    } else {
+      this.filteredSectors = this.oSector; // Si no hay texto, mostramos todos los sectores
+    }
+  }
+  trackByNombre(index: number, sector: ISector): string {
+    return sector.nombre; // Usamos el nombre para el trackBy
   }
 
-  getPage() {
-      this.oSectorService
-        .getPage(
-          this.nPage,
-          this.nRpp,
-          this.strField,
-          this.strDir,
-          this.strFiltro
-        )
-        .subscribe({
-          next: (oPageFromServer: IPage<ISector>) => {
-            this.oPage = oPageFromServer;
-            this.arrBotonera = this.oBotoneraService.getBotonera(
-              this.nPage,
-              oPageFromServer.totalPages
-            );
-          },
-          error: (err) => {
-            console.log(err);
-          },
-        });
-    }
-  
 
-
+  // Método para seleccionar un sector
   select(oSector: ISector) {
-    // seleccionar el objeto oSector
-
     oSector = { ...oSector };
-
-    this.dialogRef.close(oSector);
-
-  }
-
-
-
-  goToPage(p: number) {
-    if (p) {
-      this.nPage = p - 1;
-      this.getPage();
-    }
-    return false;
-  }
-
-  goToNext() {
-    this.nPage++;
-    this.getPage();
-    return false;
-  }
-
-  goToPrev() {
-    this.nPage--;
-    this.getPage();
-    return false;
-  }
-
-  sort(field: string) {
-    this.strField = field;
-    this.strDir = this.strDir === 'asc' ? 'desc' : 'asc';
-    this.getPage();
-  }
-
-  goToRpp(nrpp: number) {
-    this.nPage = 0;
-    this.nRpp = nrpp;
-    this.getPage();
-    return false;
-  }
-
-  filter(event: KeyboardEvent) {
-    this.debounceSubject.next(this.strFiltro);
+    this.dialogRef.close(oSector); // Cierra el modal y pasa el sector seleccionado
   }
 }
-
 

@@ -120,7 +120,7 @@ export class EmpresaAdminCreateRoutedComponent implements OnInit {
         Validators.maxLength(100),
       ]),
 
-      sector: new FormControl({
+      sector: new FormGroup({
         id: new FormControl('', Validators.required),
         nombre: new FormControl('', Validators.required),
       }),
@@ -186,12 +186,12 @@ export class EmpresaAdminCreateRoutedComponent implements OnInit {
 
   showSectorSelectorModal() {
     const dialogRef = this.dialog.open(SectorAdminSelectorUnroutedComponent, {
-      height: '800px',
+      height: '700px',
       maxHeight: '1200px',
-      width: '80%',
+      width: '90%',
       maxWidth: '90%',
       data: { origen: '', sector: '' },
-
+      panelClass: 'custom-dialog'
     });
 
     dialogRef.afterClosed().subscribe(result => {

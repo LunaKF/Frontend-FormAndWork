@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 
 import { IEmpresa } from '../../../model/empresa.interface';

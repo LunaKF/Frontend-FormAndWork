@@ -44,15 +44,6 @@ export class AlumnoAdminEditRoutedComponent implements OnInit {
   myModal: any;
   strMessage: string = '';
 
-   arrSectores: string[] = [
-     "Administración y gestión", "Agraria", "Artes gráficas", "Artes y artesanías",
-     "Comercio y marketing", "Electricidad y electrónica", "Energía y agua",
-     "Fabricación mecánica", "Hostelería y turismo", "Imagen personal",
-     "Imagen y sonido", "Informática y comunicaciones", "Instalación y mantenimiento",
-     "Madera, mueble y corcho", "Marítimo-pesquera", "Química", "Sanidad",
-     "Seguridad y medio ambiente", "Servicios socioculturales y a la comunidad",
-     "Textil, confección y piel", "Transporte y mantenimiento de vehículos", "Vidrio y cerámica"
-   ];
  
    constructor(
      private oActivatedRoute: ActivatedRoute,

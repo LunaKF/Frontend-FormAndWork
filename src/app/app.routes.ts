@@ -22,7 +22,13 @@ import { AlumnoXsectorAdminPlistComponent } from './component/alumno/alumno.xsec
 
 import { CandidaturaAdminPlistRoutedComponent } from './component/candidatura/candidatura.admin.plist.routed/candidatura.admin.plist.routed.component';
 import { CandidaturaAdminViewRoutedComponent } from './component/candidatura/candidatura.admin.view.routed/candidatura.admin.view.routed.component';
+import {CandidaturaAdminDeleteRoutedComponent} from './component/candidatura/candidatura.admin.delete.routed/candidatura.admin.delete.routed.component';
+
 import { OfertaAdminViewRoutedComponent } from './component/oferta/oferta.admin.view.routed/oferta.admin.view.routed.component';
+import { OfertaAdminDeleteRoutedComponent } from './component/oferta/oferta.admin.delete.routed/oferta.admin.delete.routed.component';
+import { OfertaAdminCreateRoutedComponent } from './component/oferta/oferta.admin.create.routed/oferta.admin.create.routed.component';
+import { OfertaAdminEditRoutedComponent } from './component/oferta/oferta.admin.edit.routed/oferta.admin.edit.routed.component';
+
 export const routes: Routes = [
     { path: '', component: SharedHomeRoutedComponent },
     { path: 'home', component: SharedHomeRoutedComponent },
@@ -46,15 +52,16 @@ export const routes: Routes = [
 
 
     {path: 'admin/oferta/plist', component: OfertaAdminPlistRoutedComponent, pathMatch: 'full', },
-    //{path: 'admin/oferta/create', component: OfertaAdminCreateRoutedComponent, pathMatch: 'full', },
-   // {path: 'admin/oferta/edit/:id', component: OfertaAdminEditRoutedComponent, pathMatch: 'full', },
+    {path: 'admin/oferta/create', component: OfertaAdminCreateRoutedComponent, pathMatch: 'full', },
+    {path: 'admin/oferta/edit/:id', component: OfertaAdminEditRoutedComponent, pathMatch: 'full', },
     {path: 'admin/oferta/view/:id', component: OfertaAdminViewRoutedComponent, pathMatch: 'full', },
+    {path: 'admin/oferta/delete/:id', component: OfertaAdminDeleteRoutedComponent, pathMatch: 'full', },
 
 
     {path: 'admin/candidatura/plist', component: CandidaturaAdminPlistRoutedComponent, pathMatch: 'full', },
    // {path: 'admin/candidatura/create', component: CandidaturaAdminCreateRoutedComponent, pathMatch: 'full', },
    // {path: 'admin/candidatura/edit/:id', component: CandidaturaAdminEditRoutedComponent, pathMatch: 'full', },
     {path: 'admin/candidatura/view/:id', component: CandidaturaAdminViewRoutedComponent, pathMatch: 'full', },
-  //  {path: 'admin/candidatura/delete/:id', component: CandidaturaAdminDeleteRoutedComponent, pathMatch: 'full', },
+    {path: 'admin/candidatura/delete/:id', component: CandidaturaAdminDeleteRoutedComponent, pathMatch: 'full', },
     
 ];

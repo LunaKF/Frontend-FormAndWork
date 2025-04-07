@@ -2,42 +2,41 @@
   <div class="col-lg-7 col-md-10 col-sm-12">
     <h1 class="my-5 text-center">
       <i class="bi bi-trash"></i>
-      Borrar candidatura
-      <i class="bi bi-person-circle"></i>
+      Borrar oferta de trabajo
+      <i class="bi bi-person-workspace"></i>
     </h1>
     <br />
     <table class="table table-striped table-bordered my-5 text-center">
       <tbody>
         <tr class="text-center">
           <th scope="row" class="bg-danger text-white text-end pe-5">Id</th>
-          <td class="text-start ps-5">{{ oCandidatura!.id }}</td>
+          <td class="text-start ps-5">{{ oOferta!.id }}</td>
         </tr>
         <tr class="text-center">
           <th scope="row" class="bg-primary text-white text-end pe-5">
-            Id del alumno candidato
+            Título de la oferta
           </th>
-          <td class="text-start ps-5">{{ oCandidatura!.alumno?.id }}</td>
+          <td class="text-start ps-5">{{ oOferta!.titulo }}</td>
         </tr>
-
         <tr class="text-center">
           <th scope="row" class="bg-primary text-white text-end pe-5">
-            Nombre completo del alumno candidato
+            Descripción de la oferta
           </th>
-          <td class="text-start ps-5">{{ oCandidatura!.alumno?.nombre }} {{ oCandidatura!.alumno?.ape1 }} {{ oCandidatura!.alumno?.ape2 }}</td>
-        </tr>
-
-        <tr class="text-center">
-          <th scope="row" class="bg-primary text-white text-end pe-5">
-            Id de la oferta
-          </th>
-          <td class="text-start ps-5">{{ oCandidatura!.oferta?.id }}</td>
+          <td class="text-start ps-5">{{ oOferta!.descripcion }}</td>
         </tr>
 
         <tr class="text-center">
           <th scope="row" class="bg-primary text-white text-end pe-5">
-            Titulo de la oferta
+            Nombre de la empresa
           </th>
-          <td class="text-start ps-5">{{ oCandidatura!.oferta?.titulo }}</td>
+          <td class="text-start ps-5">{{ oOferta!.empresa?.nombre }}</td>
+        </tr>
+
+        <tr class="text-center">
+          <th scope="row" class="bg-primary text-white text-end pe-5">
+            Sector de la oferta
+          </th>
+          <td class="text-start ps-5">{{ oOferta!.sector?.nombre }}</td>
         </tr>
 
       </tbody>
@@ -45,20 +44,20 @@
   </div>
 
   <div class="d-flex justify-content-center mt-4">
-    <p class="fs-3">¿Seguro que desea borrar la candidatura con id "{{ oCandidatura!.id }}" y alumno "{{ oCandidatura!.alumno?.nombre }}"?</p>
+    <p class="fs-3">¿Seguro que desea borrar la oferta "{{ oOferta!.titulo }}"?</p>
   </div>
 
   <div class="d-flex justify-content-center mt-4">
     <button
       class="btn btn-warning mt-4 mx-1"
-      [routerLink]="['/admin', 'candidatura', 'plist']"
+      [routerLink]="['/admin', 'oferta', 'plist']"
     >
       <i class="bi bi-list"></i>
-      Ir a listado de Candidaturas
+      Ir a listado de Ofertas
     </button>
     <button class="btn btn-danger mt-4 mx-1" (click)="delete()">
       <i class="bi bi-trash"></i>
-      Borrar candidatura
+      Borrar oferta
     </button>
   </div>
 </div>

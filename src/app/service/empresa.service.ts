@@ -74,5 +74,9 @@ export class EmpresaService {
     return this.oHttp.delete(this.serverURL + '/' + id);
   }
 
+    getAll() {
+      return this.oHttp.get<IEmpresa[]>(this.serverURL + '/all', httpOptions);
+    }
+  
 
 }

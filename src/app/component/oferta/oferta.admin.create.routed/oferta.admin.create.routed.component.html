@@ -1,0 +1,111 @@
+<div class="container mt-5 d-flex align-items-center justify-content-center">
+  <div class="row">
+    <div class="col text-center">
+      <h2 class="my-2">
+        <i class="bi bi-plus-square"></i>
+        Creación de la Oferta
+        <i class="bi bi-person-circle"></i>
+      </h2>
+      <form [formGroup]="oOfertaForm!" (ngSubmit)="onSubmit()" novalidate>
+        <div class="row mt-4">
+          <mat-form-field>
+            <mat-label>Titulo de la Oferta</mat-label>
+            <input matInput formControlName="titulo" placeholder="Titulo de la Oferta..." />
+            <mat-hint align="start">De 3 caracteres a 255 caracteres</mat-hint>
+            <mat-error *ngIf="oOfertaForm?.get('titulo')?.hasError('required')">Este campo es obligatorio</mat-error>
+            <mat-error *ngIf="oOfertaForm?.get('titulo')?.hasError('minlength')">El titulo debe ser más
+              largo</mat-error>
+            <mat-error *ngIf="oOfertaForm?.get('titulo')?.hasError('maxlength')">El titulo debe ser más
+              corto</mat-error>
+          </mat-form-field>
+        </div>
+
+        <div class="row mt-4">
+          <mat-form-field>
+            <mat-label>Decripcion de la Oferta</mat-label>
+            <input matInput formControlName="descripcion" placeholder="descripcion de la Oferta..." />
+            <mat-hint align="start">De 3 caracteres a 555 caracteres</mat-hint>
+            <mat-error *ngIf="oOfertaForm?.get('descripcion')?.hasError('required')">Este campo es obligatorio</mat-error>
+            <mat-error *ngIf="oOfertaForm?.get('descripcion')?.hasError('minlength')">El titulo debe ser más
+              largo</mat-error>
+            <mat-error *ngIf="oOfertaForm?.get('descripcion')?.hasError('maxlength')">El titulo debe ser más
+              corto</mat-error>
+          </mat-form-field>
+        </div>
+
+        <div formGroupName="sector">
+          <div class="row mt-4">
+            <mat-form-field>
+              <mat-label>SECTORES</mat-label>
+              <div class="d-flex justify-content-end">
+                <button class="btn btn-primary" (click)="showSectorSelectorModal()">
+                  <i class="bi bi-search"></i>
+                  Buscar
+                </button>
+              </div>
+              <div class="d-flex justify-content-start">
+              </div>
+              {{ oSector?.id }} - {{ oSector?.nombre }}
+              <input matInput formControlName="id" placeholder="sector" />
+            </mat-form-field>
+          </div>
+        </div>
+
+        <div formGroupName="empresa">
+          <div class="row mt-4">
+            <mat-form-field>
+              <mat-label>EMPRESAS</mat-label>
+              <div class="d-flex justify-content-end">
+                <button class="btn btn-primary" (click)="showEmpresaSelectorModal()">
+                  <i class="bi bi-search"></i>
+                  Buscar
+                </button>
+              </div>
+              <div class="d-flex justify-content-start">
+              </div>
+              {{ oEmpresa?.id }} - {{ oEmpresa?.nombre }}
+              <input matInput formControlName="id" placeholder="empresa" />
+            </mat-form-field>
+          </div>
+        </div>
+
+        <br />
+
+        <button class="btn btn-warning mt-4 mx-1" [routerLink]="['/admin', 'oferta', 'plist']">
+          <i class="bi bi-list"></i>
+          Ir a listado de Ofertas
+        </button>
+
+        <button class="btn btn-secondary mt-4 mx-1" (click)="onReset()">
+          <i class="bi bi-x-lg"></i>
+          Reset
+        </button>
+
+        <button class="btn btn-primary mt-4 mx-1" type="submit" [disabled]="!oOfertaForm?.valid">
+          <i class="bi bi-floppy"></i>
+          Guardar
+        </button>
+        
+        <div class="modal fade" [id]="'mimodal'" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">FormAndWork</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
+                  (click)="hideModal()"></button>
+              </div>
+              <div class="modal-body">
+                <p>{{ strMessage }}</p>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal" (click)="hideModal()">
+                  Cerrar
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

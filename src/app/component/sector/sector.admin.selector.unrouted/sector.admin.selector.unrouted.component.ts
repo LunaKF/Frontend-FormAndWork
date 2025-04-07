@@ -51,24 +51,6 @@ export class SectorAdminSelectorUnroutedComponent implements OnInit {
   }
 
   getPage() {
-    if (this.data.origen == "xbalance") {
-      this.oSectorService.getPageXBalanceNoTiene(
-        this.nPage,
-        this.nRpp,
-        this.data.idBalance
-      ).subscribe({
-        next: (oPageFromServer: IPage<ISector>) => {
-          this.oPage = oPageFromServer;
-          this.arrBotonera = this.oBotoneraService.getBotonera(
-            this.nPage,
-            oPageFromServer.totalPages
-          );
-        },
-        error: (err) => {
-          console.log(err);
-        },
-      })
-    } else {
       this.oSectorService
         .getPage(
           this.nPage,
@@ -90,7 +72,7 @@ export class SectorAdminSelectorUnroutedComponent implements OnInit {
           },
         });
     }
-  }
+  
 
 
   select(oSector: ISector) {

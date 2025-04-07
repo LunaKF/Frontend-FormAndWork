@@ -76,58 +76,9 @@ serverURL: string = serverURL + '/sector';
     return this.oHttp.delete(this.serverURL + '/' + id);
   }
 
-  getPageSubcuenta(id: number){
-    return this.oHttp.get<number>(this.serverURL + "/subcuenta/" + id);
-  }
-
   getAll() {
     return this.oHttp.get<ISector[]>(this.serverURL + '/all');
   }
-  getXBalance(id: number): Observable<ISector> {
-    let URL: string = '';
-    URL += this.serverURL;
-    URL += '/xbalance/' + id;
-    return this.oHttp.get<ISector>(URL);
-  }
 
 
-  getPageXBalance(
-    page: number,
-    size: number,
-    id: number
-  ): Observable<IPage<ISector>> {
-    let URL: string = '';
-    URL += this.serverURL;
-    URL += '/xbalance/' + id;
-    if (!page) {
-      page = 0;
-    }
-    URL += '?page=' + page;
-    if (!size) {
-      size = 10;
-    }
-    URL += '&size=' + size;
-    
-    return this.oHttp.get<IPage<ISector>>(URL, httpOptions);
-  }
-
-  getPageXBalanceNoTiene(
-    page: number,
-    size: number,
-    id: number
-  ): Observable<IPage<ISector>> {
-    let URL: string = '';
-    URL += this.serverURL;
-    URL += '/xbalancenotiene/' + id;
-    if (!page) {
-      page = 0;
-    }
-    URL += '?page=' + page;
-    if (!size) {
-      size = 10;
-    }
-    URL += '&size=' + size;
-    
-    return this.oHttp.get<IPage<ISector>>(URL, httpOptions);
-  }
 }

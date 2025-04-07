@@ -33,7 +33,7 @@ export class SectorAdminPlistRoutedComponent implements OnInit {
         this.oSector = data;
       },
       error: (err) => {
-        console.log(err);
+        console.error('Error al obtener sectores:', err.message || err);
       }
     });
   }

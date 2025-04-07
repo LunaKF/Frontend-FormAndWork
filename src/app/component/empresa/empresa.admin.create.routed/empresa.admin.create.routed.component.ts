@@ -70,11 +70,6 @@ export class EmpresaAdminCreateRoutedComponent implements OnInit {
         Validators.maxLength(50),
       ]),
       sector: new FormControl('', Validators.required),
-      telefono: new FormControl('', [
-        Validators.required,
-        Validators.minLength(9),
-        Validators.maxLength(9),
-      ]),
       email: new FormControl('', [
         Validators.required,
         Validators.email,
@@ -139,7 +134,6 @@ export class EmpresaAdminCreateRoutedComponent implements OnInit {
       id: null,
       nombre: null,
     });
-    this.oEmpresaForm?.controls['telefono'].setValue('');
     this.oEmpresaForm?.controls['email'].setValue('');
   }
 

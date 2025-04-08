@@ -1,12 +1,12 @@
 <div class="container mt-5 d-flex align-items-center justify-content-center">
   <div class="row">
     <div class="col text-center">
-      <h2 class="my-2">   
+      <h2 class="my-2">
         <i class="bi bi-list"></i>
-        Lista de Alumnos por sector
+        Lista de Empresas en el sector 
         <i class="bi bi-person-circle"></i>
       </h2>
-
+      
       <div class="d-inline-flex mx-2">
         <input type="text" class="form-control" placeholder="Buscar" (keyup)="filter($event)" [(ngModel)]="strFiltro" />
       </div>
@@ -80,21 +80,7 @@
                 <i class="bi bi-caret-up-fill"></i>} }
               </th>
               <th (click)="sort('nombre')" class="bg-primary text-white">
-                Nombre alumno @if (strField === 'nombre') { @if (strDir === 'desc') {
-                <i class="bi bi-caret-down-fill"></i>
-                } @else {
-                <i class="bi bi-caret-up-fill"></i>} }
-              </th>
-
-              <th (click)="sort('ape1')" class="bg-primary text-white">
-                Apellido @if (strField === 'ape1') { @if (strDir === 'desc') {
-                <i class="bi bi-caret-down-fill"></i>
-                } @else {
-                <i class="bi bi-caret-up-fill"></i>} }
-              </th>
-
-              <th (click)="sort('ape2')" class="bg-primary text-white">
-                Apellido 2 @if (strField === 'ape2') { @if (strDir === 'desc') {
+                Nombre empresa @if (strField === 'nombre') { @if (strDir === 'desc') {
                 <i class="bi bi-caret-down-fill"></i>
                 } @else {
                 <i class="bi bi-caret-up-fill"></i>} }
@@ -117,7 +103,7 @@
 
               <th (click)="sort('acciones')" class="bg-primary text-white">
                 Acciones
-                @if (strField === 'accipones') { @if (strDir === 'desc') {
+                 @if (strField === 'accipones') { @if (strDir === 'desc') {
                 <i class="bi bi-caret-down-fill"></i>
                 } @else {
                 <i class="bi bi-caret-up-fill"></i>} }
@@ -127,27 +113,26 @@
           </thead>
 
           <tbody>
-            @for (alumno of oPage?.content; track alumno.id) {
+            @for (empresa of oPage?.content; track empresa.id) {
             <tr>
-              <td class="text-center">{{ alumno.id }}</td>
-              <td class="text-start">{{ alumno.nombre | trim : 20 }}</td>
-              <td class="text-start">{{ alumno.ape1 | trim : 20 }}</td>
-              <td class="text-start">{{ alumno.ape2 | trim : 20 }}</td>
-              <td class="text-start" style="font-size: small">{{ alumno.email }}
+              <td class="text-center">{{ empresa.id }}</td>
+              <td class="text-start">{{ empresa.nombre | trim : 25 }}</td>
+              <td class="text-start" style="font-size: small">{{ empresa.email }}
               </td>
+
               <td class="text-start" style="font-size: small">
-                {{ alumno.sector.nombre }}
+                {{ empresa.sector.nombre }}
               </td>
 
               <td>
                 <div class="btn-group" role="group" aria-label="Basic example">
-                  <button type="button" class="btn btn-success" (click)="view(alumno)">
+                  <button type="button" class="btn btn-success" (click)="view(empresa)">
                     <i class="bi bi-eye icon-15"></i>
                   </button>
-                  <button type="button" class="btn btn-warning icon-15" (click)="edit(alumno)">
+                  <button type="button" class="btn btn-warning icon-15" (click)="edit(empresa)">
                     <i class="bi bi-pen"></i>
                   </button>
-                  <button type="button" class="btn btn-danger icon-15" (click)="remove(alumno)">
+                  <button type="button" class="btn btn-danger icon-15" (click)="remove(empresa)">
                     <i class="bi bi-trash"></i>
                   </button>
                 </div>
@@ -155,7 +140,7 @@
             </tr>
             } @empty {
             <tr>
-              <td colspan="6">No hay alumnos</td>
+              <td colspan="6">No hay empresas</td>
             </tr>
             }
           </tbody>

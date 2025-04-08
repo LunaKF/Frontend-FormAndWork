@@ -8,7 +8,7 @@ import { CommonModule } from '@angular/common';
   selector: 'app-alumno.admin.view.routed',
   templateUrl: './alumno.admin.view.routed.component.html',
   styleUrls: ['./alumno.admin.view.routed.component.css'],
-      imports: [CommonModule], // Aquí importas CommonModule
+      imports: [CommonModule],
       standalone: true
 })
 export class AlumnoAdminViewRoutedComponent implements OnInit {
@@ -16,7 +16,7 @@ export class AlumnoAdminViewRoutedComponent implements OnInit {
    //
    id: number = 0;
    route: string = '';
-   oAlumno: IAlumno = { id: 0, nombre: '', ape1: '', ape2: '', email: '', sector: { id: 0, nombre: '' , alumnos: 0, empresas: 0 } };
+   oAlumno: IAlumno = { id: 0, nombre: '', ape1: '', ape2: '', email: '', sector: { id: 0, nombre: '' , alumnos: 0, empresas: 0, ofertas: 0 } };
  
    //
    constructor(private oActivatedRoute: ActivatedRoute, private oAlumnoService: AlumnoService) { }

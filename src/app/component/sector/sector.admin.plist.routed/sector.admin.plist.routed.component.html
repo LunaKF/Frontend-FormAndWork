@@ -25,6 +25,9 @@
               <th class="bg-success text-white">
                 Alumnos
               </th>
+              <th class="bg-success text-white">
+                Ofertas
+              </th>
             </tr>
           </thead>
 
@@ -33,10 +36,13 @@
               <td class="text-center">{{ sector.id }}</td>
               <td class="text-center">{{ sector.nombre }}</td>
               <td class="text-center">
-                <a href="admin/empresa/list/sector/{{ sector.id }}">{{ sector.empresas }}</a>
+                <a href="admin/empresa/xsector/plist/{{ sector.id }}">{{ sector.empresas }}</a>
               </td>
               <td class="text-center">
                 <a href="admin/alumno/xsector/plist/{{ sector.id }}">{{ sector.alumnos }}</a>
+              </td>
+              <td class="text-center">
+                <a href="admin/oferta/xsector/plist/{{ sector.id }}">{{ sector.ofertas }}</a>
               </td>
             </tr>
           </tbody>

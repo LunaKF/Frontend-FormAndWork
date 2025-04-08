@@ -8,7 +8,6 @@ import { EmpresaAdminPlistRoutedComponent } from './component/empresa/empresa.ad
 import { EmpresaAdminDeleteRoutedComponent } from './component/empresa/empresa.admin.delete.routed/empresa.admin.delete.routed.component';
 import { EmpresaAdminViewRoutedComponent } from './component/empresa/empresa.admin.view.routed/empresa.admin.view.routed.component';
 
-
 import { SectorAdminPlistRoutedComponent } from './component/sector/sector.admin.plist.routed/sector.admin.plist.routed.component';
 
 import { AlumnoAdminPlistComponent } from './component/alumno/alumno.admin.plist.routed/alumno.admin.plist.routed.component';
@@ -16,14 +15,18 @@ import { AlumnoAdminCreateComponent } from './component/alumno/alumno.admin.crea
 import { AlumnoAdminDeleteRoutedComponent } from './component/alumno/alumno.admin.delete.routed/alumno.admin.delete.routed.component';
 import { AlumnoAdminEditRoutedComponent } from './component/alumno/alumno.admin.edit.routed/alumno.admin.edit.routed.component';
 import { AlumnoAdminViewRoutedComponent } from './component/alumno/alumno.admin.view.routed/alumno.admin.view.routed.component';
-import { OfertaAdminPlistRoutedComponent } from './component/oferta/oferta.admin.plist.routed/oferta.admin.plist.routed.component';
+
+/*POR SECTOR */
 import { AlumnoXsectorAdminPlistComponent } from './component/alumno/alumno.xsector.admin.plist.routed/alumno.xsector.admin.plist.routed.component';
+import { EmpresaXsectorAdminPlistComponent } from './component/empresa/empresa.xsector.admin.plist.routed/empresa.xsector.admin.plist.routed.component';
+import { OfertaXsectorAdminPlistRoutedComponent } from './component/oferta/oferta.xsector.admin.plist.routed/oferta.xsector.admin.plist.routed.component';
 
 
 import { CandidaturaAdminPlistRoutedComponent } from './component/candidatura/candidatura.admin.plist.routed/candidatura.admin.plist.routed.component';
 import { CandidaturaAdminViewRoutedComponent } from './component/candidatura/candidatura.admin.view.routed/candidatura.admin.view.routed.component';
-import {CandidaturaAdminDeleteRoutedComponent} from './component/candidatura/candidatura.admin.delete.routed/candidatura.admin.delete.routed.component';
+import { CandidaturaAdminDeleteRoutedComponent} from './component/candidatura/candidatura.admin.delete.routed/candidatura.admin.delete.routed.component';
 
+import { OfertaAdminPlistRoutedComponent } from './component/oferta/oferta.admin.plist.routed/oferta.admin.plist.routed.component';
 import { OfertaAdminViewRoutedComponent } from './component/oferta/oferta.admin.view.routed/oferta.admin.view.routed.component';
 import { OfertaAdminDeleteRoutedComponent } from './component/oferta/oferta.admin.delete.routed/oferta.admin.delete.routed.component';
 import { OfertaAdminCreateRoutedComponent } from './component/oferta/oferta.admin.create.routed/oferta.admin.create.routed.component';
@@ -44,7 +47,6 @@ export const routes: Routes = [
    
     
     {path: 'admin/alumno/plist', component: AlumnoAdminPlistComponent, pathMatch: 'full', },
-    {path: 'admin/alumno/xsector/plist/:id', component: AlumnoXsectorAdminPlistComponent, pathMatch: 'full', },
     {path: 'admin/alumno/create', component: AlumnoAdminCreateComponent, pathMatch: 'full', },
     {path: 'admin/alumno/edit/:id', component: AlumnoAdminEditRoutedComponent, pathMatch: 'full', },
     {path: 'admin/alumno/view/:id', component: AlumnoAdminViewRoutedComponent, pathMatch: 'full', },
@@ -64,4 +66,8 @@ export const routes: Routes = [
     {path: 'admin/candidatura/view/:id', component: CandidaturaAdminViewRoutedComponent, pathMatch: 'full', },
     {path: 'admin/candidatura/delete/:id', component: CandidaturaAdminDeleteRoutedComponent, pathMatch: 'full', },
     
+    /*POR SECTOR */
+    {path: 'admin/alumno/xsector/plist/:id', component: AlumnoXsectorAdminPlistComponent, pathMatch: 'full', },
+    {path:'admin/empresa/xsector/plist/:id', component: EmpresaXsectorAdminPlistComponent, pathMatch: 'full', },
+    {path:'admin/oferta/xsector/plist/:id', component: OfertaXsectorAdminPlistRoutedComponent, pathMatch: 'full', },
 ];

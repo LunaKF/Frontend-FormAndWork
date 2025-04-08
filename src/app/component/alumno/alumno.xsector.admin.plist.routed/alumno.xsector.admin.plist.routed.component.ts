@@ -65,7 +65,6 @@ export class AlumnoXsectorAdminPlistComponent implements OnInit {
 
 
   ngOnInit() {
-
   }
 
   getPage(id: number = 0) {

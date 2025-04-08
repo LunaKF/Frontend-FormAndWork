@@ -1,25 +1,26 @@
 import { Component, OnInit } from '@angular/core';
-import { ICandidatura } from '../../../model/candidatura.interface';
-import { CandidaturaService } from '../../../service/candidatura.service';
+import { IEmpresa } from '../../../model/empresa.interface';
+import { EmpresaService } from '../../../service/empresa.service';
 import { CommonModule } from '@angular/common';
 import { IPage } from '../../../model/model.interface';
 import { FormsModule } from '@angular/forms';
 import { BotoneraService } from '../../../service/botonera.service';
 import { debounceTime, Subject } from 'rxjs';
 import { Router, RouterModule } from '@angular/router';
+import { TrimPipe } from '../../../pipe/trim.pipe';
 
 
 @Component({
-  selector: 'app-candidatura.admin.plist.routed',
-  templateUrl: './candidatura.admin.plist.routed.component.html',
-  styleUrls: ['./candidatura.admin.plist.routed.component.css'] ,
+  selector: 'app-empresa-xsector-admin-plist',
+  templateUrl: './empresa.xsector.admin.plist.routed.component.html',
+  styleUrls: ['./empresa.xsector.admin.plist.routed.component.css'] ,
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule],
+  imports: [CommonModule, FormsModule, TrimPipe, RouterModule],
 })
 
-export class CandidaturaAdminPlistRoutedComponent implements OnInit {
+export class EmpresaXsectorAdminPlistComponent implements OnInit {
 
-  oPage: IPage<ICandidatura> | null = null;
+  oPage: IPage<IEmpresa> | null = null;
   //
   nPage: number = 0; // 0-based server count
   nRpp: number = 10;
@@ -33,7 +34,7 @@ export class CandidaturaAdminPlistRoutedComponent implements OnInit {
   //
   private debounceSubject = new Subject<string>();
   constructor(
-    private oCandidaturaService: CandidaturaService,
+    private oEmpresaService: EmpresaService,
     private oBotoneraService: BotoneraService,
     private oRouter: Router
   ) {
@@ -45,11 +46,11 @@ export class CandidaturaAdminPlistRoutedComponent implements OnInit {
   ngOnInit() {
     this.getPage();
   }
-  getPage() {
-    this.oCandidaturaService
-      .getPage(this.nPage, this.nRpp, this.strField, this.strDir, this.strFiltro)
-      .subscribe({
-        next: (oPageFromServer: IPage<ICandidatura>) => {
+  getPage(id: number = 0) {
+    this.oEmpresaService
+    .getPageXsector(this.nPage, this.nRpp, this.strField, this.strDir, this.strFiltro, id) //tomar el id de la url del cliente
+    .subscribe({
+        next: (oPageFromServer: IPage<IEmpresa>) => {
           this.oPage = oPageFromServer;
           this.arrBotonera = this.oBotoneraService.getBotonera(
             this.nPage,
@@ -62,18 +63,18 @@ export class CandidaturaAdminPlistRoutedComponent implements OnInit {
       });
   }
 
-  edit(oCandidatura: ICandidatura) {
+  edit(oEmpresa: IEmpresa) {
     //navegar a la página de edición
-    this.oRouter.navigate(['admin/candidatura/edit', oCandidatura.id]);
+    this.oRouter.navigate(['admin/empresa/edit', oEmpresa.id]);
   }
 
-  view(oCandidatura: ICandidatura) {
+  view(oEmpresa: IEmpresa) {
     //navegar a la página de edición
-    this.oRouter.navigate(['admin/candidatura/view', oCandidatura.id]);
+    this.oRouter.navigate(['admin/empresa/view', oEmpresa.id]);
   }
 
-  remove(oCandidatura: ICandidatura) {
-    this.oRouter.navigate(['admin/candidatura/delete/', oCandidatura.id]);
+  remove(oEmpresa: IEmpresa) {
+    this.oRouter.navigate(['admin/empresa/delete/', oEmpresa.id]);
   }
 
   goToPage(p: number) {

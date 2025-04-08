@@ -3,4 +3,5 @@ export interface ISector {
     nombre: string;
     empresas: number;
     alumnos: number;
+    ofertas: number;
 }

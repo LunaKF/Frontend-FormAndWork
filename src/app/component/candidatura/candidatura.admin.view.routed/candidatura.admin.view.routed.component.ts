@@ -18,8 +18,8 @@ export class CandidaturaAdminViewRoutedComponent implements OnInit {
  route: string = '';
  oCandidatura: ICandidatura = { 
   id: 0, 
-  alumno: { id: 0, nombre: '', ape1: '', ape2: "", email: '', sector: { id: 0, nombre: '' , alumnos: 0, empresas: 0 } }, 
-  oferta: { id: 0, titulo: '', descripcion: '', empresa: {id:0 , nombre:"", email:"",sector: { id: 0, nombre: '' , alumnos: 0, empresas: 0 } } , sector: { id: 0, nombre: '' , alumnos: 0, empresas: 0 }}, 
+  alumno: { id: 0, nombre: '', ape1: '', ape2: "", email: '', sector: { id: 0, nombre: '' , alumnos: 0, empresas: 0, ofertas: 0 } }, 
+  oferta: { id: 0, titulo: '', descripcion: '', empresa: {id:0 , nombre:"", email:"",sector: { id: 0, nombre: '' , alumnos: 0, empresas: 0, ofertas: 0 } } , sector: { id: 0, nombre: '' , alumnos: 0, empresas: 0, ofertas: 0 } }, 
   fecha: new Date() 
 };
 

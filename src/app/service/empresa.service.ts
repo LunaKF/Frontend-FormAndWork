@@ -54,7 +54,8 @@ export class EmpresaService {
     sector: number
   ): Observable<IPage<IEmpresa>> {
     let URL: string = '';
-    URL += this.serverURL + '/xsector/' + sector;     if (!page) {
+    URL += this.serverURL + '/xsector/' + sector; 
+      if (!page) {
       page = 0;
     }
     URL += '?page=' + page;

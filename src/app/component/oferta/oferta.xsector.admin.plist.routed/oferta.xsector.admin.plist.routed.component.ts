@@ -6,8 +6,11 @@ import { IPage } from '../../../model/model.interface';
 import { FormsModule } from '@angular/forms';
 import { BotoneraService } from '../../../service/botonera.service';
 import { debounceTime, Subject } from 'rxjs';
-import { Router, RouterModule } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { TrimPipe } from '../../../pipe/trim.pipe';
+import { ISector } from '../../../model/sector.interface';
+import { HttpErrorResponse } from '@angular/common/http';
+import { SectorService } from '../../../service/sector.service';
 
 
 @Component({
@@ -19,7 +22,9 @@ import { TrimPipe } from '../../../pipe/trim.pipe';
 })
 
 export class OfertaXsectorAdminPlistRoutedComponent implements OnInit {
-   oPage: IPage<IOferta> | null = null;
+   
+  oPage: IPage<IOferta> | null = null;
+   oSector: ISector | null = null;
     //
     nPage: number = 0; // 0-based server count
     nRpp: number = 10;
@@ -36,15 +41,32 @@ export class OfertaXsectorAdminPlistRoutedComponent implements OnInit {
   constructor(
       private oOfertaService: OfertaService,
       private oBotoneraService: BotoneraService,
+      private oActivatedRoute: ActivatedRoute,
+      private oSectorService: SectorService,
       private oRouter: Router
     ) {
+      // obtener el id de la ruta del cliente
+      this.oActivatedRoute.params.subscribe((params) => {
+  
+        this.oSectorService.get(params['id']).subscribe({
+          next: (oSector: ISector) => {
+            this.oSector = oSector;
+            this.getPage(oSector.id);
+          },
+          error: (err: HttpErrorResponse) => {
+            console.log();
+          },
+        });
+      });
+  
       this.debounceSubject.pipe(debounceTime(10)).subscribe((value) => {
-        this.getPage();
+        this.getPage(this.oSector?.id);
       });
     }
+  
  ngOnInit() {
-    this.getPage();
   }
+
   getPage(id: number = 0) {
     this.oOfertaService
       .getPageXsector(this.nPage, this.nRpp, this.strField, this.strDir, this.strFiltro, id)

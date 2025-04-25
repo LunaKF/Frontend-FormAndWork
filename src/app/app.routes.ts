@@ -21,6 +21,7 @@ import { AlumnoXsectorAdminPlistComponent } from './component/alumno/alumno.xsec
 import { EmpresaXsectorAdminPlistComponent } from './component/empresa/empresa.xsector.admin.plist.routed/empresa.xsector.admin.plist.routed.component';
 import { OfertaXsectorAdminPlistRoutedComponent } from './component/oferta/oferta.xsector.admin.plist.routed/oferta.xsector.admin.plist.routed.component';
 
+/*POR EMPRESA */
 
 import { CandidaturaAdminPlistRoutedComponent } from './component/candidatura/candidatura.admin.plist.routed/candidatura.admin.plist.routed.component';
 import { CandidaturaAdminViewRoutedComponent } from './component/candidatura/candidatura.admin.view.routed/candidatura.admin.view.routed.component';
@@ -31,6 +32,7 @@ import { OfertaAdminViewRoutedComponent } from './component/oferta/oferta.admin.
 import { OfertaAdminDeleteRoutedComponent } from './component/oferta/oferta.admin.delete.routed/oferta.admin.delete.routed.component';
 import { OfertaAdminCreateRoutedComponent } from './component/oferta/oferta.admin.create.routed/oferta.admin.create.routed.component';
 import { OfertaAdminEditRoutedComponent } from './component/oferta/oferta.admin.edit.routed/oferta.admin.edit.routed.component';
+import { OfertaXempresaAdminPlistRoutedComponent } from './component/oferta/oferta.xempresa.admin.plist.routed/oferta.xempresa.admin.plist.routed.component';
 
 export const routes: Routes = [
     { path: '', component: SharedHomeRoutedComponent },
@@ -61,8 +63,6 @@ export const routes: Routes = [
 
 
     {path: 'admin/candidatura/plist', component: CandidaturaAdminPlistRoutedComponent, pathMatch: 'full', },
-   // {path: 'admin/candidatura/create', component: CandidaturaAdminCreateRoutedComponent, pathMatch: 'full', },
-   // {path: 'admin/candidatura/edit/:id', component: CandidaturaAdminEditRoutedComponent, pathMatch: 'full', },
     {path: 'admin/candidatura/view/:id', component: CandidaturaAdminViewRoutedComponent, pathMatch: 'full', },
     {path: 'admin/candidatura/delete/:id', component: CandidaturaAdminDeleteRoutedComponent, pathMatch: 'full', },
     
@@ -70,4 +70,7 @@ export const routes: Routes = [
     {path: 'admin/alumno/xsector/plist/:id', component: AlumnoXsectorAdminPlistComponent, pathMatch: 'full', },
     {path:'admin/empresa/xsector/plist/:id', component: EmpresaXsectorAdminPlistComponent, pathMatch: 'full', },
     {path:'admin/oferta/xsector/plist/:id', component: OfertaXsectorAdminPlistRoutedComponent, pathMatch: 'full', },
+
+    /*POR EMPRESA */
+    {path:'admin/oferta/xempresa/plist/:id', component: OfertaXempresaAdminPlistRoutedComponent, pathMatch: 'full', },
 ];

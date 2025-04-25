@@ -16,7 +16,7 @@ export class EmpresaAdminViewRoutedComponent implements OnInit {
   //
   id: number = 0;
   route: string = '';
-  oEmpresa: IEmpresa = { id: 0, nombre: '', email: '', sector: { id: 0, nombre: '' , alumnos: 0, empresas: 0, ofertas: 0 } };
+  oEmpresa: IEmpresa = { id: 0, nombre: '', email: '', sector: { id: 0, nombre: '' , alumnos: 0, empresas: 0, ofertas: 0 }, ofertas:0 };
 
   //
   constructor(private oActivatedRoute: ActivatedRoute, private oEmpresaService: EmpresaService) { }

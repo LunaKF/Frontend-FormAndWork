@@ -111,6 +111,12 @@
                 <i class="bi bi-caret-up-fill"></i>} }
               </th>
 
+              <th (click)="sort('empresa.candidatura')" class="bg-primary text-white">
+                Candidaturas@if (strField === 'empresa.candidatura') { @if (strDir === 'desc') {
+                <i class="bi bi-caret-down-fill"></i>
+                } @else {
+                <i class="bi bi-caret-up-fill"></i>} }
+              </th>
 
               <th (click)="sort('acciones')" class="bg-primary text-white">
                 Acciones
@@ -130,7 +136,16 @@
               <td class="text-start">{{ oferta.titulo | trim : 20 }}</td>
               <td class="text-start" style="font-size: small">{{oferta.descripcion | trim : 50 }}</td>
               <td class="text-start" style="font-size: small">{{ oferta.sector.nombre | trim : 20 }}</td>
-              <td class="text-start" style="font-size: small">{{ oferta.empresa.nombre| trim : 20 }}</td>
+              <td class="text-start" style="font-size: small">
+                <a href="admin/empresa/view/{{ oferta.empresa.id }}">{{ oferta.empresa.nombre }}</a>
+              </td>
+              
+              <td class="text-center" style="font-size: medium">
+                <button type="button" class="btn btn-danger"  >
+                  <a class="text-decoration-none text-dark " href="admin/candidatura/oferta/{{ oferta.id }}">Candidaturas</a>
+                </button>
+              </td>
+
               <td>
                 <div class="btn-group" role="group" aria-label="Basic example">
                   <button type="button" class="btn btn-success" (click)="view(oferta)">

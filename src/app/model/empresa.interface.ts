@@ -5,4 +5,5 @@ export interface IEmpresa {
     nombre: string;
     sector: ISector;
     email: string;
+    ofertas: number;
 }

@@ -8,14 +8,14 @@ import {
 import {
   MatCommonModule,
   ObserversModule
-} from "./chunk-GL5WZ6XP.js";
-import {
-  Platform,
-  coerceBooleanProperty
-} from "./chunk-OTXWG63F.js";
+} from "./chunk-JXGYY2GA.js";
 import {
   Directionality
 } from "./chunk-RFCYHXAY.js";
+import {
+  Platform,
+  coerceBooleanProperty
+} from "./chunk-F6UGBNWV.js";
 import {
   CommonModule,
   DOCUMENT,
@@ -1638,4 +1638,4 @@ export {
   MatFormField,
   MatFormFieldModule
 };
-//# sourceMappingURL=chunk-UBALFAJD.js.map
+//# sourceMappingURL=chunk-APHNPW6A.js.map

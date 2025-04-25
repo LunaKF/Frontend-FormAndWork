@@ -3,13 +3,9 @@
     <div class="col text-center">
       <h2 class="my-2">
         <i class="bi bi-list"></i>
-        Lista de Candidaturas
+        Lista de Ofertas en la Empresa 
         <i class="bi bi-person-circle"></i>
       </h2>
-      <a href="admin/candidatura/create"><button class="btn btn-primary my-2 mx-2">
-          <i class="bi bi-plus-square"></i>
-          Crear nueva candidatura
-        </button></a>
 
       <div class="d-inline-flex mx-2">
         <input type="text" class="form-control" placeholder="Buscar" (keyup)="filter($event)" [(ngModel)]="strFiltro" />
@@ -83,31 +79,31 @@
                 } @else {
                 <i class="bi bi-caret-up-fill"></i>} }
               </th>
-
-              <th (click)="sort('fecha')" class="bg-danger text-white">
-                Fecha @if (strField === 'fecha') { @if (strDir === 'desc') {
+              <th (click)="sort('titulo')" class="bg-primary text-white">
+                Titulo oferta @if (strField === 'titulo') { @if (strDir === 'desc') {
                 <i class="bi bi-caret-down-fill"></i>
                 } @else {
                 <i class="bi bi-caret-up-fill"></i>} }
               </th>
 
-              <th (click)="sort('oferta')" class="bg-danger text-white">
-                Oferta @if (strField === 'oferta') { @if (strDir === 'desc') {
+              <th (click)="sort('descripcion')" class="bg-primary text-white">
+                Descripción @if (strField === 'descripcion') { @if (strDir === 'desc') {
+                <i class="bi bi-caret-down-fill"></i>
+                } @else {
+                <i class="bi bi-caret-up-fill"></i>} }
+              </th>
+        
+              <th (click)="sort('empresa.nombre')" class="bg-primary text-white">
+                Nombre Empresa @if (strField === 'empresa.nombre') { @if (strDir === 'desc') {
                 <i class="bi bi-caret-down-fill"></i>
                 } @else {
                 <i class="bi bi-caret-up-fill"></i>} }
               </th>
 
-              <th (click)="sort('alumno')" class="bg-danger text-white">
-                Alumno @if (strField === 'alumno') { @if (strDir === 'desc') {
-                <i class="bi bi-caret-down-fill"></i>
-                } @else {
-                <i class="bi bi-caret-up-fill"></i>} }
-              </th>
 
               <th (click)="sort('acciones')" class="bg-primary text-white">
                 Acciones
-                 @if (strField === 'accipones') { @if (strDir === 'desc') {
+                 @if (strField === 'acciones') { @if (strDir === 'desc') {
                 <i class="bi bi-caret-down-fill"></i>
                 } @else {
                 <i class="bi bi-caret-up-fill"></i>} }
@@ -117,26 +113,21 @@
           </thead>
 
           <tbody>
-            @for (candidatura of oPage?.content; track candidatura.id) {
+            @for (oferta of oPage?.content; track oferta.id) {
             <tr>
-              <td class="text-center">{{ candidatura.id }}</td>
-              <td class="text-center">{{ candidatura.fecha }}</td>
-              
-              <td class="text-center">
-                <a href="admin/oferta/view/{{ candidatura.oferta.id }}">{{ candidatura.oferta.id }}</a>
-              </td>
-
-              <td class="text-center">{{ candidatura.alumno.nombre + " " +candidatura.alumno.ape1 + " " +candidatura.alumno.ape2 }}</td>
-
+              <td class="text-center">{{ oferta.id }}</td>
+              <td class="text-start">{{ oferta.titulo | trim : 20 }}</td>
+              <td class="text-start" style="font-size: small">{{oferta.descripcion | trim : 100 }}</td>
+              <td class="text-start" style="font-size: small">{{ oferta.empresa.nombre | trim : 30 }}</td>
               <td>
                 <div class="btn-group" role="group" aria-label="Basic example">
-                  <button type="button" class="btn btn-success" (click)="view(candidatura)">
+                  <button type="button" class="btn btn-success" (click)="view(oferta)">
                     <i class="bi bi-eye icon-15"></i>
                   </button>
-                  <button type="button" class="btn btn-warning icon-15" (click)="edit(candidatura)">
+                  <button type="button" class="btn btn-warning icon-15" (click)="edit(oferta)">
                     <i class="bi bi-pen"></i>
                   </button>
-                  <button type="button" class="btn btn-danger icon-15" (click)="remove(candidatura)">
+                  <button type="button" class="btn btn-danger icon-15" (click)="remove(oferta)">
                     <i class="bi bi-trash"></i>
                   </button>
                 </div>
@@ -144,7 +135,7 @@
             </tr>
             } @empty {
             <tr>
-              <td colspan="6">No hay candidaturas</td>
+              <td colspan="6">No hay ofertas</td>
             </tr>
             }
           </tbody>

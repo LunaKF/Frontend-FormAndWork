@@ -7,5 +7,5 @@ export interface IOferta {
     descripcion: string;
     empresa: IEmpresa;
     sector: ISector;
-
+    candidaturas: number;
 }

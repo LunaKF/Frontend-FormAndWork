@@ -3,9 +3,9 @@
     <div class="col text-center">
       <h2 class="my-2">
         <i class="bi bi-list"></i>
-        Lista de Empresas en el sector 
-        <i class="bi bi-person-circle"></i>
+       Empresas en el sector<span class="sector-nombre">{{oSector?.nombre}}</span>
       </h2>
+      
       
       <div class="d-inline-flex mx-2">
         <input type="text" class="form-control" placeholder="Buscar" (keyup)="filter($event)" [(ngModel)]="strFiltro" />
@@ -93,14 +93,6 @@
                 <i class="bi bi-caret-up-fill"></i>} }
               </th>
 
-              <th (click)="sort('sector')" class="bg-primary text-white">
-                sector @if (strField === 'sector') { @if (strDir
-                === 'desc') {
-                <i class="bi bi-caret-down-fill"></i>
-                } @else {
-                <i class="bi bi-caret-up-fill"></i>} }
-              </th>
-
               <th (click)="sort('acciones')" class="bg-primary text-white">
                 Acciones
                  @if (strField === 'accipones') { @if (strDir === 'desc') {
@@ -118,10 +110,6 @@
               <td class="text-center">{{ empresa.id }}</td>
               <td class="text-start">{{ empresa.nombre | trim : 25 }}</td>
               <td class="text-start" style="font-size: small">{{ empresa.email }}
-              </td>
-
-              <td class="text-start" style="font-size: small">
-                {{ empresa.sector.nombre }}
               </td>
 
               <td>

@@ -44,6 +44,70 @@ export class CandidaturaService {
     return this.oHttp.get<IPage<ICandidatura>>(URL, httpOptions);
   }
 
+  getPageXoferta(
+    page: number,
+    size: number,
+    field: string,
+    dir: string,
+    filtro: string,
+    oferta: number
+  ): Observable<IPage<ICandidatura>> {
+    let URL: string = '';
+    URL += this.serverURL + '/xoferta/' + oferta;
+    if (!page) {
+      page = 0;
+    }
+    URL += '?page=' + page;
+    if (!size) {
+      size = 10;
+    }
+    URL += '&size=' + size;
+    if (field) {
+      URL += '&sort=' + field;
+      if (dir === 'asc') {
+        URL += ',asc';
+      } else {
+        URL += ',desc';
+      }
+    }
+    if (filtro) {
+      URL += '&filter=' + filtro;
+    }
+    return this.oHttp.get<IPage<ICandidatura>>(URL, httpOptions);
+  }
+
+  getPageXalumno(
+    page: number,
+    size: number,
+    field: string,
+    dir: string,
+    filtro: string,
+    alumno: number
+  ): Observable<IPage<ICandidatura>> {
+    let URL: string = '';
+    URL += this.serverURL + '/xalumno/' + alumno;
+    if (!page) {
+      page = 0;
+    }
+    URL += '?page=' + page;
+    if (!size) {
+      size = 10;
+    }
+    URL += '&size=' + size;
+    if (field) {
+      URL += '&sort=' + field;
+      if (dir === 'asc') {
+        URL += ',asc';
+      } else {
+        URL += ',desc';
+      }
+    }
+    if (filtro) {
+      URL += '&filter=' + filtro;
+    }
+    return this.oHttp.get<IPage<ICandidatura>>(URL, httpOptions);
+  }
+
   get(id: number): Observable<ICandidatura> {
     let URL: string = '';
     URL += this.serverURL;

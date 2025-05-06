@@ -20,8 +20,9 @@ export class OfertaAdminViewRoutedComponent implements OnInit {
   route: string = '';
   oOferta: IOferta = {
     id: 0, titulo: '', descripcion: '',
-    empresa: { id: 0, nombre: "", email: "", sector: { id: 0, nombre: '', alumnos: 0, empresas: 0 , ofertas: 0}, ofertas: 0 },
-    sector: { id: 0, nombre: '', alumnos: 0, empresas: 0, ofertas: 0 }
+    empresa: { id: 0, nombre: "", email: "", sector: { id: 0, nombre: '', alumnos: 0, empresas: 0, ofertas: 0 }, ofertas: 0 },
+    sector: { id: 0, nombre: '', alumnos: 0, empresas: 0, ofertas: 0 },
+    candidaturas: 0
   }
 
   

@@ -1,0 +1,19 @@
+.idth , .nombreth, .empresasth, .alumnosth, .ofertasth{
+    font-size: 22px;
+    font-weight: 400;
+
+}
+
+h2{
+    padding-bottom: 30px;
+}
+
+td{
+    font-size: 15px;
+    font-weight: 400;
+
+}
+
+.nombreth{
+    width: 30%;
+}

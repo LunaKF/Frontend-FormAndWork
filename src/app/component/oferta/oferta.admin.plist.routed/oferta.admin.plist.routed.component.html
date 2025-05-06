@@ -137,12 +137,12 @@
               <td class="text-start" style="font-size: small">{{oferta.descripcion | trim : 50 }}</td>
               <td class="text-start" style="font-size: small">{{ oferta.sector.nombre | trim : 20 }}</td>
               <td class="text-start" style="font-size: small">
-                <a href="admin/empresa/view/{{ oferta.empresa.id }}">{{ oferta.empresa.nombre }}</a>
+                <a href="admin/empresa/view/{{ oferta.empresa.id }}">{{ oferta.empresa.nombre }} </a>
               </td>
               
               <td class="text-center" style="font-size: medium">
                 <button type="button" class="btn btn-danger"  >
-                  <a class="text-decoration-none text-dark " href="admin/candidatura/oferta/{{ oferta.id }}">Candidaturas</a>
+                  <a class="text-decoration-none text-dark " href="admin/candidatura/xoferta/plist/{{ oferta.id }}"> {{ oferta.candidaturas }} candidaturas</a>
                 </button>
               </td>
 

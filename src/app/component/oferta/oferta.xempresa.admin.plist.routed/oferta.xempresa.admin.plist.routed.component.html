@@ -2,9 +2,12 @@
   <div class="row">
     <div class="col text-center">
       <h2 class="my-2">
-        <i class="bi bi-list"></i>
-        Lista de Ofertas en la Empresa 
-        <i class="bi bi-person-circle"></i>
+        <h2 class="my-2">
+          <i class="bi bi-list"></i>
+          Lista de Ofertas para la Empresa: {{ oEmpresa?.nombre }}
+          <i class="bi bi-person-circle"></i>
+        </h2>
+        
       </h2>
 
       <div class="d-inline-flex mx-2">
@@ -119,6 +122,7 @@
               <td class="text-start">{{ oferta.titulo | trim : 20 }}</td>
               <td class="text-start" style="font-size: small">{{oferta.descripcion | trim : 100 }}</td>
               <td class="text-start" style="font-size: small">{{ oferta.empresa.nombre | trim : 30 }}</td>
+              
               <td>
                 <div class="btn-group" role="group" aria-label="Basic example">
                   <button type="button" class="btn btn-success" (click)="view(oferta)">

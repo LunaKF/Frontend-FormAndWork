@@ -6,7 +6,10 @@ import { IPage } from '../../../model/model.interface';
 import { FormsModule } from '@angular/forms';
 import { BotoneraService } from '../../../service/botonera.service';
 import { debounceTime, Subject } from 'rxjs';
-import { Router, RouterModule } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { IOferta } from '../../../model/oferta.interface';
+import { HttpErrorResponse } from '@angular/common/http';
+import { OfertaService } from '../../../service/oferta.service';
 
 
 @Component({
@@ -20,6 +23,7 @@ import { Router, RouterModule } from '@angular/router';
 export class CandidaturaXofertaAdminPlistRoutedComponent implements OnInit {
 
   oPage: IPage<ICandidatura> | null = null;
+  oOferta: IOferta | null = null;
   //
   nPage: number = 0; // 0-based server count
   nRpp: number = 10;
@@ -35,32 +39,49 @@ export class CandidaturaXofertaAdminPlistRoutedComponent implements OnInit {
   constructor(
     private oCandidaturaService: CandidaturaService,
     private oBotoneraService: BotoneraService,
-    private oRouter: Router
+    private oRouter: Router,
+    private oActivatedRoute: ActivatedRoute,
+    private oOfertaService: OfertaService,
+
   ) {
+    // obtener el id de la ruta del cliente
+    this.oActivatedRoute.params.subscribe((params) => {
+
+      this.oOfertaService.get(params['id']).subscribe({
+        next: (oOferta: IOferta) => {
+          this.oOferta = oOferta;  
+          this.getPage(oOferta.id);
+        },        
+        error: (err: HttpErrorResponse) => {
+          console.log(err);
+        }
+      });
+    });
     this.debounceSubject.pipe(debounceTime(10)).subscribe((value) => {
-      this.getPage();
+      this.getPage(this.oOferta?.id);
     });
   }
 
   ngOnInit() {
-    this.getPage();
-  }
-  getPage() {
-    this.oCandidaturaService
-      .getPage(this.nPage, this.nRpp, this.strField, this.strDir, this.strFiltro)
-      .subscribe({
-        next: (oPageFromServer: IPage<ICandidatura>) => {
-          this.oPage = oPageFromServer;
-          this.arrBotonera = this.oBotoneraService.getBotonera(
-            this.nPage,
-            oPageFromServer.totalPages
-          );
-        },
-        error: (err) => {
-          console.log(err);
-        },
-      });
-  }
+   }
+ 
+   getPage(id: number = 0) {
+     this.oCandidaturaService
+       .getPageXoferta(this.nPage, this.nRpp, this.strField, this.strDir, this.strFiltro, id) //tomar el id de la url del cliente
+       .subscribe({
+         next: (oPageFromServer: IPage<ICandidatura>) => {
+           this.oPage = oPageFromServer;
+           this.arrBotonera = this.oBotoneraService.getBotonera(
+             this.nPage,
+             oPageFromServer.totalPages
+           );
+         },
+         error: (err) => {
+           console.log(err);
+         },
+       });
+   }
+ 
 
   edit(oCandidatura: ICandidatura) {
     //navegar a la página de edición

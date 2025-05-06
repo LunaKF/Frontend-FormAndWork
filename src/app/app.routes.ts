@@ -26,7 +26,8 @@ import { OfertaXsectorAdminPlistRoutedComponent } from './component/oferta/ofert
 import { CandidaturaAdminPlistRoutedComponent } from './component/candidatura/candidatura.admin.plist.routed/candidatura.admin.plist.routed.component';
 import { CandidaturaAdminViewRoutedComponent } from './component/candidatura/candidatura.admin.view.routed/candidatura.admin.view.routed.component';
 import { CandidaturaAdminDeleteRoutedComponent} from './component/candidatura/candidatura.admin.delete.routed/candidatura.admin.delete.routed.component';
-
+import { CandidaturaXofertaAdminPlistRoutedComponent } from './component/candidatura/candidatura.xoferta.admin.plist.routed/candidatura.xoferta.admin.plist.routed.component';
+import { CandidaturaXalumnoAdminPlistRoutedComponent } from './component/candidatura/candidatura.xalumno.admin.plist.routed/candidatura.xalumno.admin.plist.routed.component'
 import { OfertaAdminPlistRoutedComponent } from './component/oferta/oferta.admin.plist.routed/oferta.admin.plist.routed.component';
 import { OfertaAdminViewRoutedComponent } from './component/oferta/oferta.admin.view.routed/oferta.admin.view.routed.component';
 import { OfertaAdminDeleteRoutedComponent } from './component/oferta/oferta.admin.delete.routed/oferta.admin.delete.routed.component';
@@ -73,4 +74,11 @@ export const routes: Routes = [
 
     /*POR EMPRESA */
     {path:'admin/oferta/xempresa/plist/:id', component: OfertaXempresaAdminPlistRoutedComponent, pathMatch: 'full', },
+
+    /*POR OFERTA */
+    {path:'admin/candidatura/xoferta/plist/:id', component: CandidaturaXofertaAdminPlistRoutedComponent, pathMatch: 'full', },
+
+    /*POR ALUMNO */
+    {path:'admin/candidatura/xalumno/plist/:id', component: CandidaturaXalumnoAdminPlistRoutedComponent, pathMatch: 'full', },
+
 ];

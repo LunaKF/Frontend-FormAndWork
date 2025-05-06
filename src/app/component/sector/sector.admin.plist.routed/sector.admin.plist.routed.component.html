@@ -13,19 +13,19 @@
           style="table-layout: fixed; width: 100%; word-break: break-all">
           <thead>
             <tr>
-              <th class="bg-primary text-white">
+              <th class="idth bg-primary text-white">
                 ID
               </th>
-              <th class="bg-primary text-white">
-                Nombre Sector
+              <th class="nombreth bg-success text-white">
+                Nombre del Sector
               </th>
-              <th class="bg-success text-white">
+              <th class="empresasth bg-success text-white">
                 Empresas
               </th>
-              <th class="bg-success text-white">
+              <th class="alumnosth bg-success text-white">
                 Alumnos
               </th>
-              <th class="bg-success text-white">
+              <th class="ofertasth bg-success text-white">
                 Ofertas
               </th>
             </tr>
@@ -34,7 +34,7 @@
           <tbody>
             <tr *ngFor="let sector of oSector; trackBy: trackById">
               <td class="text-center">{{ sector.id }}</td>
-              <td class="text-center">{{ sector.nombre }}</td>
+              <td class="sectoreslista text-center">{{ sector.nombre }}</td>
               <td class="text-center">
                 <a href="admin/empresa/xsector/plist/{{ sector.id }}">{{ sector.empresas }}</a>
               </td>

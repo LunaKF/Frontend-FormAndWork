@@ -3,9 +3,10 @@
     <div class="col text-center">
       <h2 class="my-2">
         <i class="bi bi-list"></i>
-        Lista de Candidaturas por Oferta
+        Lista de Candidaturas para la Oferta: {{ oOferta?.titulo }}
         <i class="bi bi-person-circle"></i>
       </h2>
+      
       <a href="admin/candidatura/create"><button class="btn btn-primary my-2 mx-2">
           <i class="bi bi-plus-square"></i>
           Crear nueva candidatura
@@ -107,7 +108,7 @@
 
               <th (click)="sort('acciones')" class="bg-primary text-white">
                 Acciones
-                 @if (strField === 'accipones') { @if (strDir === 'desc') {
+                 @if (strField === 'acciones') { @if (strDir === 'desc') {
                 <i class="bi bi-caret-down-fill"></i>
                 } @else {
                 <i class="bi bi-caret-up-fill"></i>} }

@@ -3,8 +3,7 @@
     <div class="col text-center">
       <h2 class="my-2">
         <i class="bi bi-list"></i>
-        Lista de Ofertas en el sector
-        <i class="bi bi-person-circle"></i>
+        Ofertas en el sector<span class="sector-nombre">{{oSector?.nombre}}</span>
       </h2>
 
       <div class="d-inline-flex mx-2">
@@ -92,13 +91,7 @@
                 } @else {
                 <i class="bi bi-caret-up-fill"></i>} }
               </th>
-        
-              <th (click)="sort('sector.nombre')" class="bg-primary text-white">
-                Sector @if (strField === 'sector.nombre') { @if (strDir === 'desc') {
-                <i class="bi bi-caret-down-fill"></i>
-                } @else {
-                <i class="bi bi-caret-up-fill"></i>} }
-              </th>
+      
 
               <th (click)="sort('empresa.nombre')" class="bg-primary text-white">
                 Empresa @if (strField === 'empresa.nombre') { @if (strDir === 'desc') {
@@ -125,7 +118,6 @@
               <td class="text-center">{{ oferta.id }}</td>
               <td class="text-start">{{ oferta.titulo | trim : 20 }}</td>
               <td class="text-start" style="font-size: small">{{oferta.descripcion | trim : 100 }}</td>
-              <td class="text-start" style="font-size: small">{{ oferta.sector.nombre | trim : 30 }}</td>
               <td class="text-start" style="font-size: small">{{ oferta.empresa.nombre| trim : 30 }}</td>
               <td>
                 <div class="btn-group" role="group" aria-label="Basic example">

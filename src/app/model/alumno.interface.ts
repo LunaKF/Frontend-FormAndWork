@@ -7,5 +7,5 @@ export interface  IAlumno {
     ape2: string;
     email: string;
     sector: ISector;
-    
+    candidaturas: number;
 }

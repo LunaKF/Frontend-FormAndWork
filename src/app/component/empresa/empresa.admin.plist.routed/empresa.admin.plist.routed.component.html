@@ -4,20 +4,19 @@
       <h2 class="my-2">
         <i class="bi bi-list"></i>
         Lista de Empresas
-        <i class="bi bi-person-circle"></i>
       </h2>
-      <a href="admin/empresa/create"><button class="btn btn-primary my-2 mx-2">
-          <i class="bi bi-plus-square"></i>
-          Crear nueva empresa
-        </button></a>
 
-      <div class="d-inline-flex mx-2">
-        <input type="text" class="form-control" placeholder="Buscar" (keyup)="filter($event)" [(ngModel)]="strFiltro" />
+      <div class="d-flex justify-content-between align-items-center my-3 ">
+        <a href="admin/empresa/create" class="btn btn-primary mb-2 btn-lg ">
+          <i class="bi bi-plus-square"></i> Nueva empresa
+        </a>
       </div>
 
-      <div class="d-inline-flex mx-2">
-        <nav class="my-4">
-          <ul class="pagination justify-content-center">
+
+      <!-- Paginación RPP -->
+      <div class="my-3 ">
+        <nav>
+          <ul class="pagination justify-content-center flex-wrap">
             <li class="page-item" [class.active]="nRpp === 10">
               <a class="page-link" (click)="goToRpp(10)" href="#">10</a>
             </li>
@@ -29,6 +28,26 @@
             </li>
           </ul>
         </nav>
+      </div>
+
+
+      <div class="d-flex justify-content-between">
+        <div class="col-6">
+          <input type="text" class="form-control my-2 border border-primary" placeholder="Buscar empresa"
+            (keyup)="filter($event)" [(ngModel)]="strFiltro" />
+        </div>
+
+        @if (strFiltro.length>0) {
+        <h5 class="text-muted">
+          Filtrado por: <span class="text-danger">{{ strFiltro }}</span>
+        </h5>
+        } @else{
+        <h5 class="text-muted">Sin filtrar</h5>
+        }
+        <h5 class="text-muted">
+          Mostrando {{ oPage?.numberOfElements | number : "1.0-0" }} de
+          {{ oPage?.totalElements | number : "1.0-0" }}
+        </h5>
       </div>
 
       <nav class="my-2">
@@ -105,13 +124,13 @@
                 <i class="bi bi-caret-up-fill"></i>} }
               </th>
 
-              <th (click)="sort('ofertas')" class="bg-primary text-white">
-                Ofertas de la empresa 
+              <th class="bg-primary text-white">
+                Ofertas de la empresa
               </th>
 
-              <th (click)="sort('acciones')" class="bg-primary text-white">
+              <th class="bg-primary text-white">
                 Acciones
-                 @if (strField === 'accipones') { @if (strDir === 'desc') {
+                @if (strField === 'accipones') { @if (strDir === 'desc') {
                 <i class="bi bi-caret-down-fill"></i>
                 } @else {
                 <i class="bi bi-caret-up-fill"></i>} }
@@ -132,8 +151,9 @@
               </td>
 
               <td class="text-center" style="font-size: medium">
-                <button type="button" class="btn btn-danger"  >
-                  <a class="text-decoration-none text-dark " href="admin/oferta/xempresa/plist/{{ empresa.id }}">{{ empresa.ofertas }} ofertas</a>
+                <button type="button" class="btn btn-danger">
+                  <a class="text-decoration-none text-dark " href="admin/oferta/xempresa/plist/{{ empresa.id }}">{{
+                    empresa.ofertas }} ofertas</a>
                 </button>
               </td>
 

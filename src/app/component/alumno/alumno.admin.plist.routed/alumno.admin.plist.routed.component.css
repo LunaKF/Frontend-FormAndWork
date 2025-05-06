@@ -1,0 +1,18 @@
+:root {
+    --bs-primary: #6C5CE7; /* un violeta bonito */
+    --bs-success: #00b894; /* verde menta */
+    --bs-danger: #d46969;  /* rojo coral */
+    --bs-warning: #fdcb6e; /* amarillo pastel */
+    --bs-info: #74b9ff;    /* azul clarito */
+}
+
+.corner-img {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 50%; /* para imagen tipo avatar */
+  }
+  

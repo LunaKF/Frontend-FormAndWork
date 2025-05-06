@@ -1,0 +1,51 @@
+nav {
+    align-self: center;
+    padding: 10px;
+    background-color: transparent;
+
+    .navbar-brand {
+        margin: 0;
+        padding: 0;
+        font-size: 28px;
+        color: var(--bs-primary);
+    
+    }
+
+    .navbar-nav .nav-link.active {
+        color: #fff !important;
+        background-color: var(--bs-primary) !important;
+        border-radius: var(--bs-border-radius-lg);
+    
+    }
+    .container-fluid {
+        padding-inline: 5%;
+        margin: 0;
+        max-width: 100%;
+
+        .btn-login {
+            color: #fff;
+            background-color: var(--bs-primary);
+            border-radius: var(--bs-border-radius-lg);
+            text-decoration: none;
+            padding: 0.5rem 1.5rem;
+            font-size: 1.2rem;
+        }
+
+        .navbar-collapse {
+            flex-grow: 0;
+
+            .navbar-nav {
+                background-color: #cdb9f0;
+                border-radius: var(--bs-border-radius-lg);
+            }
+            
+        }
+    }
+}
+
+
+
+
+
+
+

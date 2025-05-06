@@ -1,25 +1,150 @@
 @import "bootstrap-icons/font/bootstrap-icons.css";
-@import "primeng/resources/themes/lara-light-blue/theme.css";
-@import "primeng/resources/primeng.css";
 @import "../node_modules/@angular/material/prebuilt-themes/deeppurple-amber.css";
 
-
-html, body { height: 100%; font-size: 0.9rem;}
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif;}
-
-.icon-10 { font-size: 10px; }
-.icon-15 { font-size: 15px; }
-.icon-20 { font-size: 20px; }
-.icon-50 { font-size: 50px; }
-
-.table tr th  { padding: 0.5rem 0.3rem; }
-.table tr td { padding: 0 0.5rem; align-content: center;}
-.table-totales tr th { padding: 0.8rem 2rem; border-width: 1px; border-color: #dee2e6; }
-.table-totales tr td { padding: 0.8rem 2rem; align-content: center; border-width: 1px;border-color: #dee2e6; font-size: large; }
-
-
-
-.navbar-nav .nav-link.active {
-    color: #fff !important;
-    background-color: #884599;
+:root {
+    --bs-primary: #3f14b8;
+    /* un violeta */
+    --bs-success: #00b894;
+    /* verde menta */
+    --bs-danger: #e749a0;
+    /* rojo coral */
+    --bs-warning: #f3bb53;
+    /* amarillo pastel */
+    --bs-info: #74b9ff;
+    /* azul clarito */
 }
+*, *::before, *::after {
+    box-sizing: border-box;
+  }
+  
+
+/*Supuestamente previene el desbordamiento horizontal*/
+html, body {
+    overflow-x: hidden;
+}
+
+.pagination .active > .page-link,
+.pagination .page-link.active {
+    background-color: var(--bs-primary) !important;
+    border-color: var(--bs-primary) !important;
+    color: white !important;
+}
+
+.bg-primary {
+    background-color: var(--bs-primary) !important;
+}
+
+.bg-success {
+    background-color: var(--bs-success) !important;
+}
+.bg-danger {
+    background-color: var(--bs-danger) !important;
+}
+.bg-warning {
+    background-color: var(--bs-warning) !important;
+}
+.bg-info {
+    background-color: var(--bs-info) !important;
+}
+.bg-light {
+    background-color: #f8f9fa !important;
+}
+div.container a.page-link {
+    color: var(--bs-primary) !important;
+  }
+  
+  div.container a.page-link.active {
+    background-color: var(--bs-primary) !important;
+    border-color: var(--bs-primary) !important;
+    color: white !important;
+  }
+  
+
+.btn-primary {
+    background-color: var(--bs-primary)!important;
+    border-color: var(--bs-primary)!important;
+}
+.btn-primary:hover{
+    background-color: var(--bs-primary)!important;
+    border-color: var(--bs-primary)!important;
+
+}
+
+.btn-success {
+    background-color: var(--bs-success)!important;
+    border-color: var(--bs-success)!important;
+}
+.btn-danger {
+    background-color: var(--bs-danger)!important;
+    border-color: var(--bs-danger)!important;
+}
+.btn-warning {
+    background-color: var(--bs-warning)!important;
+    border-color: var(--bs-warning)!important;
+}
+
+.georama {
+    font-family: "Georama", sans-serif;
+    font-optical-sizing: auto;
+    font-style: normal;
+    font-variation-settings:
+        "wdth" 100;
+}
+
+html,
+body {
+    height: 100%;
+    font-size: 0.9rem;
+}
+
+body {
+    
+    margin: 0;
+    font-family: "Georama", sans-serif;
+    font-optical-sizing: auto;
+}
+
+
+
+.icon-10 {
+    font-size: 10px;
+}
+
+.icon-15 {
+    font-size: 15px;
+}
+
+.icon-20 {
+    font-size: 20px;
+}
+
+.icon-50 {
+    font-size: 50px;
+}
+
+.table tr th {
+    padding: 0.5rem 0.3rem;
+    
+}
+
+.table tr td {
+    padding: 0 0.5rem;
+    align-content: center;
+}
+
+.table-totales tr th {
+    padding: 0.8rem 2rem;
+    border-width: 1px;
+    border-color: #dee2e6;
+    
+}
+
+.table-totales tr td {
+    padding: 0.8rem 2rem;
+    align-content: center;
+    border-width: 1px;
+    border-color: #dee2e6;
+    font-size: large;
+}
+
+

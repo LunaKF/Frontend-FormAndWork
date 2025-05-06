@@ -1,0 +1,42 @@
+:root {
+    --bs-primary: #3f14b8;
+    --bs-success: #00b894;
+    --bs-danger: #e749a0;
+    --bs-warning: #f3bb53;
+    --bs-info: #74b9ff;
+}
+
+html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    overflow-x: hidden;
+}
+
+body {
+    background-image: url('../../../../../public/img/uwu.jpg') !important;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    padding: 0 !important;
+    margin: 0 !important;
+    max-width: 100% !important;
+      
+}
+
+.subheading {
+    text-align: center;
+    font-size: 6rem;
+    color: white;
+    max-width: 90vw;
+    word-wrap: break-word;
+    width: 55%;
+    font-weight:500;
+}

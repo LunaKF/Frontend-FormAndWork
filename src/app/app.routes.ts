@@ -35,6 +35,9 @@ import { OfertaAdminCreateRoutedComponent } from './component/oferta/oferta.admi
 import { OfertaAdminEditRoutedComponent } from './component/oferta/oferta.admin.edit.routed/oferta.admin.edit.routed.component';
 import { OfertaXempresaAdminPlistRoutedComponent } from './component/oferta/oferta.xempresa.admin.plist.routed/oferta.xempresa.admin.plist.routed.component';
 
+/*RUTAS PARA LOS ALUMNOS (LOGIN) */
+import { AlumnoAlumnoPlistComponent } from './component/alumno/alumno.alumno.plist.routed/alumno.alumno.plist.routed.component';
+
 export const routes: Routes = [
     { path: '', component: SharedHomeRoutedComponent },
     { path: 'home', component: SharedHomeRoutedComponent },
@@ -67,6 +70,9 @@ export const routes: Routes = [
     {path: 'admin/candidatura/view/:id', component: CandidaturaAdminViewRoutedComponent, pathMatch: 'full', },
     {path: 'admin/candidatura/delete/:id', component: CandidaturaAdminDeleteRoutedComponent, pathMatch: 'full', },
     
+    /*RUTAS PARA LOS ALUMNOS (LOGIN) */
+    {path: 'alumno/alumno/plist', component: AlumnoAlumnoPlistComponent, pathMatch: 'full', },
+
     /*POR SECTOR */
     {path: 'admin/alumno/xsector/plist/:id', component: AlumnoXsectorAdminPlistComponent, pathMatch: 'full', },
     {path:'admin/empresa/xsector/plist/:id', component: EmpresaXsectorAdminPlistComponent, pathMatch: 'full', },

@@ -36,7 +36,12 @@
               <td class="text-center">{{ sector.id }}</td>
               <td class="sectoreslista text-center">{{ sector.nombre }}</td>
               <td class="text-center">
+                @if (sector.empresas>0){
                 <a href="admin/empresa/xsector/plist/{{ sector.id }}">{{ sector.empresas }}</a>
+                } 
+                @else{
+                  <p>0</p>
+                }
               </td>
               <td class="text-center">
                 <a href="admin/alumno/xsector/plist/{{ sector.id }}">{{ sector.alumnos }}</a>

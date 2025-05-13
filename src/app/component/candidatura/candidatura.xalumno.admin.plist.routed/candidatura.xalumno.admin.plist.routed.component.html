@@ -3,8 +3,8 @@
     <div class="col text-center">
       <h2 class="my-2">
         <i class="bi bi-list"></i>
-        Lista de Candidaturas del alumno {{ oAlumno?.nombre + " " + oAlumno?.ape1 + " " + oAlumno?.ape2 }}
-        <i class="bi bi-person-circle"></i>
+        Lista de Candidaturas del alumno 
+        <p class ="nombreAlumno"> <i class="bi bi-person-circle"></i> {{ oAlumno?.nombre + " " + oAlumno?.ape1 + " " + oAlumno?.ape2 }}</p> 
       </h2>
       <a href="admin/candidatura/create"><button class="btn btn-primary my-2 mx-2">
           <i class="bi bi-plus-square"></i>
@@ -98,21 +98,13 @@
                 <i class="bi bi-caret-up-fill"></i>} }
               </th>
 
-              <th (click)="sort('alumno')" class="bg-danger text-white">
-                Alumno @if (strField === 'alumno') { @if (strDir === 'desc') {
-                <i class="bi bi-caret-down-fill"></i>
-                } @else {
-                <i class="bi bi-caret-up-fill"></i>} }
-              </th>
-
               <th (click)="sort('acciones')" class="bg-primary text-white">
                 Acciones
-                 @if (strField === 'accipones') { @if (strDir === 'desc') {
+                 @if (strField === 'acciones') { @if (strDir === 'desc') {
                 <i class="bi bi-caret-down-fill"></i>
                 } @else {
                 <i class="bi bi-caret-up-fill"></i>} }
               </th>
-
             </tr>
           </thead>
 
@@ -125,8 +117,6 @@
               <td class="text-center">
                 <a href="admin/oferta/view/{{ candidatura.oferta.id }}">{{ candidatura.oferta.id }}</a>
               </td>
-
-              <td class="text-center">{{ candidatura.alumno.nombre + " " +candidatura.alumno.ape1 + " " +candidatura.alumno.ape2 }}</td>
 
               <td>
                 <div class="btn-group" role="group" aria-label="Basic example">

@@ -21,27 +21,32 @@ import { AlumnoXsectorAdminPlistComponent } from './component/alumno/alumno.xsec
 import { EmpresaXsectorAdminPlistComponent } from './component/empresa/empresa.xsector.admin.plist.routed/empresa.xsector.admin.plist.routed.component';
 import { OfertaXsectorAdminPlistRoutedComponent } from './component/oferta/oferta.xsector.admin.plist.routed/oferta.xsector.admin.plist.routed.component';
 
-/*POR EMPRESA */
 
 import { CandidaturaAdminPlistRoutedComponent } from './component/candidatura/candidatura.admin.plist.routed/candidatura.admin.plist.routed.component';
 import { CandidaturaAdminViewRoutedComponent } from './component/candidatura/candidatura.admin.view.routed/candidatura.admin.view.routed.component';
 import { CandidaturaAdminDeleteRoutedComponent} from './component/candidatura/candidatura.admin.delete.routed/candidatura.admin.delete.routed.component';
 import { CandidaturaXofertaAdminPlistRoutedComponent } from './component/candidatura/candidatura.xoferta.admin.plist.routed/candidatura.xoferta.admin.plist.routed.component';
 import { CandidaturaXalumnoAdminPlistRoutedComponent } from './component/candidatura/candidatura.xalumno.admin.plist.routed/candidatura.xalumno.admin.plist.routed.component'
+
 import { OfertaAdminPlistRoutedComponent } from './component/oferta/oferta.admin.plist.routed/oferta.admin.plist.routed.component';
 import { OfertaAdminViewRoutedComponent } from './component/oferta/oferta.admin.view.routed/oferta.admin.view.routed.component';
 import { OfertaAdminDeleteRoutedComponent } from './component/oferta/oferta.admin.delete.routed/oferta.admin.delete.routed.component';
 import { OfertaAdminCreateRoutedComponent } from './component/oferta/oferta.admin.create.routed/oferta.admin.create.routed.component';
 import { OfertaAdminEditRoutedComponent } from './component/oferta/oferta.admin.edit.routed/oferta.admin.edit.routed.component';
+
 import { OfertaXempresaAdminPlistRoutedComponent } from './component/oferta/oferta.xempresa.admin.plist.routed/oferta.xempresa.admin.plist.routed.component';
 
 /*RUTAS PARA LOS ALUMNOS (LOGIN) */
 import { AlumnoAlumnoPlistComponent } from './component/alumno/alumno.alumno.plist.routed/alumno.alumno.plist.routed.component';
+import { SharedLoginRoutedComponent } from './component/shared/shared.login.routed/shared.login.routed.component';
+import { SharedLogoutRoutedComponent } from './component/shared/shared.logout.routed/shared.logout.routed.component';
 
 export const routes: Routes = [
     { path: '', component: SharedHomeRoutedComponent },
     { path: 'home', component: SharedHomeRoutedComponent },
     { path: 'menu', component: SharedMenuUnroutedComponent },
+    { path: 'login', component: SharedLoginRoutedComponent },
+    { path: 'logout', component: SharedLogoutRoutedComponent },
 
     {path: 'admin/sector/plist', component: SectorAdminPlistRoutedComponent, pathMatch: 'full', },
 

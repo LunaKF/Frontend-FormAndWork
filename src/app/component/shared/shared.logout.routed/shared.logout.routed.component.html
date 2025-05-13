@@ -1,0 +1,25 @@
+<div class="row justify-content-center m-3">
+  <div class="col-lg-7 col-md-10 col-sm-12">
+    <h1 class="my-5 text-center">
+      Cerrar la sesión
+    </h1>
+
+    <h1 class="my-5 text-center">
+      <i class="bi bi-person-circle"></i>
+    </h1>
+
+    <div class="login-container">
+      <h2>LOGOUT</h2>      
+      <p class="fs-2 color-white text-center"> ¿Seguro que desea cerrar sesión?</p>
+      <div class="d-flex justify-content-center">
+        <button type="submit" class="btn bg-success mx-1" (click)="onLogout()">Cerrar sesión</button>
+        <button type="submit" class="btn bg-danger mx-1" (click)="onCancel()">Cancelar</button>
+      </div>
+      <!-- Mensaje de error -->
+      <div class="error-message" *ngIf="errorMessage">
+        {{ errorMessage }}
+      </div>
+    </div>
+
+  </div>
+</div>

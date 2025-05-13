@@ -1,6 +1,6 @@
 import {
   isPlatformBrowser
-} from "./chunk-KOO6HHSS.js";
+} from "./chunk-X64FFIV2.js";
 import {
   ElementRef,
   Inject,
@@ -12,7 +12,7 @@ import {
   ɵɵdefineInjector,
   ɵɵdefineNgModule,
   ɵɵinject
-} from "./chunk-VU6X2Q5G.js";
+} from "./chunk-O7EMCGWM.js";
 
 // node_modules/@angular/cdk/fesm2022/coercion.mjs
 function coerceBooleanProperty(value) {
@@ -282,4 +282,4 @@ export {
   _getEventTarget,
   _isTestEnvironment
 };
-//# sourceMappingURL=chunk-F6UGBNWV.js.map
+//# sourceMappingURL=chunk-7SJ47GKL.js.map

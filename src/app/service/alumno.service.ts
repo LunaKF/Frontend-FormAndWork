@@ -45,6 +45,12 @@ export class AlumnoService {
     return this.oHttp.get<IPage<IAlumno>>(URL, httpOptions);
   }
 
+  getAlumnoByEmail(email: string): Observable<IAlumno> {
+    let URL: string = '';
+    URL += this.serverURL + '/byemail';
+    URL += '/' + email;
+    return this.oHttp.get<IAlumno>(URL);
+  }
 
   getPageXsector(
     page: number,

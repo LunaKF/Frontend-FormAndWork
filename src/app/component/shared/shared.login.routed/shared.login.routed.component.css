@@ -1,0 +1,23 @@
+:root {
+    --bs-primary: #3f14b8;
+    /* un violeta */
+    --bs-success: #00b894;
+    /* verde menta */
+    --bs-danger: #e749a0;
+    /* rojo coral */
+    --bs-warning: #f3bb53;
+    /* amarillo pastel */
+    --bs-info: #74b9ff;
+    /* azul clarito */
+}
+
+.input-group{
+    margin-block: 10px;
+    width: 100%;
+    align-items: center;
+
+    .form-control{
+        width: 100%;
+        background-color: #cdb9f0;
+    }
+}

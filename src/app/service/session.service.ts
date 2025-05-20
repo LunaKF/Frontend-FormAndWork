@@ -7,7 +7,7 @@ import { Subject } from "rxjs";
     providedIn: 'root'
 })
 
-export class SessionService {
+export class SessionService {    
 
     subjectLogin: Subject<void> = new Subject<void>();
     subjectLogout: Subject<void> = new Subject<void>();
@@ -38,12 +38,6 @@ export class SessionService {
         }
     }
 
-    // Guardar datos de sesión
-    setSession(email: string, tipoUsuario: string): void {
-        localStorage.setItem('email', email);
-        localStorage.setItem('tipoUsuario', tipoUsuario); // Ej: 'admin', 'alumno', 'empresa'
-    }
-
     getSessionEmail(): string {
         const token = this.getToken();
         if (token) {
@@ -57,11 +51,6 @@ export class SessionService {
         } else {
             return '';
         }
-    }
-
-    // Obtener el tipo de usuario
-    getSessionTipoUsuario(): string | null {
-        return localStorage.getItem('tipoUsuario');
     }
 
     private parseJwt(token: string): IJwt {

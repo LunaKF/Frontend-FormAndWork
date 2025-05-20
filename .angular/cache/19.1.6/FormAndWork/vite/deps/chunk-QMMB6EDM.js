@@ -5257,6 +5257,7 @@ var _MatInternalFormField = class __MatInternalFormField {
 })();
 
 export {
+  ObserversModule,
   ENTER,
   ESCAPE,
   SPACE,
@@ -5266,7 +5267,6 @@ export {
   DOWN_ARROW,
   A,
   hasModifierKey,
-  ObserversModule,
   addAriaReferencedId,
   removeAriaReferencedId,
   ActiveDescendantKeyManager,
@@ -5321,4 +5321,4 @@ export {
   MatRippleLoader,
   _MatInternalFormField
 };
-//# sourceMappingURL=chunk-HVEPJHMM.js.map
+//# sourceMappingURL=chunk-QMMB6EDM.js.map

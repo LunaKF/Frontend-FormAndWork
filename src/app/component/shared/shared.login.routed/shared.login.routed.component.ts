@@ -19,7 +19,7 @@ import { CryptoService } from '../../../service/crypto.service';
 })
 export class SharedLoginRoutedComponent implements OnInit {
   errorMessage: string | null = null;
-
+  showPassword: boolean = false;
   loginForm: FormGroup = new FormGroup({});
 
   constructor(
@@ -34,6 +34,11 @@ export class SharedLoginRoutedComponent implements OnInit {
     });
 
 
+  }
+
+  //para ver la contraseña
+  togglePasswordVisibility() {
+    this.showPassword = !this.showPassword;
   }
 
   ngOnInit(): void { }

@@ -9,7 +9,7 @@ import { map, Observable } from "rxjs";
     providedIn: 'root'
 })
 
-export class ContableGuard implements CanActivate {
+export class EmpresaGuard implements CanActivate {
 
     constructor(private oSessionService: SessionService,
         private oEmpresaService: EmpresaService,
@@ -19,22 +19,21 @@ export class ContableGuard implements CanActivate {
         if (this.oSessionService.isSessionActive()) {
             //email del token
             let email: string = this.oSessionService.getSessionEmail();
-            //si el email no es vacio
-            if (email !== '') {
-                //comparar los emails, si el email aparece en alguna empresa devolver true (usar getAll)
-                return this.oEmpresaService.getAll().pipe(
-                    map((empresas: IEmpresa[]) => {
-                        return empresas.some((empresa: IEmpresa) => empresa.email === email);
-                    })
-                );
-            } else {
-                this.oRouter.navigate(['/login']);
-                return new Observable<boolean>(observer => {
-                    observer.next(false);
-                    observer.complete();
-                });
-            }
+            // llamar al servidor para obtener el tipo de usuario a partir del email
+            return this.oEmpresaService.getEmpresaByEmail(email).pipe(
+                map((oEmpresa: IEmpresa) => {
+                    if (oEmpresa) {
+                        return true;
+                    } else {
+                        this.oRouter.navigate(['/login']);
+                        return false;
+                    }
+                })
+            );
 
+            
+
+            
         } else {
             this.oRouter.navigate(['/login']);
             return new Observable<boolean>(observer => {

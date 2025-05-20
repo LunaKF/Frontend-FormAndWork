@@ -112,4 +112,6 @@ export class EmpresaService {
     }
   
 
+    // getByEmail(email: string): Observable<IEmpresa> {
+
 }

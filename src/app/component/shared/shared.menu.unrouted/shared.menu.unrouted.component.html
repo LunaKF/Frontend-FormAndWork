@@ -50,4 +50,18 @@
     </div>
 
   </div>
+
+  @if(activeSession){
+    <div class="item-login">
+      <a class="btn-login" href="/logout" role="button">Logout</a>
+      {{userEmail}}
+    </div>
+  }@else {
+    <div class="item-login">
+      <a class="btn-login" href="/login" role="button">Login</a>      
+    </div>
+  }
+
+
+
 </nav>

@@ -13,12 +13,19 @@ export class SharedMenuUnroutedComponent implements OnInit {
   activeSession: boolean = false;
   userEmail: string = '';
 
-  constructor(private oRouter: Router, private oSessionService: SessionService) {
+constructor(
+    private oRouter: Router,
+    private oSessionService: SessionService
+  ) {
     this.oRouter.events.subscribe((oEvent) => {
       if (oEvent instanceof NavigationEnd) {
         this.strRuta = oEvent.url;
       }
     });
+    this.activeSession = this.oSessionService.isSessionActive();
+    if (this.activeSession) {
+      this.userEmail = this.oSessionService.getSessionEmail();
+    }
   }
 
   ngOnInit() {

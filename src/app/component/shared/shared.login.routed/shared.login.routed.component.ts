@@ -21,7 +21,8 @@ export class SharedLoginRoutedComponent implements OnInit {
   errorMessage: string | null = null;
   showPassword: boolean = false;
   loginForm: FormGroup = new FormGroup({});
-
+  activeSession: boolean = false;
+  userEmail: string = '';
   constructor(
     private oLoginService: LoginService,
     private oSessionService: SessionService,
@@ -41,7 +42,13 @@ export class SharedLoginRoutedComponent implements OnInit {
     this.showPassword = !this.showPassword;
   }
 
-  ngOnInit(): void { }
+  ngOnInit(): void {
+    this.activeSession = this.oSessionService.isSessionActive();
+    if (this.activeSession) {
+      this.userEmail = this.oSessionService.getSessionEmail();
+      
+    }
+   }
 
   onSubmit() {
     if (this.loginForm.valid) {
@@ -50,7 +57,8 @@ export class SharedLoginRoutedComponent implements OnInit {
         next: (token: string) => {
           console.log('Token recibido:', token);
           alert('Inicio de sesión exitoso');
-
+          this.activeSession = true;
+          this.userEmail = this.loginForm.value.email;
           this.oSessionService.login(token);
           this.oRouter.navigate(['/']);
 

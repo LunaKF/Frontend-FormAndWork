@@ -7,7 +7,7 @@ import { Subject } from "rxjs";
     providedIn: 'root'
 })
 
-export class SessionService {    
+export class SessionService {
 
     subjectLogin: Subject<void> = new Subject<void>();
     subjectLogout: Subject<void> = new Subject<void>();
@@ -19,6 +19,20 @@ export class SessionService {
     private deleteToken(): void {
         localStorage.removeItem('token');
     }
+
+    getSessionTipoUsuario(): string {
+        //Comprueba si hay un token y si la sesión sigue activa.
+        const token = this.getToken();
+        if (token && this.isSessionActive()) {
+            //Si es así, lo parsea y devuelve el campo tipoUsuario.
+            const parsedToken: IJwt = this.parseJwt(token);
+            return parsedToken.tipoUsuario;
+        } else {
+            //Si no, devuelve una cadena vacía (''), para que el guard AdminGuard redirija correctamente al login
+            return '';
+        }
+    }
+
 
     isSessionActive(): boolean {
         // comprobar si el token no ha expirado

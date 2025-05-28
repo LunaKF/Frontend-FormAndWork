@@ -77,6 +77,12 @@ export class EmpresaService {
     return this.oHttp.get<IPage<IEmpresa>>(URL, httpOptions);
   }
 
+  getEmpresaByEmail(email: string): Observable<IEmpresa> {
+    let URL: string = '';
+    URL += this.serverURL + '/email/' + email;
+    return this.oHttp.get<IEmpresa>(URL);
+  }
+
   get(id: number): Observable<IEmpresa> {
     let URL: string = '';
     URL += this.serverURL;

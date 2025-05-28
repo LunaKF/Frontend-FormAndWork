@@ -5,4 +5,7 @@ export interface IJwt {
     iss: string,   // Emisor del token (issuer), normalmente el servidor
     iat: number,   // Fecha de emisión del token (issued at), en formato UNIX (segundos)
     exp: number    // Fecha de expiración del token, en formato UNIX
+    
+    
+    tipoUsuario: string; //para el getSessionTipoUsuario
 }

@@ -63,12 +63,10 @@ export class CandidaturaAdminPlistRoutedComponent implements OnInit {
   }
 
   edit(oCandidatura: ICandidatura) {
-    //navegar a la página de edición
     this.oRouter.navigate(['admin/candidatura/edit', oCandidatura.id]);
   }
 
   view(oCandidatura: ICandidatura) {
-    //navegar a la página de edición
     this.oRouter.navigate(['admin/candidatura/view', oCandidatura.id]);
   }
 

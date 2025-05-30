@@ -103,33 +103,33 @@ export class OfertaXempresaAdminPlistRoutedComponent implements OnInit {
   goToPage(p: number) {
     if (p) {
       this.nPage = p - 1;
-      this.getPage();
+      this.getPage( this.oEmpresa?.id);
     }
     return false;
   }
 
   goToNext() {
     this.nPage++;
-    this.getPage();
+    this.getPage( this.oEmpresa?.id);
     return false;
   }
 
   goToPrev() {
     this.nPage--;
-    this.getPage();
+    this.getPage(   this.oEmpresa?.id);
     return false;
   }
 
   sort(field: string) {
     this.strField = field;
     this.strDir = this.strDir === 'asc' ? 'desc' : 'asc';
-    this.getPage();
+    this.getPage( this.oEmpresa?.id);
   }
 
   goToRpp(nrpp: number) {
     this.nPage = 0;
     this.nRpp = nrpp;
-    this.getPage();
+    this.getPage( this.oEmpresa?.id);
     return false;
   }
 

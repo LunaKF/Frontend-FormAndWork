@@ -101,20 +101,20 @@ export class EmpresaXsectorAdminPlistComponent implements OnInit {
   goToPage(p: number) {
     if (p) {
       this.nPage = p - 1;
-      this.getPage();
+      this.getPage( this.oSector?.id);
     }
     return false;
   }
 
   goToNext() {
     this.nPage++;
-    this.getPage();
+    this.getPage( this.oSector?.id);
     return false;
   }
 
   goToPrev() {
     this.nPage--;
-    this.getPage();
+    this.getPage( this.oSector?.id);
     return false;
   }
 
@@ -127,7 +127,7 @@ export class EmpresaXsectorAdminPlistComponent implements OnInit {
   goToRpp(nrpp: number) {
     this.nPage = 0;
     this.nRpp = nrpp;
-    this.getPage();
+    this.getPage( this.oSector?.id);
     return false;
   }
 

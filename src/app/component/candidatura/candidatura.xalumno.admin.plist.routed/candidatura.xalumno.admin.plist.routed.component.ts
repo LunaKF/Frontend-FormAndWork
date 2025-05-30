@@ -101,33 +101,33 @@ export class CandidaturaXalumnoAdminPlistRoutedComponent implements OnInit {
   goToPage(p: number) {
     if (p) {
       this.nPage = p - 1;
-      this.getPage();
+      this.getPage(this.oAlumno?.id?? 0);
     }
     return false;
   }
 
   goToNext() {
     this.nPage++;
-    this.getPage();
+    this.getPage(this.oAlumno?.id?? 0);
     return false;
   }
 
   goToPrev() {
     this.nPage--;
-    this.getPage();
+    this.getPage(this.oAlumno?.id?? 0);
     return false;
   }
 
   sort(field: string) {
     this.strField = field;
     this.strDir = this.strDir === 'asc' ? 'desc' : 'asc';
-    this.getPage();
+    this.getPage(this.oAlumno?.id?? 0);
   }
 
   goToRpp(nrpp: number) {
     this.nPage = 0;
     this.nRpp = nrpp;
-    this.getPage();
+    this.getPage(this.oAlumno?.id?? 0);
     return false;
   }
 

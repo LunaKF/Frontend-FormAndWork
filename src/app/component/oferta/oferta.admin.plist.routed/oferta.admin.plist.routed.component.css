@@ -1,0 +1,57 @@
+:root {
+    --bs-primary: #3f14b8;
+    /* un violeta */
+    --bs-success: #00b894;
+    /* verde menta */
+    --bs-danger: #e749a0;
+    /* rojo coral */
+    --bs-warning: #f3bb53;
+    /* amarillo pastel */
+    --bs-info: #74b9ff;
+    /* azul clarito */
+
+}
+
+.table-responsive {
+    background-color: var(--bs-vio);
+    font-size: 16px;
+    padding: 10px;
+
+    .id {
+        background-color: var(--bs-danger);
+        border-radius: 15px;
+    }
+
+    .idContent {
+        color: var(--bs-primary);
+        font-weight: bold;
+        text-align: center;
+                background-color: rgb(204, 172, 255);
+                        border-radius: 15px;
+
+
+    }
+
+    .descripcionContent {
+        padding: 10px;
+    }
+}
+
+/* Ajuste de la tabla para mejor visualización de descripción */
+.table-ofertas .descripcion-col {
+    width: 30%;
+    min-width: 250px;
+    ;
+}
+
+.table-ofertas .descripcion-cell {
+    white-space: normal;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    font-size: 0.95rem;
+    line-height: 1.3;
+    max-height: 8em;
+    /* limita altura visual */
+    overflow: auto;
+    /* scroll si es muy larga */
+}

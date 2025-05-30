@@ -33,21 +33,31 @@
 
           <tbody>
             <tr *ngFor="let sector of oSector; trackBy: trackById">
-              <td class="text-center">{{ sector.id }}</td>
-              <td class="sectoreslista text-center">{{ sector.nombre }}</td>
-              <td class="text-center">
+              <td class="IDsectores">{{ sector.id }}</td>
+              <td class="sectoreslista">{{ sector.nombre }}</td>
+
+              <td class="empresaslista">
                 @if (sector.empresas>0){
                 <a href="admin/empresa/xsector/plist/{{ sector.id }}">{{ sector.empresas }}</a>
-                } 
-                @else{
-                  <p>0</p>
                 }
+                @else{
+                <i class="bi bi-0-circle"></i> }
               </td>
-              <td class="text-center">
+
+              <td class="alumnoslista">
+                @if (sector.alumnos>0){
                 <a href="admin/alumno/xsector/plist/{{ sector.id }}">{{ sector.alumnos }}</a>
+                }
+                @else{
+                <i class="bi bi-0-circle"></i> }
               </td>
-              <td class="text-center">
+
+              <td class="ofertaslista">
+                @if( sector.ofertas>0){
                 <a href="admin/oferta/xsector/plist/{{ sector.id }}">{{ sector.ofertas }}</a>
+                }
+                @else{
+                <i class="bi bi-0-circle"></i> }
               </td>
             </tr>
           </tbody>

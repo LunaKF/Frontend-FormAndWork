@@ -6,6 +6,7 @@ import { Router } from '@angular/router';
 import { LoginService } from '../../../service/login.service';
 import { SessionService } from '../../../service/session.service';
 import { CryptoService } from '../../../service/crypto.service';
+import { environment } from '../../../enviroment/enviroment';
 @Component({
   selector: 'app-shared.login.routed',
   templateUrl: './shared.login.routed.component.html',
@@ -23,12 +24,18 @@ export class SharedLoginRoutedComponent implements OnInit {
   loginForm: FormGroup = new FormGroup({});
   activeSession: boolean = false;
   userEmail: string = '';
+  production:boolean = false;
+
+
+
   constructor(
     private oLoginService: LoginService,
     private oSessionService: SessionService,
     private oRouter: Router,
     private oCryptoService: CryptoService
   ) {
+    // take production from environment file
+    this.production= environment.production;
     this.loginForm = new FormGroup({
       email: new FormControl('', [Validators.required, Validators.email]),
       password: new FormControl('', [Validators.required, Validators.minLength(5)])
@@ -73,6 +80,18 @@ export class SharedLoginRoutedComponent implements OnInit {
         }
       });
     }
+  }
+
+  setLoginAdmin() {    
+    this.loginForm.setValue({ email: "admin@ausias.es", password: "admin1234" });
+  }
+
+  setLoginEmpresa() {
+    this.loginForm.setValue({email: "emailgre3849@gmail.com", password: "energy1234"})
+  }
+
+  setLoginAlumno() {
+    this.loginForm.setValue({email: "rafa@gmail.com", password: "rafa1234"})
   }
 
 

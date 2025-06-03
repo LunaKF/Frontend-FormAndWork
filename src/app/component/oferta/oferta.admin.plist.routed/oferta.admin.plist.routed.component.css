@@ -29,7 +29,14 @@
                 background-color: rgb(204, 172, 255);
                         border-radius: 15px;
 
-
+        a{
+            color: var(--bs-primary);
+            text-decoration: none;
+            font-weight: bold;
+            &:hover {
+                text-decoration: underline;
+            }
+        }
     }
 
     .descripcionContent {
@@ -54,4 +61,12 @@
     /* limita altura visual */
     overflow: auto;
     /* scroll si es muy larga */
+}
+
+.candidaturas-sin-sesion{
+    color: var(--bs-danger);
+    padding: 10px;
+
+    border-radius: 10px;
+    text-align: center;
 }

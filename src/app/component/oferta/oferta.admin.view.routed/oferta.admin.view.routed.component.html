@@ -1,58 +1,42 @@
-<div class="row justify-content-center m-3">
-  <div class="col-lg-7 col-md-10 col-sm-12">
-    <h1 class="my-5 text-center">
-      Vista del Oferta con Id: {{ oOferta.id }}
-    </h1>
-    
-    <br />
-    <table *ngIf="oOferta" class="table table-striped table-bordered my-5 text-center">
-      <tbody>
-        <tr class="text-center">
-          <th scope="row" class="bg-danger text-white text-end pe-5">Id</th>
-          <td class="text-start ps-5">{{ oOferta.id }}</td>
-        </tr>
-        <tr class="text-center">
-          <th scope="row" class="bg-primary text-white text-end pe-5">
-            Titulo
-          </th>
-          <td class="text-start ps-5">{{ oOferta.titulo }}</td>
-        </tr>
-        <tr class="text-start">
-          <th scope="row" class="bg-primary text-white text-end pe-5">
-            Descripción
-          </th>
-          <td class="text-start ps-5">{{ oOferta.descripcion }}</td>
+<div class="row justify-content-center m-4">
+  <div class="col-lg-8 col-md-10 col-sm-12">
+    <div class="card shadow-lg rounded-4 oferta-view-card">
+      <div class="card-body p-5">
+        <h2 class="titulo-oferta">
+          {{ oOferta.titulo }}
+        </h2>
 
-        </tr>
-        <tr class="text-center">
-          <th scope="row" class="bg-primary text-white text-end pe-5">
-           Empresa
-          </th>
-          <td class="text-start ps-5">{{ oOferta.empresa?.nombre }}</td>
-        </tr>
-        <tr class="text-center">
-          <th scope="row" class="bg-primary text-white text-end pe-5">
-            Sector 
-          </th>
-          <td class="text-start ps-5">{{ oOferta.sector?.nombre }}</td>
-        </tr>
-      </tbody>
-    </table>
-    
-  </div>
+        <hr class="mb-4" />
 
-  <div class="d-flex justify-content-center mt-4">
-    <a class="btn btn-warning mt-4 mx-1" href="admin/oferta/plist">
-      <i class="bi bi-list"></i>
-      Ir a listado de Ofertas
-    </a>
-    <a class="btn btn-primary mt-4 mx-1" href="admin/oferta/edit/{{ oOferta.id }}">
-      <i class="bi bi-pencil"></i>
-      Editar
-    </a>
-    <a class="btn btn-danger mt-4 mx-1" href="admin/oferta/delete/{{ oOferta.id }}">
-      <i class="bi bi-trash"></i>
-      Borrar
-    </a>
+        <div class="info-row">
+          <span class="label bg-danger text-white">ID</span>
+          <span class="value">{{ oOferta.id }}</span>
+
+
+          <div class="info-row">
+            <span class="label bg-primary text-white">Sector</span>
+            <span class="value">{{ oOferta.sector?.nombre }}</span>
+          </div>
+          <div class="info-row">
+            <span class="label bg-primary text-white">Empresa</span>
+            <span class="value">{{ oOferta.empresa?.nombre }}</span>
+          </div>
+
+
+
+        </div>
+        <div class="info-row">
+          <span class="label bg-primary text-white">Descripción</span>
+          <span class="value">{{ oOferta.descripcion }}</span>
+        </div>
+
+
+        <div class="d-flex justify-content-center mt-5 gap-3 flex-wrap">
+          <a class="btn btn-warning" href="/admin/oferta/plist">
+            <i class="bi bi-list"></i> Listado
+          </a>
+        </div>
+      </div>
+    </div>
   </div>
 </div>

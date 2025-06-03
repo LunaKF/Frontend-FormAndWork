@@ -6,12 +6,13 @@
         Lista de Empresas
       </h2>
 
+           <!--
       <div class="d-flex justify-content-between align-items-center my-3 ">
         <a href="admin/empresa/create" class="btn btn-primary mb-2 btn-lg ">
           <i class="bi bi-plus-square"></i> Nueva empresa
         </a>
       </div>
-
+-->
 
       <!-- Paginación RPP -->
       <div class="my-3 ">
@@ -77,19 +78,7 @@
         </ul>
       </nav>
 
-      <div class="d-flex justify-content-between">
-        @if (strFiltro.length>0) {
-        <h5 class="text-muted">
-          Filtrado por: <span class="text-danger">{{ strFiltro }}</span>
-        </h5>
-        } @else{
-        <h5 class="text-muted">Sin filtrar</h5>
-        }
-        <h5 class="text-muted">
-          Mostrando {{ oPage?.numberOfElements | number : "1.0-0" }} de
-          {{ oPage?.totalElements | number : "1.0-0" }}
-        </h5>
-      </div>
+      <!-- Tabla de empresas -->
 
       <div class="d-flex flex-column">
         <table class="table table-striped table-bordered my-2"

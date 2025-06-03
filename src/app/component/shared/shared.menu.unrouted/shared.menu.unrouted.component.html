@@ -5,7 +5,7 @@
       aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
-
+    @if (activeSession) {
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
       <ul class="navbar-nav me-auto mb-2 mb-lg-0">
         <li class="nav-item">
@@ -44,7 +44,25 @@
         </li>
       </ul>
     </div>
+  } @else {
+    <!-- sOLO PODRÁ VER LAS OFERTAS, MENSAJE PARA INCIAR SESION  -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <li class="nav-item">
+          <a class="nav-link" [class.active]="
+              strRuta == '/home' || strRuta == '/' || strRuta == ''
+            " aria-current="page" href="/home">Inicio</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" [class.active]="
+            strRuta == '/admin/oferta/plist'" 
+            href="/admin/oferta/plist">Ofertas</a>
+        </li>
+      </ul>
+    <span class="navbar-session">Inicia sesión para ver más</span>
+    </div>
 
+  }
 
   @if(activeSession){
     <div class="item-login">

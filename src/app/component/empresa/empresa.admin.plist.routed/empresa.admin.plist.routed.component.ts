@@ -8,12 +8,13 @@ import { BotoneraService } from '../../../service/botonera.service';
 import { debounceTime, Subject } from 'rxjs';
 import { Router, RouterModule } from '@angular/router';
 import { TrimPipe } from '../../../pipe/trim.pipe';
+import { SessionService } from '../../../service/session.service';
 
 
 @Component({
   selector: 'app-empresa.admin.plist.routed',
   templateUrl: './empresa.admin.plist.routed.component.html',
-  styleUrls: ['./empresa.admin.plist.routed.component.css'] ,
+  styleUrls: ['./empresa.admin.plist.routed.component.css'],
   standalone: true,
   imports: [CommonModule, FormsModule, TrimPipe, RouterModule],
 })
@@ -33,18 +34,41 @@ export class EmpresaAdminPlistRoutedComponent implements OnInit {
   arrBotonera: string[] = [];
   //
   private debounceSubject = new Subject<string>();
+
+  activeSession: boolean = false;
+  userEmail: string = '';
   constructor(
     private oEmpresaService: EmpresaService,
     private oBotoneraService: BotoneraService,
-    private oRouter: Router
-  ) {
+    private oRouter: Router,
+    private oSessionService: SessionService
+
+) {
     this.debounceSubject.pipe(debounceTime(10)).subscribe((value) => {
       this.getPage();
-    });
+    }); this.activeSession = this.oSessionService.isSessionActive();
+    if (this.activeSession) {
+      this.userEmail = this.oSessionService.getSessionEmail();
+    }
   }
 
-  ngOnInit() {
+
+ ngOnInit() {
+    this.oSessionService.onLogin().subscribe({
+      next: () => {
+        this.activeSession = true;
+        this.userEmail = this.oSessionService.getSessionEmail();
+      },
+    });
+    this.oSessionService.onLogout().subscribe({
+      next: () => {
+        this.activeSession = false;
+        this.userEmail = '';
+      },
+    });
+
     this.getPage();
+
   }
   getPage() {
     this.oEmpresaService

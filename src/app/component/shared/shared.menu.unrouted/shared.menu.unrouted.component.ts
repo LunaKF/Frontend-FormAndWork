@@ -7,13 +7,14 @@ import { SessionService } from '../../../service/session.service';
   templateUrl: './shared.menu.unrouted.component.html',
   styleUrls: ['./shared.menu.unrouted.component.css'],
   standalone: true,
+  
 })
 export class SharedMenuUnroutedComponent implements OnInit {
   strRuta: string = '';
   activeSession: boolean = false;
   userEmail: string = '';
 
-constructor(
+  constructor(
     private oRouter: Router,
     private oSessionService: SessionService
   ) {

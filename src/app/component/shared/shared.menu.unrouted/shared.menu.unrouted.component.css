@@ -40,6 +40,10 @@ nav {
             }
             
         }
+
+        .navbar-session{
+            padding-inline: 1.5rem;
+        }
     }
 }
 

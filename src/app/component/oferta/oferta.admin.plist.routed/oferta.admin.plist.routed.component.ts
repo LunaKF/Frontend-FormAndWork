@@ -8,43 +8,68 @@ import { BotoneraService } from '../../../service/botonera.service';
 import { debounceTime, Subject } from 'rxjs';
 import { Router, RouterModule } from '@angular/router';
 import { TrimPipe } from '../../../pipe/trim.pipe';
+import { SessionService } from '../../../service/session.service';
 
 
 @Component({
   selector: 'app-oferta.admin.plist.routed',
   templateUrl: './oferta.admin.plist.routed.component.html',
-  styleUrls: ['./oferta.admin.plist.routed.component.css'] ,
+  styleUrls: ['./oferta.admin.plist.routed.component.css'],
   standalone: true,
   imports: [CommonModule, FormsModule, TrimPipe, RouterModule],
 })
 
 export class OfertaAdminPlistRoutedComponent implements OnInit {
-   oPage: IPage<IOferta> | null = null;
-    //
-    nPage: number = 0; // 0-based server count
-    nRpp: number = 10;
-    //
-    strField: string = '';
-    strDir: string = '';
-    //
-    strFiltro: string = '';
-    //
-    arrBotonera: string[] = [];
-    //
-    private debounceSubject = new Subject<string>();
+ 
+  oPage: IPage<IOferta> | null = null;
+  //
+  nPage: number = 0; // 0-based server count
+  nRpp: number = 10;
+  //
+  strField: string = '';
+  strDir: string = '';
+  //
+  strFiltro: string = '';
+  //
+  arrBotonera: string[] = [];
+  //
+  private debounceSubject = new Subject<string>();
+
+  activeSession: boolean = false;
+  userEmail: string = '';
 
   constructor(
-      private oOfertaService: OfertaService,
-      private oBotoneraService: BotoneraService,
-      private oRouter: Router
-    ) {
-      this.debounceSubject.pipe(debounceTime(10)).subscribe((value) => {
-        this.getPage();
-      });
+    private oOfertaService: OfertaService,
+    private oBotoneraService: BotoneraService,
+    private oRouter: Router,
+    private oSessionService: SessionService
+
+  ) {
+    this.debounceSubject.pipe(debounceTime(10)).subscribe((value) => {
+      this.getPage();
+    }); this.activeSession = this.oSessionService.isSessionActive();
+    if (this.activeSession) {
+      this.userEmail = this.oSessionService.getSessionEmail();
     }
- ngOnInit() {
-    this.getPage();
   }
+ ngOnInit() {
+    this.oSessionService.onLogin().subscribe({
+      next: () => {
+        this.activeSession = true;
+        this.userEmail = this.oSessionService.getSessionEmail();
+      },
+    });
+    this.oSessionService.onLogout().subscribe({
+      next: () => {
+        this.activeSession = false;
+        this.userEmail = '';
+      },
+    });
+
+    this.getPage();
+
+  }
+
   getPage() {
     this.oOfertaService
       .getPage(this.nPage, this.nRpp, this.strField, this.strDir, this.strFiltro)
@@ -79,7 +104,7 @@ export class OfertaAdminPlistRoutedComponent implements OnInit {
   goToPage(p: number) {
     if (p) {
       this.nPage = p - 1;
-      this.getPage( );
+      this.getPage();
     }
     return false;
   }

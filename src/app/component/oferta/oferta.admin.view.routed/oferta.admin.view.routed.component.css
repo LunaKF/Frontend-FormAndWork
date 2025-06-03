@@ -1,0 +1,64 @@
+:root {
+    --bs-primary: #3f14b8;
+    /* un violeta */
+    --bs-success: #00b894;
+    /* verde menta */
+    --bs-danger: #e749a0;
+    /* rojo coral */
+    --bs-warning: #f3bb53;
+    /* amarillo pastel */
+    --bs-info: #74b9ff;
+    /* azul clarito */
+}
+
+.oferta-view-card {
+  background: #fff;
+  border: none;
+  border-radius: 1rem;
+
+.titulo-oferta{
+  color: var(--bs-primary);
+  font-size: 2.5rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
+
+}
+
+  .info-row {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    border-bottom: 1px solid #eee;
+
+    .label {
+      min-width: 120px;
+      padding: 1rem;
+      font-weight: bold;
+      border-radius: 0.5rem;
+      text-align: center;
+    }
+
+    .value {
+      flex: 1;
+      margin-left: 2rem;
+      font-size: 1.1rem;
+      color: #333;
+    }
+  }
+
+  .info-row:last-child {
+    border-bottom: none;
+  }
+
+  .btn {
+    padding: 0.6rem 1.4rem;
+    font-size: 1rem;
+    border-radius: 0.7rem;
+
+    i {
+      margin-right: 0.4rem;
+    }
+  }
+}

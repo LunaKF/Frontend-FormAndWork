@@ -93,8 +93,6 @@ export class OfertaAdminCreateRoutedComponent implements OnInit {
 
   createForm() {
     this.oOfertaForm = new FormGroup({
-      id: new FormControl(''),
-
       titulo: new FormControl('', [
         Validators.required,
         Validators.minLength(3),
@@ -109,26 +107,17 @@ export class OfertaAdminCreateRoutedComponent implements OnInit {
 
       sector: new FormGroup({
         id: new FormControl('', Validators.required),
-        nombre: new FormControl('', Validators.required),
-        empresas: new FormControl('', Validators.required),
-        alumnos: new FormControl('', Validators.required),
-
+        nombre: new FormControl('', Validators.required)
       }),
 
       empresa: new FormGroup({
         id: new FormControl('', Validators.required),
         nombre: new FormControl('', Validators.required),
-        email: new FormControl('', Validators.required),
-        sector: new FormGroup({
-          id: new FormControl('', Validators.required),
-          nombre: new FormControl('', Validators.required),
-          empresas: new FormControl('', Validators.required),
-          alumnos: new FormControl('', Validators.required),
-        })
-      }),
-
+        email: new FormControl('', Validators.required)
+      })
     });
   }
+
 
   updateForm() {
     this.oOfertaForm?.controls['titulo'].setValue('');
@@ -205,7 +194,11 @@ export class OfertaAdminCreateRoutedComponent implements OnInit {
       if (result !== undefined) {
         console.log(result);
         this.oSector = result;
-        this.oOfertaForm?.controls['sector'].setValue(this.oSector);
+        this.oOfertaForm?.controls['sector'].setValue({
+          id: this.oSector.id,
+          nombre: this.oSector.nombre
+        });
+
         console.log(this.oOfertaForm?.value);
       }
     });
@@ -226,7 +219,12 @@ export class OfertaAdminCreateRoutedComponent implements OnInit {
       if (result !== undefined) {
         console.log(result);
         this.oEmpresa = result;
-        this.oOfertaForm?.controls['empresa'].setValue(this.oEmpresa);
+        this.oOfertaForm?.controls['empresa'].setValue({
+          id: this.oEmpresa.id,
+          nombre: this.oEmpresa.nombre,
+          email: this.oEmpresa.email
+        });
+
         console.log(this.oOfertaForm?.value);
       }
     });

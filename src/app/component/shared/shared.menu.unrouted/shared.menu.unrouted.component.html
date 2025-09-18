@@ -1,80 +1,86 @@
 <nav class="navbar navbar-expand-lg ">
   <div class="container-fluid">
-    <a class="navbar-brand" href="/home">FormAndWork</a>
+    <a class="navbar-brand" [routerLink]="'/home'">FormAndWork</a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
       aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
+
     @if (activeSession) {
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
       <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+
         <li class="nav-item">
-          <a class="nav-link" [class.active]="
-              strRuta == '/home' || strRuta == '/' || strRuta == ''
-            " aria-current="page" href="/home">Inicio</a>
+          <a class="nav-link"
+             [class.active]="strRuta == '/home' || strRuta == '/' || strRuta == ''"
+             [routerLink]="'/home'">Inicio</a>
         </li>
-        <li class="nav-item">
-          <a class="nav-link" [class.active]="
-            strRuta == '/admin/empresa/plist'" 
-            href="/admin/empresa/plist">Empresas</a>
+
+        <!-- Ocultar a EMPRESA -->
+        <li class="nav-item" *ngIf="!isEmpresa">
+          <a class="nav-link"
+             [class.active]="strRuta == '/admin/empresa/plist'"
+             [routerLink]="'/admin/empresa/plist'">Empresas</a>
         </li>
 
         <li class="nav-item">
-          <a class="nav-link" [class.active]="
-            strRuta == '/admin/sector/plist'" 
-            href="/admin/sector/plist">Sectores</a>
+          <a class="nav-link"
+             [class.active]="strRuta == '/admin/sector/plist'"
+             [routerLink]="'/admin/sector/plist'">Sectores</a>
+        </li>
+
+        <!-- Ocultar a ALUMNO -->
+        <li class="nav-item" *ngIf="!isAlumno">
+          <a class="nav-link"
+             [class.active]="strRuta == '/admin/alumno/plist'"
+             [routerLink]="'/admin/alumno/plist'">Alumnos</a>
         </li>
 
         <li class="nav-item">
-          <a class="nav-link" [class.active]="
-            strRuta == '/admin/alumno/plist'" 
-            href="/admin/alumno/plist">Alumnos</a>
+          <a class="nav-link"
+             [class.active]="strRuta == '/admin/oferta/plist' || strRuta == '/oferta/plist'"
+             [routerLink]="activeSession ? '/admin/oferta/plist' : '/oferta/plist'">Ofertas</a>
         </li>
 
         <li class="nav-item">
-          <a class="nav-link" [class.active]="
-            strRuta == '/admin/oferta/plist'" 
-            href="/admin/oferta/plist">Ofertas</a>
-        </li>
-
-        <li class="nav-item">
-          <a class="nav-link" [class.active]="
-            strRuta == '/admin/candidatura/plist'" 
-            href="/admin/candidatura/plist">Candidaturas</a>
+          <a class="nav-link"
+             [class.active]="strRuta == '/admin/candidatura/plist'"
+             [routerLink]="'/admin/candidatura/plist'">Candidaturas</a>
         </li>
       </ul>
     </div>
-  } @else {
-    <!-- sOLO PODRÁ VER LAS OFERTAS, MENSAJE PARA INCIAR SESION  -->
+
+    } @else {
+
+    <!-- Sin sesión: solo Inicio y Ofertas (pública) -->
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
       <ul class="navbar-nav me-auto mb-2 mb-lg-0">
         <li class="nav-item">
-          <a class="nav-link" [class.active]="
-              strRuta == '/home' || strRuta == '/' || strRuta == ''
-            " aria-current="page" href="/home">Inicio</a>
+          <a class="nav-link"
+             [class.active]="strRuta == '/home' || strRuta == '/' || strRuta == ''"
+             [routerLink]="'/home'">Inicio</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" [class.active]="
-            strRuta == '/admin/oferta/plist'" 
-            href="/admin/oferta/plist">Ofertas</a>
+          <a class="nav-link"
+             [class.active]="strRuta == '/oferta/plist'"
+             [routerLink]="'/oferta/plist'">Ofertas</a>
         </li>
       </ul>
-    <span class="navbar-session">Inicia sesión para ver más</span>
+      <span class="navbar-session">Inicia sesión para ver más</span>
     </div>
 
-  }
+    }
 
-  @if(activeSession){
-    <div class="item-login">
-      <a class="btn-login" href="/logout" role="button">Logout</a>
-      {{userEmail}}
-    </div>
-  }@else {
-    <div class="item-login">
-      <a class="btn-login" href="/login" role="button">Login</a>      
-    </div>
-  }
+    @if(activeSession){
+      <div class="item-login">
+        <a class="btn-login" [routerLink]="'/logout'" role="button">Logout</a>
+        {{userEmail}}
+      </div>
+    }@else {
+      <div class="item-login">
+        <a class="btn-login" [routerLink]="'/login'" role="button">Login</a>
+      </div>
+    }
 
   </div>
-
 </nav>

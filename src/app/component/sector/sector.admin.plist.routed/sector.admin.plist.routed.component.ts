@@ -1,67 +1,73 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { debounceTime, Subject } from 'rxjs';
 import { Router, RouterModule } from '@angular/router';
+
 import { ISector } from '../../../model/sector.interface';
-import { IPage } from '../../../model/model.interface';
-import { BotoneraService } from '../../../service/botonera.service';
 import { SectorService } from '../../../service/sector.service';
-
-
 
 @Component({
   selector: 'app-sector.admin.plist.routed',
+  standalone: true,
   templateUrl: './sector.admin.plist.routed.component.html',
   styleUrls: ['./sector.admin.plist.routed.component.css'],
-  standalone: true,
-  imports: [ CommonModule, FormsModule, RouterModule],
+  imports: [CommonModule, FormsModule, RouterModule],
 })
 export class SectorAdminPlistRoutedComponent implements OnInit {
 
   oSector: ISector[] = [];
+  query = '';
+  loading = true;
 
+  // ⚠️ Sustituye esto por tu AuthService cuando lo tengas.
+  // Por ejemplo, leyendo del token o de un servicio global.
+  isAdmin = this.readIsAdmin();
 
   constructor(
-    private oSectorService: SectorService,
-    private oRouter: Router
+    private sectorService: SectorService,
+    private router: Router
   ) {}
+
   ngOnInit() {
-    this.oSectorService.getAll().subscribe({
+    this.cargar();
+  }
+
+  private cargar() {
+    this.loading = true;
+    this.sectorService.getAll().subscribe({
       next: (data: ISector[]) => {
-        this.oSector = data;
+        this.oSector = data || [];
+        this.loading = false;
       },
       error: (err) => {
-        console.error('Error al obtener sectores:', err.message || err);
+        console.error('Error al obtener sectores:', err?.message || err);
+        this.loading = false;
       }
     });
   }
 
-  getAll() {
-    this.oSectorService.getAll().subscribe({
-      next: (data: ISector[]) => {
-        this.oSector = data;
-      },
-      error: (err) => {
-        console.error(err);
-      },
-    });
+  // Filtro simple en cliente
+  get filtered(): ISector[] {
+    const q = (this.query || '').toLowerCase().trim();
+    if (!q) return this.oSector;
+    return this.oSector.filter(s =>
+      String(s.id).includes(q) ||
+      (s.nombre || '').toLowerCase().includes(q)
+    );
   }
 
-  trackById(index: number, item: ISector): number {
-    return item.id;
-  }
+  trackById = (_: number, item: ISector) => item.id;
 
-  edit(oSector: ISector) {
-    this.oRouter.navigate(['sector', 'edit', oSector.id]);
-  }
+  // Navegación
+  view(s: ISector)  { this.router.navigate(['sector', 'view',  s.id]); }
+  edit(s: ISector)  { if (this.isAdmin) this.router.navigate(['sector', 'edit',  s.id]); }
+  remove(s: ISector){ if (this.isAdmin) this.router.navigate(['sector', 'delete', s.id]); }
+  create()          { if (this.isAdmin) this.router.navigate(['sector', 'new']); }
 
-  remove(oSector: ISector) {
-    this.oRouter.navigate(['sector', 'delete', oSector.id]);
-  }
-
-
-  view(oSector: ISector) {
-    this.oRouter.navigate(['sector', 'view', oSector.id]);
+  // Simulación muy básica: cambia por tu lógica real
+  private readIsAdmin(): boolean {
+    // ejemplo: si guardas el rol en localStorage
+    const role = (localStorage.getItem('role') || '').toLowerCase();
+    return role === 'admin';
   }
 }

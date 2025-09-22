@@ -66,7 +66,14 @@
             </thead>
             <tbody>
               @for (oferta of oPage?.content; track oferta.id) {
-                <tr class="row-card hover-rise">
+                <!-- CAMBIO: hacemos toda la fila clicable, accesible y con clase 'clickable' -->
+                <tr class="row-card hover-rise clickable"
+                  (click)="view(oferta)"              
+                  tabindex="0"                          
+                  role="button"                         
+                  (keydown.enter)="view(oferta)"        
+                  (keydown.space)="$event.preventDefault(); view(oferta)"
+                >
 
                   <td class="text-center fw-semibold">{{ oferta.titulo | trim: 20 }}</td>
 
@@ -78,7 +85,10 @@
 
                   <td class="text-center">
                     @if (activeSession) {
-                      <a class="link-empresa" [routerLink]="'/admin/empresa/view/' + oferta.empresa.id">
+                      <!-- CAMBIO: evitar que el click en el link de empresa dispare el click de la fila -->
+                      <a class="link-empresa"
+                         [routerLink]="'/admin/empresa/view/' + oferta.empresa.id"
+                         (click)="$event.stopPropagation()"> <!-- CAMBIO -->
                         {{ oferta.empresa.nombre }}
                       </a>
                     } @else {
@@ -88,11 +98,18 @@
 
                   @if (!activeSession) {
                     <td>
-                      <span class="badge bg-soft-danger text-danger candidatura-oferta">{{ oferta.candidaturas }} </span>
+                      <!-- CAMBIO: evitar propagación en el badge -->
+                      <span class="badge bg-soft-danger text-danger candidatura-oferta"
+                            (click)="$event.stopPropagation()"> <!-- CAMBIO -->
+                        {{ oferta.candidaturas }}
+                      </span>
                     </td>
                   } @else {
                     <td>
-                      <a class="btn btn-outline-danger btn-sm lift" [routerLink]="'/admin/candidatura/xoferta/plist/' + oferta.id">
+                      <!-- CAMBIO: evitar propagación en el link de candidaturas -->
+                      <a class="btn btn-outline-danger btn-sm lift"
+                         [routerLink]="'/admin/candidatura/xoferta/plist/' + oferta.id"
+                         (click)="$event.stopPropagation()"> <!-- CAMBIO -->
                         {{ oferta.candidaturas }}
                       </a>
                     </td>
@@ -100,7 +117,9 @@
 
                   @if (activeSession) {
                     <td>
-                      <div class="d-flex gap-2 justify-content-center">
+                      <!-- CAMBIO: evitar propagación en todo el contenedor de acciones -->
+                      <div class="d-flex gap-2 justify-content-center"
+                           (click)="$event.stopPropagation()"> <!-- CAMBIO -->
                         <button type="button" class="btn-icon lift" (click)="view(oferta)" aria-label="Ver oferta">
                           <i class="bi bi-eye"></i>
                         </button>
@@ -129,7 +148,7 @@
         <ul class="pagination justify-content-center flex-wrap gap-1">
           <li class="page-item" [class.disabled]="!hasPrev()">
             <a class="page-link" href="#" (click)="goToPrev()">
-              <i class="bi bi-caret-left-square-fill"></i> Anterior
+              <i class="bi bi-caret-left-square-fill"></i> 
             </a>
           </li>
 
@@ -143,7 +162,7 @@
 
           <li class="page-item" [class.disabled]="!hasNext()">
             <a class="page-link" href="#" (click)="goToNext()">
-              Siguiente <i class="bi bi-caret-right-square-fill"></i>
+               <i class="bi bi-caret-right-square-fill"></i>
             </a>
           </li>
         </ul>

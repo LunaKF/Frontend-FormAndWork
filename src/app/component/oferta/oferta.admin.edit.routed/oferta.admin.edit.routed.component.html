@@ -1,116 +1,125 @@
-<div class="container mt-5 d-flex align-items-center justify-content-center">
-  <div class="row">
-    <div class="col text-center">
-      <h2 class="my-5">
-        <i class="bi bi-pencil"></i>
-        Edición del oferta {{ oOferta?.titulo }}
-        <i class="bi bi-person-circle"></i>
-      </h2>
+<div class="page-wrap soft-bg">
+  <!-- CABECERA -->
+  <header class="header-ofertas">
+    <h2 class="title-gradient">
+      Editar oferta
+    </h2>
+  </header>
 
-      <form [formGroup]="oOfertaForm!" (ngSubmit)="onSubmit()" novalidate>
-        <div class="row mt-4">
-          <mat-form-field>
-            <mat-label>Id </mat-label>
-            <input matInput formControlName="id" placeholder="Id" readonly />
-            <mat-hint align="end">No se puede cambiar</mat-hint>
-          </mat-form-field>
+  <!-- TARJETA FORMULARIO -->
+  <div class="container py-4">
+    <div class="form-card shadow-xl hover-rise">
+
+    <!-- Skeleton -->
+      <div *ngIf="loading" class="skeleton">
+        <div class="sk-line"></div>
+        <div class="sk-line"></div>
+        <div class="sk-line"></div>
+      </div>
+
+      <!-- FORMULARIO -->
+      <form *ngIf="!loading" [formGroup]="oOfertaForm" (ngSubmit)="onSubmit()" class="form-grid" novalidate>
+
+        <!-- ID (solo lectura, fuera del form) -->
+        <div class="full info-row">
+          <span class="chip"><i class="bi bi-hash"></i> ID</span>
+          <span class="pill">{{ oOferta?.id }}</span>
         </div>
 
-        <div class="row mt-4">
-          <mat-form-field>
-            <mat-label>Titulo de la Oferta</mat-label>
-            <input matInput formControlName="titulo" placeholder="Nombre de la Oferta..." />
-            <mat-hint align="start">De 3 caracteres a 255 caracteres</mat-hint>
-            <mat-error *ngIf="oOfertaForm?.get('titulo')?.hasError('required')">Este campo es obligatorio</mat-error>
-            <mat-error *ngIf="oOfertaForm?.get('titulo')?.hasError('minlength')">El titulo debe ser más
-              largo</mat-error>
-            <mat-error *ngIf="oOfertaForm?.get('titulo')?.hasError('maxlength')">El titulo debe ser más
-              corto</mat-error>
-          </mat-form-field>
-        </div>
-
-        <div class="row mt-4">
-          <mat-form-field>
-            <mat-label>Descripcion</mat-label>
-            <input matInput formControlName="descripcion" placeholder="Apellido 1 del Oferta..." />
-            <mat-hint align="start">De 3 caracteres a 555 caracteres</mat-hint>
-            <mat-error *ngIf="oOfertaForm?.get('descripcion')?.hasError('required')">Este campo es obligatorio</mat-error>
-            <mat-error *ngIf="oOfertaForm?.get('descripcion')?.hasError('minlength')">La descripcion debe ser más
-              larga</mat-error>
-            <mat-error *ngIf="oOfertaForm?.get('descripcion')?.hasError('maxlength')">La descripcion debe ser más
-              corta</mat-error>
-          </mat-form-field>
-        </div>
-
-        <div formGroupName="sector">
-          <div class="row mt-4">
-            <mat-form-field>
-              <mat-label>SECTORES</mat-label>
-              <div class="d-flex justify-content-end">
-                <button class="btn btn-primary" (click)="showSectorSelectorModal()">
-                  <i class="bi bi-search"></i>
-                  Buscar
-                </button>
-              </div>
-              <div class="d-flex justify-content-start">
-              </div>
-              {{ oSector?.id }} {{ oSector?.nombre }}
-              <input matInput formControlName="id" placeholder="Sector" />
-            </mat-form-field>
+        <!-- Empresa (solo lectura, fuera del form) -->
+        <div class="full fieldset field-locked">
+          <div class="fieldset-head">
+            <span class="chip bg-soft-danger text-danger">
+              <i class="bi bi-building-lock"></i> Empresa (bloqueada)
+            </span>
+            <button class="btn btn-secondary lift" type="button" disabled title="Bloqueado">
+              <i class="bi bi-ban"></i> Cambiar
+            </button>
           </div>
-        </div>
-        
-        <div formGroupName="empresa">
-          <div class="row mt-4">
-            <mat-form-field>
-              <mat-label>EMPRESAS</mat-label>
-              <div class="d-flex justify-content-end">
-                <button class="btn btn-primary" (click)="showEmpresaSelectorModal()">
-                  <i class="bi bi-search"></i>
-                  Buscar
-                </button>
-              </div>
-              <div class="d-flex justify-content-start">
-              </div>
-              {{ oEmpresa?.id }} - {{ oEmpresa?.nombre }}
-              <input matInput formControlName="id" placeholder="empresa" />
-            </mat-form-field>
+          <div class="empresa-readonly">
+            <div><strong>Nombre</strong> <span>{{ empresaNombre }}</span></div>
+            <div><strong>Email</strong> <span>{{ empresaEmail }}</span></div>
           </div>
+          <small class="locked-note">Esta información no se puede modificar desde esta pantalla.</small>
         </div>
 
-        <br />
+        <!-- Título -->
+        <mat-form-field appearance="outline" class="full">
+          <mat-label>Título de la oferta</mat-label>
+          <input matInput formControlName="titulo" placeholder="Nombre de la oferta..." />
+          <mat-hint align="start">De 3 a 255 caracteres</mat-hint>
+          <mat-error *ngIf="oOfertaForm.get('titulo')?.hasError('required')">Campo obligatorio</mat-error>
+          <mat-error *ngIf="oOfertaForm.get('titulo')?.hasError('minlength')">Demasiado corto</mat-error>
+          <mat-error *ngIf="oOfertaForm.get('titulo')?.hasError('maxlength')">Demasiado largo</mat-error>
+        </mat-form-field>
 
-        <button class="btn btn-warning mt-4 mx-1" [routerLink]="['/admin', 'oferta', 'plist']">
-          <i class="bi bi-list"></i>
-          Ir a listado de Ofertas
-        </button>
+        <!-- Descripción -->
+        <mat-form-field appearance="outline" class="full">
+          <mat-label>Descripción</mat-label>
+          <textarea matInput rows="4" formControlName="descripcion" placeholder="Descripción de la oferta..."></textarea>
+          <mat-hint align="start">De 5 a 255 caracteres</mat-hint>
+          <mat-error *ngIf="oOfertaForm.get('descripcion')?.hasError('required')">Campo obligatorio</mat-error>
+          <mat-error *ngIf="oOfertaForm.get('descripcion')?.hasError('minlength')">Demasiado corta</mat-error>
+          <mat-error *ngIf="oOfertaForm.get('descripcion')?.hasError('maxlength')">Demasiado larga</mat-error>
+        </mat-form-field>
 
-        <button class="btn btn-secondary mt-4 mx-1" (click)="onReset()">
-          <i class="bi bi-x-lg"></i>
-          Reset
-        </button>
+        <!-- Sector -->
+        <div class="full fieldset">
+          <div class="fieldset-head">
+            <span class="chip"><i class="bi bi-diagram-3"></i> Sector</span>
+            <button class="btn btn-primary lift" type="button" (click)="showSectorSelectorModal()">
+              <i class="bi bi-search"></i> Buscar
+            </button>
+          </div>
 
-        <button class="btn btn-primary mt-4 mx-1" type="submit" [disabled]="!oOfertaForm?.valid">
-          <i class="bi bi-floppy"></i>
-          Guardar
-        </button>
-
-        <div class="modal fade" [id]="'mimodal'" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-          <div class="modal-dialog">
-            <div class="modal-content">
-              <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">FormAndWork</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
-                  (click)="hideModal()"></button>
-              </div>
-              <div class="modal-body">
-                <p>{{ strMessage }}</p>
-              </div>
-              <div class="modal-footer">
-                <button type="button" class="btn btn-primary" data-bs-dismiss="modal" (click)="hideModal()">
-                  Cerrar
-                </button>
-              </div>
+          <div class="sector-row">
+            <div>
+              <label class="lbl">ID sector</label>
+              <input class="ro-input" [value]="oOfertaForm.value.sectorId ?? ''" readonly>
+            </div>
+            <div>
+              <label class="lbl">Nombre sector</label>
+              <input class="ro-input" [value]="sectorNombre" readonly>
             </div>
           </div>
+
+          <!-- Control real (oculto) para sectorId -->
+          <input type="hidden" formControlName="sectorId">
         </div>
+
+        <!-- Acciones -->
+        <div class="actions">
+          <button class="btn btn-warning mx-1 lift" type="button" [routerLink]="['/admin','oferta','plist']">
+            <i class="bi bi-list"></i> Ir al listado
+          </button>
+
+          <button class="btn btn-secondary mx-1 lift" type="button" (click)="onReset()">
+            <i class="bi bi-x-lg"></i> Reset
+          </button>
+
+          <button class="btn btn-primary mx-1 lift" type="submit" [disabled]="oOfertaForm.invalid">
+            <i class="bi bi-floppy"></i> Guardar
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL -->
+  <div class="modal fade" [id]="'mimodal'" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">FormAndWork</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" (click)="hideModal()"></button>
+        </div>
+        <div class="modal-body">
+          <p>{{ strMessage }}</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" data-bs-dismiss="modal" (click)="hideModal()">Cerrar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

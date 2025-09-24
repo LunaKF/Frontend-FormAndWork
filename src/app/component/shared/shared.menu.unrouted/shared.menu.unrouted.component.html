@@ -40,7 +40,7 @@
         <li class="nav-item">
           <a class="nav-link"
              [class.active]="strRuta == '/admin/oferta/plist' || strRuta == '/oferta/plist'"
-             [routerLink]="activeSession ? '/admin/oferta/plist' : '/oferta/plist'">Ofertas</a>
+             [routerLink]="activeSession ? '/admin/oferta/plist' : '/oferta/plist'">Tus ofertas</a>
         </li>
 
         <li class="nav-item">
@@ -61,10 +61,12 @@
              [class.active]="strRuta == '/home' || strRuta == '/' || strRuta == ''"
              [routerLink]="'/home'">Inicio</a>
         </li>
+        
         <li class="nav-item">
+          
           <a class="nav-link"
              [class.active]="strRuta == '/oferta/plist'"
-             [routerLink]="'/oferta/plist'">Ofertas</a>
+             [routerLink]="'/oferta/plist'"><i class="bi bi-search"></i> Ofertas</a>
         </li>
       </ul>
       <span class="navbar-session">Inicia sesión para ver más</span>

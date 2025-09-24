@@ -16,14 +16,15 @@
 
 /* Página */
 .page.soft-bg {
-  background: var(--soft-bg);
+  background: var(--soft-bg, #f8f9fb);
 }
 
 /* ===== HEADER / TOOLBAR (same vibes que plist) ===== */
 .header-ofertas {
   padding-inline: 10%;
   padding-block: 2rem 1rem;
-  border-bottom: 1px solid black;
+  /*sobra solo de abajo morada intensa*/
+  box-shadow: 0 2px 6px rgba(63, 20, 184, .12);
 }
 
 .toolbar {
@@ -41,15 +42,15 @@
 }
 
 .title-gradient {
-  background: linear-gradient(90deg, var(--violet), var(--softviolet));
+  background: linear-gradient(90deg, var(--violet, #3f14b8), var(--softviolet, #9982fd));
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
   color: transparent;
   display: inline-block;
-  font-size: clamp(2.4rem, 6vw, 3.4rem);
-  /* letras grandes */
+  font-size:  3rem;
   line-height: 1.05;
+  font-weight: 700;
 }
 
 .subtitle {
@@ -83,7 +84,7 @@
   width: 100%;
   padding: .65rem .9rem .65rem 2.2rem;
   border-radius: 14px;
-  border: 1px solid var(--border);
+  border: 1px solid var(--border, #e8e8ef);
   background: #fff;
   transition: box-shadow .2s ease, transform .1s ease;
 }
@@ -99,17 +100,17 @@
   align-items: center;
   gap: .5rem;
   border-radius: 12px;
-  border: 1px solid var(--border);
   padding: .6rem 1rem;
   transition: transform .12s ease, box-shadow .2s ease, border-color .2s ease;
 }
+
 
 .btn:hover {
   transform: translateY(-1px);
 }
 
 .btn-primary {
-  background: linear-gradient(90deg, var(--violet), var(--softviolet));
+  background: linear-gradient(90deg, var(--violet,  #3f14b8), var(--softviolet, #9982fd));
   color: #fff;
   border-color: rgba(63, 20, 184, .25);
 }
@@ -124,11 +125,13 @@
 }
 
 .btn.danger {
-  border-color: rgba(231, 73, 160, .35);
+  background: var(--coral, #e749a0);
+  color: #fff;
 }
 
 .btn.danger:hover {
-  background: rgba(231, 73, 160, .08);
+  background: pink;
+;
 }
 
 /* Chips */
@@ -148,7 +151,7 @@
   border-radius: 999px;
   background: #f2f3f7;
   color: #555;
-  border: 1px solid var(--border);
+  border: 1px solid var(--border, #e8e8ef);
 }
 
 .chip i {
@@ -161,11 +164,9 @@
 
 /* ===== GRID / FONDO degradado ===== */
 .sectors-grid {
-  background: rgba(89, 0, 255, .06);
-  background-image:
-    radial-gradient(60rem 60rem at 85% -5%, rgba(153, 130, 253, .28), transparent 60%),
-    radial-gradient(30rem 30rem at 10% 105%, rgba(63, 20, 184, .12), transparent 60%);
-  border-top: 1px solid var(--border);
+  background: rgba(156, 103, 255, 0.205);
+
+  border-top: 1px solid var(--border, #e8e8ef);
   padding-block: 2rem 3rem;
 }
 
@@ -195,8 +196,7 @@
 
 /* ===== CARD ===== */
 .sector-card {
-  border: 1px solid var(--border);
-  background: linear-gradient(180deg, #ffffffcc, #ffffff);
+  background: linear-gradient(180deg, var(--soft-violet, #5900ff36), #ffffff);
   backdrop-filter: blur(4px);
   border-radius: 18px;
   padding: 1.25rem;
@@ -207,7 +207,7 @@
 .hover-rise:hover {
   transform: translateY(-5px);
   box-shadow: 0 12px 32px rgba(0, 0, 0, .10);
-  border-color: rgba(63, 20, 184, .25);
+  border-color: rgba(64, 20, 184, 0.466);
 }
 
 .clickable {
@@ -222,7 +222,7 @@
 }
 
 .badge-id {
-  background: linear-gradient(90deg, var(--violet), var(--softviolet));
+  background: linear-gradient(90deg, var(--violet,  #3f14b8), var(--softviolet, #9982fd));
   color: #fff;
   font-weight: 700;
   padding: .35rem .6rem;
@@ -231,6 +231,7 @@
 }
 
 .sector-name {
+ 
   font-size: clamp(1.5rem, 2.6vw, 2rem);
   margin: 0;
   line-height: 1.15;
@@ -240,6 +241,8 @@
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
+  
+  
 }
 
 /* Stats / Pills */
@@ -297,7 +300,7 @@
   text-align: center;
   color: #777;
   padding: 2rem 0;
-  border: 1px dashed var(--border);
+  border: 1px dashed var(--border, #e8e8ef);
   border-radius: 12px;
   background: #fff;
 }
@@ -334,7 +337,7 @@
 
 /* Utilidades colores */
 .text-danger {
-  color: var(--coral) !important;
+  color: var(--coral, #e749a0) !important;
 }
 
 .bg-soft-danger {

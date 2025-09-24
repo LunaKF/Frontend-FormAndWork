@@ -11,20 +11,11 @@
         <div class="tools">
           <div class="searchbox">
             <i class="bi bi-search"></i>
-            <input
-              type="text"
-              class="form-control"
-              placeholder="Buscar por nombre o ID…"
-              [(ngModel)]="query"
-              aria-label="Buscar sectores"
-            />
+            <input type="text" class="form-control" placeholder="Buscar por nombre o ID…" [(ngModel)]="query"
+              aria-label="Buscar sectores" />
           </div>
 
-          <button
-            *ngIf="isAdmin"
-            class="btn btn-primary lift"
-            type="button"
-            (click)="create()">
+          <button *ngIf="isAdmin" class="btn btn-primary lift" type="button" (click)="create()">
             <i class="bi bi-plus-lg"></i> Nuevo sector
           </button>
         </div>
@@ -60,51 +51,32 @@
         </ng-container>
 
         <!-- Tarjetas -->
-        <article
-          class="sector-card hover-rise clickable"
-          *ngFor="let s of filtered; trackBy: trackById"
-          (click)="view(s)"
-          tabindex="0"
-          role="button"
-          (keydown.enter)="view(s)"
-          (keydown.space)="$event.preventDefault(); view(s)"
-        >
+        <article class="sector-card hover-rise clickable" *ngFor="let s of filtered; trackBy: trackById"
+          (click)="view(s)" tabindex="0" role="button" (keydown.enter)="view(s)"
+          (keydown.space)="$event.preventDefault(); view(s)">
           <div class="card-head">
-            <span class="badge-id">#{{ s.id }}</span>
+            <span class="badge-id">{{ s.id }}</span>
             <h2 class="sector-name">{{ s.nombre }}</h2>
           </div>
-
           <div class="stats">
-            <!-- Empresas -->
-            <a
-              class="pill"
-              [class.disabled]="!(s.empresas>0)"
+            <!-- Empresas: visible para todos -->
+            <a class="pill" [class.disabled]="!(s.empresas>0)"
               [routerLink]="s.empresas>0 ? ['/admin','empresa','xsector','plist', s.id] : null"
-              (click)="$event.stopPropagation()"
-              aria-label="Empresas del sector"
-            >
+              (click)="$event.stopPropagation()" aria-label="Empresas del sector">
               <i class="bi bi-building"></i> Empresas <strong>{{ s.empresas || 0 }}</strong>
             </a>
 
-            <!-- Alumnos -->
-            <a
-              class="pill"
-              [class.disabled]="!(s.alumnos>0)"
+            <!-- Alumnos: SOLO admin (no mostrar número ni enlace a no-admin) -->
+            <a *ngIf="isAdmin" class="pill" [class.disabled]="!(s.alumnos>0)"
               [routerLink]="s.alumnos>0 ? ['/admin','alumno','xsector','plist', s.id] : null"
-              (click)="$event.stopPropagation()"
-              aria-label="Alumnos del sector"
-            >
+              (click)="$event.stopPropagation()" aria-label="Alumnos del sector">
               <i class="bi bi-people"></i> Alumnos <strong>{{ s.alumnos || 0 }}</strong>
             </a>
 
-            <!-- Ofertas -->
-            <a
-              class="pill"
-              [class.disabled]="!(s.ofertas>0)"
+            <!-- Ofertas: visible para todos -->
+            <a class="pill" [class.disabled]="!(s.ofertas>0)"
               [routerLink]="s.ofertas>0 ? ['/admin','oferta','xsector','plist', s.id] : null"
-              (click)="$event.stopPropagation()"
-              aria-label="Ofertas del sector"
-            >
+              (click)="$event.stopPropagation()" aria-label="Ofertas del sector">
               <i class="bi bi-briefcase"></i> Ofertas <strong>{{ s.ofertas || 0 }}</strong>
             </a>
           </div>

@@ -5,6 +5,7 @@ import { Router, RouterModule } from '@angular/router';
 
 import { ISector } from '../../../model/sector.interface';
 import { SectorService } from '../../../service/sector.service';
+import { SessionService } from '../../../service/session.service'; // ⬅️ NUEVO
 
 @Component({
   selector: 'app-sector.admin.plist.routed',
@@ -19,17 +20,35 @@ export class SectorAdminPlistRoutedComponent implements OnInit {
   query = '';
   loading = true;
 
-  // ⚠️ Sustituye esto por tu AuthService cuando lo tengas.
-  // Por ejemplo, leyendo del token o de un servicio global.
-  isAdmin = this.readIsAdmin();
+  // flags de rol (como en tu SharedMenuUnroutedComponent)
+  isAdmin = false;
+  isEmpresa = false;
+  isAlumno = false;
 
   constructor(
     private sectorService: SectorService,
-    private router: Router
+    private router: Router,
+    private oSessionService: SessionService      // ⬅️ NUEVO
   ) {}
 
   ngOnInit() {
+    // rol desde la sesión (misma fuente de verdad que tu menú)
+    this.setRoleFromSession();
+
+    // si el rol cambia en caliente:
+    this.oSessionService.onLogin().subscribe({ next: () => this.setRoleFromSession() });
+    this.oSessionService.onLogout().subscribe({ next: () => {
+      this.isAdmin = this.isEmpresa = this.isAlumno = false;
+    }});
+
     this.cargar();
+  }
+
+  private setRoleFromSession() {
+    const tipo = (this.oSessionService.getSessionTipoUsuario() || '').toLowerCase().trim();
+    this.isAdmin   = (tipo === 'admin' || tipo === 'administrador');
+    this.isEmpresa = (tipo === 'empresa');
+    this.isAlumno  = (tipo === 'alumno');
   }
 
   private cargar() {
@@ -43,10 +62,12 @@ export class SectorAdminPlistRoutedComponent implements OnInit {
         console.error('Error al obtener sectores:', err?.message || err);
         this.loading = false;
       }
+
+      
     });
   }
 
-  // Filtro simple en cliente
+  // Filtro simple
   get filtered(): ISector[] {
     const q = (this.query || '').toLowerCase().trim();
     if (!q) return this.oSector;
@@ -59,15 +80,8 @@ export class SectorAdminPlistRoutedComponent implements OnInit {
   trackById = (_: number, item: ISector) => item.id;
 
   // Navegación
-  view(s: ISector)  { this.router.navigate(['sector', 'view',  s.id]); }
-  edit(s: ISector)  { if (this.isAdmin) this.router.navigate(['sector', 'edit',  s.id]); }
-  remove(s: ISector){ if (this.isAdmin) this.router.navigate(['sector', 'delete', s.id]); }
-  create()          { if (this.isAdmin) this.router.navigate(['sector', 'new']); }
-
-  // Simulación muy básica: cambia por tu lógica real
-  private readIsAdmin(): boolean {
-    // ejemplo: si guardas el rol en localStorage
-    const role = (localStorage.getItem('role') || '').toLowerCase();
-    return role === 'admin';
-  }
+  view(s: ISector)  { this.router.navigate(['sector','view',  s.id]); }
+  edit(s: ISector)  { if (this.isAdmin) this.router.navigate(['sector','edit',  s.id]); }
+  remove(s: ISector){ if (this.isAdmin) this.router.navigate(['sector','delete',s.id]); }
+  create()          { if (this.isAdmin) this.router.navigate(['sector','new']); }
 }

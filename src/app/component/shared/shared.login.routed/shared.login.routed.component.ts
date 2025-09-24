@@ -87,11 +87,11 @@ export class SharedLoginRoutedComponent implements OnInit {
   }
 
   setLoginEmpresa() {
-    this.loginForm.setValue({email: "emailgre3849@gmail.com", password: "energy1234"})
+    this.loginForm.setValue({email: "fro6672@gmail.com", password: "12345@"})
   }
 
   setLoginAlumno() {
-    this.loginForm.setValue({email: "emailLauraRodriguez9715@gmail.com", password: "luna1234"})
+    this.loginForm.setValue({email: "emailmartahoffmann2872@gmail.com", password: "12345@"})
   }
 
 

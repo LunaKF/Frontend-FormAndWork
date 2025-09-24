@@ -66,13 +66,14 @@
             </thead>
             <tbody>
               @for (oferta of oPage?.content; track oferta.id) {
-                <!-- CAMBIO: hacemos toda la fila clicable, accesible y con clase 'clickable' -->
+                <!-- Hacemos toda la fila clicable, accesible y con clase 'clickable', ademas al poner el puntero encima aparece un mensaje [title] -->
                 <tr class="row-card hover-rise clickable"
                   (click)="view(oferta)"              
                   tabindex="0"                          
                   role="button"                         
                   (keydown.enter)="view(oferta)"        
                   (keydown.space)="$event.preventDefault(); view(oferta)"
+                  [title]="'Inicia sesión para ver ,los detalles de la oferta ' + oferta.titulo"
                 >
 
                   <td class="text-center fw-semibold">{{ oferta.titulo | trim: 20 }}</td>
@@ -85,7 +86,7 @@
 
                   <td class="text-center">
                     @if (activeSession) {
-                      <!-- CAMBIO: evitar que el click en el link de empresa dispare el click de la fila -->
+                      <!-- Evitar que el click en el link de empresa dispare el click de la fila -->
                       <a class="link-empresa"
                          [routerLink]="'/admin/empresa/view/' + oferta.empresa.id"
                          (click)="$event.stopPropagation()"> <!-- CAMBIO -->

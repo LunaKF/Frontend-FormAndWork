@@ -32,14 +32,10 @@
 .title-gradient {
     background: linear-gradient(90deg, var(--violet, #3f14b8), var(--softviolet, #9982fd));
     -webkit-background-clip: text;
-    /* necesario en WebKit */
     background-clip: text;
     -webkit-text-fill-color: transparent;
-    /* clave para que se vea el gradiente */
     color: transparent;
-    /* por si el motor usa color */
     display: inline-block;
-    /* evita rarezas en elementos inline */
     font-size: 3rem;
     text-align: center;
     font-weight: 700;
@@ -115,7 +111,6 @@
     color: white;
     background: linear-gradient(90deg, var(--violet, #3f14b8), var(--softviolet, #9982fd));
     font-size: 1rem;
-
 }
 
 .table-separated tbody tr.row-card {
@@ -164,12 +159,9 @@
     text-decoration: underline;
 }
 
-
-
 .text-info {
     color: #2979ff !important;
     font-size: 1rem;
-
 }
 
 .bg-soft-danger {

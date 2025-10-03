@@ -3,13 +3,14 @@
     <div class="card-body p-0">
 
       <!-- Toolbar / Encabezado -->
-      <header class="toolbar d-flex flex-column gap-3 gap-lg-0 flex-lg-row align-items-stretch align-items-lg-center justify-content-between border-bottom header-ofertas">
+      <header
+        class="toolbar d-flex flex-column gap-3 gap-lg-0 flex-lg-row align-items-stretch align-items-lg-center justify-content-between border-bottom header-ofertas">
         <div class="d-flex align-items-center gap-3">
           <div>
-            @if (activeSession) {
-              <h1 class="mb-0 fw-bold display-6 title-gradient">Tus ofertas</h1>
+            @if (adminContext) {
+            <h1 class="mb-0 fw-bold display-6 title-gradient">Tus ofertas</h1>
             } @else {
-              <h1 class="mb-0 fw-bold display-6 title-gradient">Lista de Ofertas</h1>
+            <h1 class="mb-0 fw-bold display-6 title-gradient">Lista de Ofertas</h1>
             }
           </div>
         </div>
@@ -18,14 +19,8 @@
           <!-- Buscador -->
           <div class="searchbox position-relative flex-grow-1">
             <i class="bi bi-search position-absolute top-50 start-0 translate-middle-y ms-3 text-secondary"></i>
-            <input
-              type="text"
-              class="form-control ps-5"
-              placeholder="Buscar por título, sector, empresa…"
-              [(ngModel)]="strFiltro"
-              (keyup)="filter($event)"
-              aria-label="Buscar ofertas"
-            />
+            <input type="text" class="form-control ps-5" placeholder="Buscar por título, sector, empresa…"
+              [(ngModel)]="strFiltro" (keyup)="filter($event)" aria-label="Buscar ofertas" />
           </div>
 
           <!-- RPP pills -->
@@ -41,12 +36,14 @@
       <section class="px-4 py-3 d-flex flex-wrap gap-2 align-items-center justify-content-between">
         <span class="chip" [class.chip-muted]="!(strFiltro.length > 0)">
           <i class="bi bi-funnel"></i>
-          @if (strFiltro.length > 0) { Filtrado por: <strong class="text-danger">{{ strFiltro }}</strong> } @else { Sin filtro }
+          @if (strFiltro.length > 0) { Filtrado por: <strong class="text-danger">{{ strFiltro }}</strong> } @else { Sin
+          filtro }
         </span>
 
         <span class="chip">
           <i class="bi bi-collection"></i>
-          Mostrando {{ oPage?.numberOfElements || 0 | number:'1.0-0' }} de {{ oPage?.totalElements || 0 | number:'1.0-0' }}
+          Mostrando {{ oPage?.numberOfElements || 0 | number:'1.0-0' }} de {{ oPage?.totalElements || 0 | number:'1.0-0'
+          }}
         </span>
       </section>
 
@@ -61,83 +58,73 @@
                 <th class="sortable" (click)="sort('sector.nombre')">Sector</th>
                 <th class="sortable" (click)="sort('empresa.nombre')">Empresa</th>
                 <th class="sortable" (click)="sort('empresa.candidatura')">Candidaturas</th>
-                @if (activeSession) { <th class="min-col">Acciones</th> }
+                @if (adminContext) { <th class="min-col">Acciones</th> }
               </tr>
             </thead>
             <tbody>
               @for (oferta of oPage?.content; track oferta.id) {
-                <!-- Hacemos toda la fila clicable, accesible y con clase 'clickable', ademas al poner el puntero encima aparece un mensaje [title] -->
-                <tr class="row-card hover-rise clickable"
-                  (click)="view(oferta)"              
-                  tabindex="0"                          
-                  role="button"                         
-                  (keydown.enter)="view(oferta)"        
-                  (keydown.space)="$event.preventDefault(); view(oferta)"
-                  [title]="'Inicia sesión para ver ,los detalles de la oferta ' + oferta.titulo"
-                >
+              <tr class="row-card hover-rise clickable" (click)="view(oferta)" tabindex="0" role="button"
+                (keydown.enter)="view(oferta)" (keydown.space)="$event.preventDefault(); view(oferta)" [title]="adminContext
+                            ? 'Ver detalles de ' + oferta.titulo
+                            : (activeSession ? 'Ver detalles de ' + oferta.titulo
+                                             : 'Inicia sesión para ver los detalles de ' + oferta.titulo)">
+                <td class="text-center fw-semibold">{{ oferta.titulo | trim: 20 }}</td>
 
-                  <td class="text-center fw-semibold">{{ oferta.titulo | trim: 20 }}</td>
+                <td class="descripcion-cell text-start">{{ oferta.descripcion }}</td>
 
-                  <td class="descripcion-cell text-start">{{ oferta.descripcion }}</td>
+                <td class="text-center small">
+                  <span class="badge bg-soft-info text-info">{{ oferta.sector.nombre | trim: 20 }}</span>
+                </td>
 
-                  <td class="text-center small">
-                    <span class="badge bg-soft-info text-info">{{ oferta.sector.nombre | trim: 20 }}</span>
-                  </td>
-
-                  <td class="text-center">
-                    @if (activeSession) {
-                      <!-- Evitar que el click en el link de empresa dispare el click de la fila -->
-                      <a class="link-empresa"
-                         [routerLink]="'/admin/empresa/view/' + oferta.empresa.id"
-                         (click)="$event.stopPropagation()"> <!-- CAMBIO -->
-                        {{ oferta.empresa.nombre }}
-                      </a>
-                    } @else {
-                      {{ oferta.empresa.nombre }}
-                    }
-                  </td>
-
-                  @if (!activeSession) {
-                    <td>
-                      <!-- CAMBIO: evitar propagación en el badge -->
-                      <span class="badge bg-soft-danger text-danger candidatura-oferta"
-                            (click)="$event.stopPropagation()"> <!-- CAMBIO -->
-                        {{ oferta.candidaturas }}
-                      </span>
-                    </td>
+                <td class="text-center">
+                  @if (adminContext) {
+                  <!-- En admin: link interno a la empresa -->
+                  <a class="link-empresa" [routerLink]="'/admin/empresa/view/' + oferta.empresa.id"
+                    (click)="$event.stopPropagation()">
+                    {{ oferta.empresa.nombre }}
+                  </a>
                   } @else {
-                    <td>
-                      <!-- CAMBIO: evitar propagación en el link de candidaturas -->
-                      <a class="btn btn-outline-danger btn-sm lift"
-                         [routerLink]="'/admin/candidatura/xoferta/plist/' + oferta.id"
-                         (click)="$event.stopPropagation()"> <!-- CAMBIO -->
-                        {{ oferta.candidaturas }}
-                      </a>
-                    </td>
+                  <!-- Público: solo texto, sin navegación -->
+                  {{ oferta.empresa.nombre }}
                   }
+                </td>
 
-                  @if (activeSession) {
-                    <td>
-                      <!-- CAMBIO: evitar propagación en todo el contenedor de acciones -->
-                      <div class="d-flex gap-2 justify-content-center"
-                           (click)="$event.stopPropagation()"> <!-- CAMBIO -->
-                        <button type="button" class="btn-icon lift" (click)="view(oferta)" aria-label="Ver oferta">
-                          <i class="bi bi-eye"></i>
-                        </button>
-                        <button type="button" class="btn-icon lift" (click)="edit(oferta)" aria-label="Editar oferta">
-                          <i class="bi bi-pen"></i>
-                        </button>
-                        <button type="button" class="btn-icon lift btn-danger-soft" (click)="remove(oferta)" aria-label="Eliminar oferta">
-                          <i class="bi bi-trash"></i>
-                        </button>
-                      </div>
-                    </td>
-                  }
-                </tr>
+                @if (!adminContext) {
+                <td>
+                  <span class="badge bg-soft-danger text-danger candidatura-oferta" (click)="$event.stopPropagation()">
+                    {{ oferta.candidaturas }}
+                  </span>
+                </td>
+                } @else {
+                <td>
+                  <a class="btn btn-outline-danger btn-sm lift"
+                    [routerLink]="'/admin/candidatura/xoferta/plist/' + oferta.id" (click)="$event.stopPropagation()">
+                    {{ oferta.candidaturas }}
+                  </a>
+                </td>
+                }
+
+                @if (adminContext) {
+                <td>
+                  <div class="d-flex gap-2 justify-content-center" (click)="$event.stopPropagation()">
+                    <button type="button" class="btn-icon lift" (click)="view(oferta)" aria-label="Ver oferta">
+                      <i class="bi bi-eye"></i>
+                    </button>
+                    <button type="button" class="btn-icon lift" (click)="edit(oferta)" aria-label="Editar oferta">
+                      <i class="bi bi-pen"></i>
+                    </button>
+                    <button type="button" class="btn-icon lift btn-danger-soft" (click)="remove(oferta)"
+                      aria-label="Eliminar oferta">
+                      <i class="bi bi-trash"></i>
+                    </button>
+                  </div>
+                </td>
+                }
+              </tr>
               } @empty {
-                <tr>
-                  <td colspan="7" class="text-center py-5 text-muted">No hay ofertas</td>
-                </tr>
+              <tr>
+                <td colspan="7" class="text-center py-5 text-muted">No hay ofertas</td>
+              </tr>
               }
             </tbody>
           </table>
@@ -149,21 +136,21 @@
         <ul class="pagination justify-content-center flex-wrap gap-1">
           <li class="page-item" [class.disabled]="!hasPrev()">
             <a class="page-link" href="#" (click)="goToPrev()">
-              <i class="bi bi-caret-left-square-fill"></i> 
+              <i class="bi bi-caret-left-square-fill"></i>
             </a>
           </li>
 
           <li class="page-item" *ngFor="let pag of arrBotonera">
             @if (pag === '...') {
-              <span class="page-link">{{ pag }}</span>
+            <span class="page-link">{{ pag }}</span>
             } @else {
-              <a class="page-link" href="#" (click)="goToPage(+pag)" [class.active]="currentPage === +pag">{{ pag }}</a>
+            <a class="page-link" href="#" (click)="goToPage(+pag)" [class.active]="currentPage === +pag">{{ pag }}</a>
             }
           </li>
 
           <li class="page-item" [class.disabled]="!hasNext()">
             <a class="page-link" href="#" (click)="goToNext()">
-               <i class="bi bi-caret-right-square-fill"></i>
+              <i class="bi bi-caret-right-square-fill"></i>
             </a>
           </li>
         </ul>

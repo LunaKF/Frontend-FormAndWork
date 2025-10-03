@@ -1,91 +1,150 @@
-<nav class="navbar navbar-expand-lg ">
-  <div class="container-fluid">
-    <a class="navbar-brand" [routerLink]="'/home'">FormAndWork</a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
-      aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+<nav class="navbar navbar-expand-lg fw-navbar">
+  <div class="container-fluid fw-bar">
+    <!-- Izquierda: logo -->
+    <a class="navbar-brand fw-brand" [routerLink]="'/home'">
+      <span class="brand-gradient">FormAndWork</span>
+    </a>
+
+    <!-- Toggler (solo móvil/tablet) -->
+    <button class="navbar-toggler fw-toggler d-lg-none" type="button"
+            data-bs-toggle="collapse" data-bs-target="#fwNavbar"
+            aria-controls="fwNavbar" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
 
+    <!-- Centro: navegación -->
+    <div class="collapse navbar-collapse fw-center" id="fwNavbar">
+      <ul class="navbar-nav fw-nav mx-auto">
 
-    @if (activeSession) {
-    <div class="collapse navbar-collapse" id="navbarSupportedContent">
-      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-
+        <!-- Inicio (siempre) -->
         <li class="nav-item">
-          <a class="nav-link"
+          <a class="nav-link fw-link"
              [class.active]="strRuta == '/home' || strRuta == '/' || strRuta == ''"
-             [routerLink]="'/home'">Inicio</a>
+             [routerLink]="'/home'">
+            <i class="bi bi-house"></i> Inicio
+            <span class="fw-underline"></span>
+          </a>
         </li>
 
-        <!-- Ocultar a EMPRESA -->
-        <li class="nav-item" *ngIf="!isEmpresa">
-          <a class="nav-link"
-             [class.active]="strRuta == '/admin/empresa/plist'"
-             [routerLink]="'/admin/empresa/plist'">Empresas</a>
-        </li>
+        <!-- ===== ADMIN ===== -->
+        @if (activeSession && isAdmin) {
+          <li class="nav-item">
+            <a class="nav-link fw-link"
+               [class.active]="strRuta == '/admin/empresa/plist'"
+               [routerLink]="'/admin/empresa/plist'">
+              <i class="bi bi-building"></i> Empresas
+              <span class="fw-underline"></span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link fw-link"
+               [class.active]="strRuta == '/admin/sector/plist'"
+               [routerLink]="'/admin/sector/plist'">
+              <i class="bi bi-diagram-3"></i> Sectores
+              <span class="fw-underline"></span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link fw-link"
+               [class.active]="strRuta == '/admin/alumno/plist'"
+               [routerLink]="'/admin/alumno/plist'">
+              <i class="bi bi-people"></i> Alumnos
+              <span class="fw-underline"></span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link fw-link"
+               [class.active]="strRuta == '/admin/oferta/plist'"
+               [routerLink]="'/admin/oferta/plist'">
+              <i class="bi bi-briefcase"></i> Ofertas
+              <span class="fw-underline"></span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link fw-link"
+               [class.active]="strRuta == '/admin/candidatura/plist'"
+               [routerLink]="'/admin/candidatura/plist'">
+              <i class="bi bi-file-earmark-text"></i> Candidaturas
+              <span class="fw-underline"></span>
+            </a>
+          </li>
+        }
 
-        <li class="nav-item">
-          <a class="nav-link"
-             [class.active]="strRuta == '/admin/sector/plist'"
-             [routerLink]="'/admin/sector/plist'">Sectores</a>
-        </li>
+        <!-- ===== ALUMNO ===== -->
+        @if (activeSession && isAlumno && !isAdmin) {
+          <li class="nav-item">
+            <a class="nav-link fw-link"
+               [class.active]="strRuta == '/admin/empresa/plist'"
+               [routerLink]="'/admin/empresa/plist'">
+              <i class="bi bi-building"></i> Empresas
+              <span class="fw-underline"></span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link fw-link"
+               [class.active]="strRuta == '/admin/oferta/plist'"
+               [routerLink]="'/admin/oferta/plist'">
+              <i class="bi bi-briefcase"></i> Ofertas
+              <span class="fw-underline"></span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link fw-link"
+               [class.active]="strRuta == '/admin/candidatura/plist'"
+               [routerLink]="'/admin/candidatura/plist'">
+              <i class="bi bi-file-earmark-text"></i> Candidaturas
+              <span class="fw-underline"></span>
+            </a>
+          </li>
+        }
 
-        <!-- Ocultar a ALUMNO -->
-        <li class="nav-item" *ngIf="!isAlumno">
-          <a class="nav-link"
-             [class.active]="strRuta == '/admin/alumno/plist'"
-             [routerLink]="'/admin/alumno/plist'">Alumnos</a>
-        </li>
+        <!-- ===== EMPRESA ===== -->
+        @if (activeSession && isEmpresa && !isAdmin) {
+          <li class="nav-item">
+            <a class="nav-link fw-link"
+               [class.active]="strRuta == '/admin/oferta/plist'"
+               [routerLink]="'/admin/oferta/plist'">
+              <i class="bi bi-briefcase"></i> Tus ofertas
+              <span class="fw-underline"></span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link fw-link"
+               [class.active]="strRuta == '/admin/candidatura/plist'"
+               [routerLink]="'/admin/candidatura/plist'">
+              <i class="bi bi-file-earmark-text"></i> Candidaturas
+              <span class="fw-underline"></span>
+            </a>
+          </li>
+        }
 
-        <li class="nav-item">
-          <a class="nav-link"
-             [class.active]="strRuta == '/admin/oferta/plist' || strRuta == '/oferta/plist'"
-             [routerLink]="activeSession ? '/admin/oferta/plist' : '/oferta/plist'">Tus ofertas</a>
-        </li>
-
-        <li class="nav-item">
-          <a class="nav-link"
-             [class.active]="strRuta == '/admin/candidatura/plist'"
-             [routerLink]="'/admin/candidatura/plist'">Candidaturas</a>
-        </li>
+        <!-- ===== SIN SESIÓN ===== -->
+        @if (!activeSession) {
+          <li class="nav-item">
+            <a class="nav-link fw-link"
+               [class.active]="strRuta == '/oferta/plist'"
+               [routerLink]="'/oferta/plist'">
+              <i class="bi bi-search"></i> Ofertas
+              <span class="fw-underline"></span>
+            </a>
+          </li>
+        }
       </ul>
     </div>
 
-    } @else {
-
-    <!-- Sin sesión: solo Inicio y Ofertas (pública) -->
-    <div class="collapse navbar-collapse" id="navbarSupportedContent">
-      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-        <li class="nav-item">
-          <a class="nav-link"
-             [class.active]="strRuta == '/home' || strRuta == '/' || strRuta == ''"
-             [routerLink]="'/home'">Inicio</a>
-        </li>
-        
-        <li class="nav-item">
-          
-          <a class="nav-link"
-             [class.active]="strRuta == '/oferta/plist'"
-             [routerLink]="'/oferta/plist'"><i class="bi bi-search"></i> Ofertas</a>
-        </li>
-      </ul>
-      <span class="navbar-session">Inicia sesión para ver más</span>
+    <!-- Derecha: sesión -->
+    <div class="fw-right">
+      @if (activeSession) {
+        <span class="fw-user-email d-none d-lg-inline">{{ userEmail }}</span>
+        <a class="fw-btn" [routerLink]="'/logout'" role="button">
+          <i class="bi bi-box-arrow-right"></i> Logout
+        </a>
+      } @else {
+        <span class="fw-user-email d-none d-md-inline">Inicia sesión para ver más</span>
+        <a class="fw-btn" [routerLink]="'/login'" role="button">
+          <i class="bi bi-box-arrow-in-right"></i> Login
+        </a>
+      }
     </div>
-
-    }
-
-    @if(activeSession){
-      <div class="item-login">
-        <a class="btn-login" [routerLink]="'/logout'" role="button">Logout</a>
-        {{userEmail}} 
-
-
-      </div>
-    }@else {
-      <div class="item-login">
-        <a class="btn-login" [routerLink]="'/login'" role="button">Login</a>
-      </div>
-    }
-
   </div>
 </nav>

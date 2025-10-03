@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router, RouterModule } from '@angular/router';
-import { debounceTime, Subject } from 'rxjs';
+import { Router, RouterModule, NavigationEnd } from '@angular/router';
+import { debounceTime, Subject, filter } from 'rxjs';
 
 import { TrimPipe } from '../../../pipe/trim.pipe';
 import { IOferta } from '../../../model/oferta.interface';
@@ -35,6 +35,9 @@ export class OfertaAdminPlistRoutedComponent implements OnInit {
   activeSession = false;
   userEmail = '';
 
+  /** Contexto: true si estamos bajo /admin/... */
+  adminContext = false;
+
   constructor(
     private oOfertaService: OfertaService,
     private oBotoneraService: BotoneraService,
@@ -42,8 +45,17 @@ export class OfertaAdminPlistRoutedComponent implements OnInit {
     private oSessionService: SessionService,
   ) {
     this.debounceSubject.pipe(debounceTime(300)).subscribe(() => this.getPage());
+
     this.activeSession = this.oSessionService.isSessionActive();
     if (this.activeSession) this.userEmail = this.oSessionService.getSessionEmail();
+
+    // Detectar si estamos en /admin/ para habilitar acciones y enlaces internos
+    this.adminContext = this.oRouter.url.startsWith('/admin/');
+    this.oRouter.events
+      .pipe(filter(ev => ev instanceof NavigationEnd))
+      .subscribe(() => {
+        this.adminContext = this.oRouter.url.startsWith('/admin/');
+      });
   }
 
   ngOnInit(): void {
@@ -78,7 +90,7 @@ export class OfertaAdminPlistRoutedComponent implements OnInit {
       .subscribe({
         next: (oPageFromServer: IPage<IOferta>) => {
           this.oPage = oPageFromServer;
-        // Genera la botonera (1..N con posibles …)
+          // Genera la botonera (1..N con posibles …)
           this.arrBotonera = this.oBotoneraService.getBotonera(this.nPage, oPageFromServer.totalPages);
         },
         error: (err) => console.error(err),
@@ -111,7 +123,14 @@ export class OfertaAdminPlistRoutedComponent implements OnInit {
   filter(_: KeyboardEvent): void { this.debounceSubject.next(this.strFiltro); }
 
   /** Acciones */
-  edit(o: IOferta): void { this.oRouter.navigate(['admin/oferta/edit', o.id]); }
-  view(o: IOferta): void { this.oRouter.navigate(['admin/oferta/view', o.id]); }
-  remove(o: IOferta): void { this.oRouter.navigate(['admin/oferta/delete', o.id]); }
+  edit(o: IOferta): void { if (this.adminContext) this.oRouter.navigate(['admin/oferta/edit', o.id]); }
+  view(o: IOferta): void {
+    // En admin -> siempre ver. En público:
+    //   - si loggeada -> ver detalle protegido
+    //   - si no loggeada -> no hace nada (tooltip ya avisa)
+    if (this.adminContext || this.activeSession) {
+      this.oRouter.navigate(['admin/oferta/view', o.id]);
+    }
+  }
+  remove(o: IOferta): void { if (this.adminContext) this.oRouter.navigate(['admin/oferta/delete', o.id]); }
 }

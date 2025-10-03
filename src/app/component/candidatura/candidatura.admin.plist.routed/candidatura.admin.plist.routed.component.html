@@ -6,7 +6,7 @@
         <div class="title-group">
           <h1 class="title-gradient">Candidaturas</h1>
 
-          <p class="subtitle" *ngIf="isEmpresa">
+          <p class="subtitle" *ngIf="isEmpresa && !isAdmin">
             Vista de empresa: candidaturas agrupadas por <strong>oferta</strong>.
           </p>
           <p class="subtitle" *ngIf="isAlumno && !isAdmin">
@@ -20,8 +20,15 @@
         <div class="tools">
           <div class="searchbox">
             <i class="bi bi-search"></i>
-            <input type="text" class="form-control" placeholder="Buscar por oferta o alumno…" [(ngModel)]="strFiltro"
-              (keyup)="filter()" aria-label="Buscar candidaturas" />
+            <!-- IMPORTANTE: usamos ngModelChange (no keyup) para debouncing real -->
+            <input
+              type="text"
+              class="form-control"
+              placeholder="Buscar por oferta o alumno…"
+              [(ngModel)]="strFiltro"
+              (ngModelChange)="onFilterChange($event)"
+              aria-label="Buscar candidaturas"
+            />
           </div>
 
           <div class="btn-group rpp-pills" role="group" aria-label="Resultados por página">
@@ -33,16 +40,19 @@
 
         <!-- Chips estado -->
         <div class="chips">
-          <span class="chip" [class.chip-muted]="!(strFiltro.length>0)">
+          <span class="chip" [class.chip-muted]="filterLen === 0">
             <i class="bi bi-funnel"></i>
-            @if (strFiltro.length>0) { Filtro: <strong class="text-danger">{{ strFiltro }}</strong> } @else { Sin filtro
+            @if (filterLen > 0) {
+              Filtro: <strong class="text-danger">{{ strFiltro }}</strong>
+            } @else {
+              Sin filtro
             }
           </span>
 
           <span class="chip">
             <i class="bi bi-collection"></i>
-            Mostrando {{ oPage?.numberOfElements || 0 | number:'1.0-0' }}
-            de {{ oPage?.totalElements || 0 | number:'1.0-0' }}
+            Mostrando {{ displayedCount | number:'1.0-0' }}
+            de {{ totalCount | number:'1.0-0' }}
           </span>
         </div>
       </div>
@@ -60,14 +70,13 @@
         <div class="sk-line short"></div>
       </div>
 
-      <!-- EMPRESA: bloques agrupados por oferta -->
+      <!-- EMPRESA (no admin): bloques agrupados por oferta -->
       <ng-container *ngIf="!loading && isEmpresa && !isAdmin">
         <div class="group-list">
           <article class="group-card hover-rise" *ngFor="let g of groupsByOferta">
             <header class="group-header">
               <div class="left">
                 <h2 class="group-title">
-                  <!-- ID oferta solo admin (aquí no aplica, pero por consistencia dejamos el ngIf) -->
                   <span *ngIf="isAdmin" class="badge-id">#{{ g.ofertaId }}</span>
                   <span class="title">{{ g.ofertaTitulo || ('Oferta ' + g.ofertaId) }}</span>
                 </h2>
@@ -87,12 +96,9 @@
                   <div class="meta small text-muted">Fecha: {{ c.fecha }}</div>
                 </div>
                 <div class="col-actions">
-                  <button type="button" class="btn-icon lift" (click)="view(c)" aria-label="Ver"><i
-                      class="bi bi-eye"></i></button>
-                  <button *ngIf="isAdmin" type="button" class="btn-icon lift" (click)="edit(c)" aria-label="Editar"><i
-                      class="bi bi-pen"></i></button>
-                  <button *ngIf="isAdmin" type="button" class="btn-icon lift btn-danger-soft" (click)="remove(c)"
-                    aria-label="Eliminar"><i class="bi bi-trash"></i></button>
+                  <button type="button" class="btn-icon lift" (click)="view(c)" aria-label="Ver"><i class="bi bi-eye"></i></button>
+                  <button *ngIf="isAdmin" type="button" class="btn-icon lift" (click)="edit(c)" aria-label="Editar"><i class="bi bi-pen"></i></button>
+                  <button *ngIf="isAdmin || isAlumno" type="button" class="btn-icon lift btn-danger-soft" (click)="remove(c)" aria-label="Eliminar"><i class="bi bi-trash"></i></button>
                 </div>
               </li>
             </ul>
@@ -105,7 +111,7 @@
         </div>
       </ng-container>
 
-      <!-- ADMIN o ALUMNO: tabla clásica modernizada -->
+      <!-- ADMIN o ALUMNO: tabla clásica -->
       <ng-container *ngIf="!loading && (!isEmpresa || isAdmin)">
         <div class="card shadow-xl rounded-4 overflow-hidden">
           <div class="table-wrapper p-4">
@@ -116,40 +122,35 @@
                     <th *ngIf="isAdmin" class="min-col">ID</th>
                     <th>Fecha</th>
                     <th>Oferta</th>
-                    <!-- alumno solo si es admin -->
                     <th *ngIf="isAdmin">Alumno</th>
-                    <th *ngIf="isAdmin" class="min-col">Acciones</th>
+                    <th class="min-col">Acciones</th>
                   </tr>
                 </thead>
                 <tbody>
-                  @for (c of oPage?.content; track c.id) {
-                  <tr class="row-card hover-rise">
-                    <td *ngIf="isAdmin" class="idContent">{{ c.id }}</td>
-                    <td>{{ c.fecha }}</td>
-                    <td class="text-start">
-                      <a [routerLink]="['/admin','oferta','view', c.oferta?.id]" class="link-empresa">
-                        {{ c.oferta?.titulo || ('Oferta ' + c.oferta?.id) }}
-                      </a>
-                    </td>
-                    <!-- 👇 alumno solo si es admin -->
-                    <td *ngIf="isAdmin" class="text-start">
-                      {{ c.alumno?.nombre }} {{ c.alumno?.ape1 }} {{ c.alumno?.ape2 }}
-                    </td>
-                    <td *ngIf="isAdmin">
-                      <div class="d-flex gap-2 justify-content-center">
-                        <button type="button" class="btn-icon lift" (click)="view(c)" aria-label="Ver"><i
-                            class="bi bi-eye"></i></button>
-                        <button type="button" class="btn-icon lift" (click)="edit(c)" aria-label="Editar"><i
-                            class="bi bi-pen"></i></button>
-                        <button type="button" class="btn-icon lift btn-danger-soft" (click)="remove(c)"
-                          aria-label="Eliminar"><i class="bi bi-trash"></i></button>
-                      </div>
-                    </td>
-                  </tr>
+                  @for (c of displayedRows; track c.id) {
+                    <tr class="row-card hover-rise">
+                      <td *ngIf="isAdmin" class="idContent">{{ c.id }}</td>
+                      <td>{{ c.fecha }}</td>
+                      <td class="text-start">
+                        <a [routerLink]="['/admin','oferta','view', c.oferta?.id]" class="link-empresa">
+                          {{ c.oferta?.titulo || ('Oferta ' + c.oferta?.id) }}
+                        </a>
+                      </td>
+                      <td *ngIf="isAdmin" class="text-start">
+                        {{ c.alumno?.nombre }} {{ c.alumno?.ape1 }} {{ c.alumno?.ape2 }}
+                      </td>
+                      <td>
+                        <div class="d-flex gap-2 justify-content-center">
+                          <button type="button" class="btn-icon lift" (click)="view(c)" aria-label="Ver"><i class="bi bi-eye"></i></button>
+                          <button *ngIf="isAdmin" type="button" class="btn-icon lift" (click)="edit(c)" aria-label="Editar"><i class="bi bi-pen"></i></button>
+                          <button *ngIf="isAdmin || isAlumno" type="button" class="btn-icon lift btn-danger-soft" (click)="remove(c)" aria-label="Eliminar"><i class="bi bi-trash"></i></button>
+                        </div>
+                      </td>
+                    </tr>
                   } @empty {
-                  <tr>
-                    <td [attr.colspan]="isAdmin ? 5 : 3" class="text-center py-5 text-muted">No hay candidaturas</td>
-                  </tr>
+                    <tr>
+                      <td [attr.colspan]="isAdmin ? 5 : 4" class="text-center py-5 text-muted">No hay candidaturas</td>
+                    </tr>
                   }
                 </tbody>
               </table>
@@ -164,10 +165,9 @@
 
                 <li class="page-item" *ngFor="let pag of arrBotonera">
                   @if (pag === '...') {
-                  <span class="page-link">{{ pag }}</span>
+                    <span class="page-link">{{ pag }}</span>
                   } @else {
-                  <a class="page-link" href="#" (click)="goToPage(+pag)" [class.active]="(nPage + 1) === +pag">{{ pag
-                    }}</a>
+                    <a class="page-link" href="#" (click)="goToPage(+pag)" [class.active]="(nPage + 1) === +pag">{{ pag }}</a>
                   }
                 </li>
 

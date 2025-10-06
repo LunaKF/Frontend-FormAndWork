@@ -73,6 +73,7 @@ export const routes: Routes = [
     children: [
       { path: 'sector/plist', component: SectorAdminPlistRoutedComponent },
 
+      { path: 'empresa/plist', component: EmpresaAdminPlistRoutedComponent },
       { path: 'empresa/create', component: EmpresaAdminCreateRoutedComponent },
       { path: 'empresa/edit/:id', component: EmpresaAdminEditRoutedComponent },
       { path: 'empresa/view/:id', component: EmpresaAdminViewRoutedComponent },

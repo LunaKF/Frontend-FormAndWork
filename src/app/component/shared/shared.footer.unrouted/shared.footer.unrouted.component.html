@@ -1,0 +1,153 @@
+<!-- TIRA DE CONTACTO -->
+<section class="contact-strip">
+  <div class="container-xl contact-grid">
+    <div class="contact-item hover-rise">
+      <i class="bi bi-geo-alt"></i>
+      <div>
+        <strong>Ubicación</strong>
+        <div>España · Valencia</div>
+      </div>
+    </div>
+
+    <a class="contact-item hover-rise" href="tel:+34665405678">
+      <i class="bi bi-telephone"></i>
+      <div>
+        <strong>Teléfono</strong>
+        <div>+34 665 405 678</div>
+      </div>
+    </a>
+
+    <a
+      class="contact-item hover-rise"
+      href="mailto:lunakhanjifustek@gmail.es"
+    >
+      <i class="bi bi-envelope"></i>
+      <div>
+        <strong>Correo</strong>
+        <div>lunakhanjifustek&#64;gmail.es</div>
+      </div>
+    </a>
+  </div>
+</section>
+
+<!-- FOOTER PRINCIPAL -->
+<footer class="app-footer">
+  <div class="container-xl footer-main">
+    <!-- Columna marca -->
+    <div class="footer-brand">
+      <div class="footer-logo">
+        <!-- Aquí podrías poner un <img> con tu logo -->
+        <span class="logo-symbol">F&W</span>
+        <span class="logo-text">FormAndWork</span>
+      </div>
+      <p class="footer-description">
+        Conectamos estudiantes, centros y empresas para crear experiencias de
+        prácticas más humanas, transparentes y eficientes.
+      </p>
+
+      <div class="footer-social">
+        <!-- Ejemplo con Bootstrap Icons; cambia enlaces reales -->
+        <a
+          href="#"
+          class="social-link"
+          aria-label="LinkedIn"
+          target="_blank"
+          rel="noopener"
+        >
+          <i class="bi bi-linkedin"></i>
+        </a>
+        <a
+          href="#"
+          class="social-link"
+          aria-label="Instagram"
+          target="_blank"
+          rel="noopener"
+        >
+          <i class="bi bi-instagram"></i>
+        </a>
+        <a
+          href="#"
+          class="social-link"
+          aria-label="Email"
+          href="mailto:info@formandwork.com"
+        >
+          <i class="bi bi-envelope"></i>
+        </a>
+      </div>
+    </div>
+
+    <!-- Columna navegación -->
+    <nav class="footer-column">
+      <h3 class="footer-title">Explora</h3>
+      <a
+        *ngFor="let link of mainLinks"
+        [routerLink]="link.path"
+        class="footer-link"
+        [class.active]="isActive(link.path)"
+      >
+        {{ link.label }}
+      </a>
+    </nav>
+
+    <!-- Columna info -->
+    <nav class="footer-column">
+      <h3 class="footer-title">Información</h3>
+      <a
+        *ngFor="let link of infoLinks"
+        [routerLink]="link.path"
+        class="footer-link"
+      >
+        {{ link.label }}
+      </a>
+    </nav>
+
+    <!-- Columna legal + zona usuario -->
+    <div class="footer-column">
+      <h3 class="footer-title">Legal</h3>
+      <a
+        *ngFor="let link of legalLinks"
+        [routerLink]="link.path"
+        class="footer-link"
+      >
+        {{ link.label }}
+      </a>
+
+      <div class="footer-user" *ngIf="activeSession">
+        <p class="footer-user-label">Sesión iniciada</p>
+        <p class="footer-user-email">{{ userEmail }}</p>
+
+<!-- 
+
+        <div class="footer-user-links">
+          <a
+            *ngIf="isAlumno"
+            routerLink="/alumno/misperfiles"
+            class="footer-link subtle"
+            >Mi perfil de alumno</a
+          >
+          <a
+            *ngIf="isEmpresa"
+            routerLink="/empresa/misofertas"
+            class="footer-link subtle"
+            >Panel de empresa</a
+          >
+          <a
+            *ngIf="isAdmin"
+            routerLink="/admin/dashboard"
+            class="footer-link subtle"
+            >Panel de administración</a
+          >
+        </div>
+        -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Franja inferior -->
+  <div class="footer-bottom">
+    <div class="container-xl footer-bottom-inner">
+      <span>© {{ currentYear }} FormAndWork. Todos los derechos reservados.</span>
+      <span class="footer-made-by">Desarrollado con 💻 por Luna.</span>
+    </div>
+  </div>
+</footer>

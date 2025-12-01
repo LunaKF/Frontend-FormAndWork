@@ -5,7 +5,6 @@
     90deg,
     var(--violet, #3f14b8),
     var(--softviolet, #9982fd)
-    
   );
   color: #fff;
 }
@@ -48,7 +47,7 @@
 
 /* ====== FOOTER PRINCIPAL ====== */
 .app-footer {
-  background:  #201d30;
+  background: #0c0b1a;
   color: #f3f0ff;
   padding-top: clamp(2.5rem, 5vw, 3rem);
 }
@@ -89,7 +88,7 @@
   width: 40px;
   height: 40px;
   border-radius: 1.2rem;
-  background: linear-gradient(135deg, rgb(52, 22, 182), rgb(152, 129, 254));
+  background: radial-gradient(circle at 0% 0%, #ffb86c, #ff6ea1);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -134,7 +133,7 @@
 .social-link:hover {
   transform: translateY(-3px);
   box-shadow: 0 12px 25px rgba(0, 0, 0, 0.3);
-  background: #b093ff;
+  background: #f3e9d0;
   color: #20113a;
   border-color: transparent;
 }

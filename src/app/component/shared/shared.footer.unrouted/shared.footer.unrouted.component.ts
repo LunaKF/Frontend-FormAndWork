@@ -24,7 +24,7 @@ export class SharedFooterUnroutedComponent implements OnInit {
   // Enlaces principales del footer (modifícalos según tus rutas)
   mainLinks = [
     { label: 'Inicio', path: '/' },
-    { label: 'Ofertas', path: '/oferta/plist' },
+    { label: 'Ofertas', path: '/ofertas' },
     { label: 'Empresas', path: '/empresa/plist' },
     { label: 'Alumnos', path: '/alumno/plist' },
   ];

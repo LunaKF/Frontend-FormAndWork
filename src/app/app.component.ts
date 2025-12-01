@@ -1,10 +1,11 @@
 import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { SharedMenuUnroutedComponent } from "./component/shared/shared.menu.unrouted/shared.menu.unrouted.component";
+import { SharedFooterUnroutedComponent } from "./component/shared/shared.footer.unrouted/shared.footer.unrouted.component";
 
 @Component({
     selector: 'app-root',
-    imports: [RouterOutlet, SharedMenuUnroutedComponent],
+    imports: [RouterOutlet, SharedMenuUnroutedComponent, SharedFooterUnroutedComponent],
     templateUrl: './app.component.html',
     styleUrl: './app.component.css'
 })

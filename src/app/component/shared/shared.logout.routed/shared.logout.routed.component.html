@@ -1,25 +1,67 @@
-<div class="row justify-content-center m-3">
-  <div class="col-lg-7 col-md-10 col-sm-12">
-    <h1 class="my-5 text-center">
-      Cerrar la sesión
-    </h1>
+<div class="logout-page">
+  <div class="container-xl">
+    <div class="row justify-content-center">
+      <div class="col-lg-10 col-xl-8">
+        <div class="logout-shell">
+          <!-- LADO IZQUIERDO: mensaje amable -->
+          <aside class="logout-aside">
+            <p class="logout-kicker">Hasta pronto</p>
+            <h1 class="logout-title">
+              <span>FormAndWork</span>
+            </h1>
+            <p class="logout-tagline">
+              Gracias por utilizar la plataforma. Tus ofertas, candidaturas y datos
+              seguirán aquí esperándote cuando vuelvas.
+            </p>
 
-    <h1 class="my-5 text-center">
-      <i class="bi bi-person-circle"></i>
-    </h1>
+            <ul class="logout-bullets">
+              <li>
+                <i class="bi bi-clock-history"></i>
+                Recupera tu sesión en cualquier momento.
+              </li>
+              <li>
+                <i class="bi bi-shield-lock"></i>
+                Tus datos se mantienen protegidos.
+              </li>
+              <li>
+                <i class="bi bi-arrow-repeat"></i>
+                Siempre puedes volver con tu mismo correo.
+              </li>
+            </ul>
+          </aside>
 
-    <div class="login-container">
-      <h2>LOGOUT</h2>      
-      <p class="fs-2 color-white text-center"> ¿Seguro que desea cerrar sesión?</p>
-      <div class="d-flex justify-content-center">
-        <button type="submit" class="btn bg-success mx-1" (click)="onLogout()">Cerrar sesión</button>
-        <button type="submit" class="btn bg-danger mx-1" (click)="onCancel()">Cancelar</button>
-      </div>
-      <!-- Mensaje de error -->
-      <div class="error-message" *ngIf="errorMessage">
-        {{ errorMessage }}
+          <!-- LADO DERECHO: confirmación -->
+          <section class="logout-main">
+            <header class="logout-header">
+              <div class="logout-icon">
+                <i class="bi bi-box-arrow-right"></i>
+              </div>
+              <h2>¿Cerrar sesión?</h2>
+              <p class="logout-subtitle">
+                Si sales de tu cuenta, tendrás que volver a iniciar sesión para acceder
+                a tus ofertas y candidaturas.
+              </p>
+            </header>
+
+            <div class="logout-question">
+              <p>¿Seguro que quieres cerrar sesión ahora?</p>
+            </div>
+
+            <div class="logout-actions">
+              <button type="button" class="btn-logout" (click)="onLogout()">
+                Sí, cerrar sesión
+              </button>
+              <button type="button" class="btn-cancel" (click)="onCancel()">
+                No, seguir dentro
+              </button>
+            </div>
+
+            <div class="error-message" *ngIf="errorMessage">
+              {{ errorMessage }}
+            </div>
+          </section>
+        </div>
       </div>
     </div>
-
   </div>
 </div>

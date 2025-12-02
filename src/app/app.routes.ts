@@ -46,8 +46,13 @@ import { OfertaAdminCreateRoutedComponent } from './component/oferta/oferta.admi
 import { OfertaAdminEditRoutedComponent } from './component/oferta/oferta.admin.edit.routed/oferta.admin.edit.routed.component';
 import { OfertaXempresaAdminPlistRoutedComponent } from './component/oferta/oferta.xempresa.admin.plist.routed/oferta.xempresa.admin.plist.routed.component';
 import { AlumnoAdminViewRoutedComponent } from './component/alumno/alumno.admin.view.routed/alumno.admin.view.routed.component';
+import { AdminGuard } from './guards/admin.guard';
+import { EmpresaGuard } from './guards/empresa.guard';
+import { AdminEmpresaGuard } from './guards/admin-empresa.guard';
+import { AlumnoGuard } from './guards/alumno.guard';
+import { AdminAlumnoGuard } from './guards/admin-alumno.guard';
 
-// --- Guard funcional inline: permite pasar a cualquiera que esté loggeado (admin, empresa o alumno)
+// --- GUARD que verifica si hay sesión activa ---
 const authGuard: CanActivateFn = () => {
   const session = inject(SessionService);
   const router = inject(Router);
@@ -66,48 +71,53 @@ export const routes: Routes = [
   // Acceso denegado
   { path: '403', component: ForbiddenComponent },
 
+
   // ===== Todo lo "admin" (y también empresa/alumno) protegido por "estar loggeado" =====
   {
     path: 'admin',
     canActivate: [authGuard],   // ← cambia el antiguo AdminGuard por este guard de "login requerido"
     children: [
-      { path: 'sector/plist', component: SectorAdminPlistRoutedComponent },
+      {
+        path: 'sector/plist',
+        component: SectorAdminPlistRoutedComponent,
+        canActivate: [AdminGuard]
+      },
 
-      { path: 'empresa/plist', component: EmpresaAdminPlistRoutedComponent },
-      { path: 'empresa/create', component: EmpresaAdminCreateRoutedComponent },
-      { path: 'empresa/edit/:id', component: EmpresaAdminEditRoutedComponent },
-      { path: 'empresa/view/:id', component: EmpresaAdminViewRoutedComponent },
-      { path: 'empresa/delete/:id', component: EmpresaAdminDeleteRoutedComponent },
+      { path: 'empresa/plist', component: EmpresaAdminPlistRoutedComponent, canActivate: [AdminAlumnoGuard] },
+      { path: 'empresa/create', component: EmpresaAdminCreateRoutedComponent, canActivate: [AdminGuard] },
+      { path: 'empresa/edit/:id', component: EmpresaAdminEditRoutedComponent, canActivate: [AdminGuard] },
+      { path: 'empresa/view/:id', component: EmpresaAdminViewRoutedComponent, canActivate: [AdminAlumnoGuard] },
+      { path: 'empresa/delete/:id', component: EmpresaAdminDeleteRoutedComponent, canActivate: [AdminGuard] },
 
-      { path: 'alumno/plist', component: AlumnoAdminPlistComponent },
-      { path: 'alumno/create', component: AlumnoAdminCreateComponent },
-      { path: 'alumno/edit/:id', component: AlumnoAdminEditRoutedComponent },
-      { path: 'alumno/view/:id', component: AlumnoAdminViewRoutedComponent },
-      { path: 'alumno/delete/:id', component: AlumnoAdminDeleteRoutedComponent },
+      { path: 'alumno/plist', component: AlumnoAdminPlistComponent, canActivate: [EmpresaGuard] },
+      { path: 'alumno/create', component: AlumnoAdminCreateComponent, canActivate: [AdminGuard] },
+      { path: 'alumno/edit/:id', component: AlumnoAdminEditRoutedComponent, canActivate: [AdminGuard] },
+      { path: 'alumno/view/:id', component: AlumnoAdminViewRoutedComponent, canActivate: [AdminEmpresaGuard] },
+      { path: 'alumno/delete/:id', component: AlumnoAdminDeleteRoutedComponent, canActivate: [AdminGuard] },
 
-      { path: 'oferta/plist', component: OfertaAdminPlistRoutedComponent },
-      { path: 'oferta/create', component: OfertaAdminCreateRoutedComponent },
-      { path: 'oferta/edit/:id', component: OfertaAdminEditRoutedComponent },
-      { path: 'oferta/view/:id', component: OfertaAdminViewRoutedComponent },
-      { path: 'oferta/delete/:id', component: OfertaAdminDeleteRoutedComponent },
+      { path: 'oferta/plist', component: OfertaAdminPlistRoutedComponent }, //todos pueden entrar incluso sin logearse
+      { path: 'oferta/create', component: OfertaAdminCreateRoutedComponent, canActivate: [AdminEmpresaGuard] },
+      { path: 'oferta/edit/:id', component: OfertaAdminEditRoutedComponent, canActivate: [AdminEmpresaGuard] },
+      { path: 'oferta/view/:id', component: OfertaAdminViewRoutedComponent, },//todos pueden entrar incluso sin logearse
+      { path: 'oferta/delete/:id', component: OfertaAdminDeleteRoutedComponent, canActivate: [AdminEmpresaGuard] },
 
       { path: 'candidatura/plist', component: CandidaturaAdminPlistRoutedComponent },
       { path: 'candidatura/view/:id', component: CandidaturaAdminViewRoutedComponent },
-      { path: 'candidatura/delete/:id', component: CandidaturaAdminDeleteRoutedComponent },
+      { path: 'candidatura/delete/:id', component: CandidaturaAdminDeleteRoutedComponent , canActivate: [AdminAlumnoGuard]},
 
       // POR SECTOR
-      { path: 'alumno/xsector/plist/:id', component: AlumnoXsectorAdminPlistComponent },
-      { path: 'empresa/xsector/plist/:id', component: EmpresaXsectorAdminPlistComponent },
-      { path: 'oferta/xsector/plist/:id', component: OfertaXsectorAdminPlistRoutedComponent },
+      { path: 'alumno/xsector/plist/:id', component: AlumnoXsectorAdminPlistComponent, canActivate: [AdminGuard] },
+      { path: 'empresa/xsector/plist/:id', component: EmpresaXsectorAdminPlistComponent, canActivate: [AdminAlumnoGuard] },
+      { path: 'oferta/xsector/plist/:id', component: OfertaXsectorAdminPlistRoutedComponent , canActivate: [AdminAlumnoGuard] },
 
       // POR EMPRESA
-      { path: 'oferta/xempresa/plist/:id', component: OfertaXempresaAdminPlistRoutedComponent },
+      { path: 'oferta/xempresa/plist/:id', component: OfertaXempresaAdminPlistRoutedComponent, canActivate: [AdminEmpresaGuard] },
 
       // POR OFERTA
-      { path: 'candidatura/xoferta/plist/:id', component: CandidaturaXofertaAdminPlistRoutedComponent },
+      { path: 'candidatura/xoferta/plist/:id', component: CandidaturaXofertaAdminPlistRoutedComponent, canActivate: [AdminEmpresaGuard] },
 
       // POR ALUMNO
-      { path: 'candidatura/xalumno/plist/:id', component: CandidaturaXalumnoAdminPlistRoutedComponent },
+      { path: 'candidatura/xalumno/plist/:id', component: CandidaturaXalumnoAdminPlistRoutedComponent, canActivate: [AdminGuard] },
     ],
   },
 

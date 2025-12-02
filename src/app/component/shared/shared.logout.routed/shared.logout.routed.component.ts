@@ -1,42 +1,37 @@
 import { CommonModule } from '@angular/common';
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
-import { FormsModule, NgForm } from '@angular/forms';
-import { ActivatedRoute, Route, Router } from '@angular/router';
-import { LoginService } from '../../../service/login.service';
+import { Router } from '@angular/router';
 import { SessionService } from '../../../service/session.service';
+
 @Component({
   selector: 'app-shared.logout.routed',
   templateUrl: './shared.logout.routed.component.html',
   styleUrls: ['./shared.logout.routed.component.css'],
   standalone: true,
-  imports: [
-    FormsModule,
-    CommonModule
-  ]
+  imports: [CommonModule]
 })
 export class SharedLogoutRoutedComponent implements OnInit {
 
- 
   errorMessage: string | null = null;
 
   constructor(
-    private http: HttpClient,
-    private oLoginService: LoginService,
     private oSessionService: SessionService,
-    private oRouter:Router 
-  ) { }
+    private oRouter: Router
+  ) {}
 
-  ngOnInit(): void { }
+  ngOnInit(): void {}
 
- 
-  onLogout() {
-    this.oSessionService.logout();    
-    this.oRouter.navigate(['/']);
+  onLogout(): void {
+    try {
+      this.oSessionService.logout();
+      this.oRouter.navigate(['/']);
+    } catch (e) {
+      console.error(e);
+      this.errorMessage = 'Ha ocurrido un error al cerrar sesión. Inténtalo de nuevo.';
+    }
   }
 
-  onCancel() {
+  onCancel(): void {
     this.oRouter.navigate(['/']);
   }
-
 }

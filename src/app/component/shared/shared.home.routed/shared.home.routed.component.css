@@ -1,31 +1,12 @@
-:root {
-    --violet: #3f14b8;
-    --softviolet: #9982fd;
-    --mint: #00b894;
-    --coral: #e749a0;
-    --amber: #f3bb53;
-    --soft-bg: #f8f9fb;
-    --border: #e8e8ef;
-}
-
-html,
-body {
-    margin: 0;
-    padding: 0;
-    overflow-x: hidden;
-}
-
 /* ===== FONDO global ===== */
 
 .landing {
     min-height: 100vh;
     background-image: url('../../../../assets/img/uwu.jpg') !important;
     background-attachment: fixed;
-
     background-size: cover;
     background-repeat: no-repeat;
     background-position: center;
-    backdrop-filter: blur(3px);
 }
 
 /* ====== HERO ====== */
@@ -42,10 +23,9 @@ body {
     position: absolute;
     inset: 0;
     background:
-        radial-gradient(70rem 35rem at 50% 0%, rgba(0, 0, 0, .20), transparent 60%),
-        linear-gradient(180deg, rgba(255, 255, 255, .15), rgba(255, 255, 255, 0));
-       
-    backdrop-filter: blur(3px) saturate(2.5) ;
+        radial-gradient(70rem 35rem at 50% 0%, rgba(63, 20, 184, .25), transparent 60%),
+        linear-gradient(180deg, rgba(255, 255, 255, .35), rgba(255, 255, 255, 0));
+    backdrop-filter: blur(3px) saturate(2.2);
 }
 
 .hero-inner {
@@ -57,55 +37,91 @@ body {
     color: #222;
 }
 
-.kicker {
-    display: inline-block;
-    background: rgba(255, 255, 255, .65);
-    border: 1px solid var(--border, #e8e8ef);
-    padding: .35rem .75rem;
-    border-radius: 999px;
-    backdrop-filter: blur(4px);
-    font-weight: 700;
-    letter-spacing: .4px;
-    margin-bottom: .75rem;
-}
-
 .hero-title {
     font-size: clamp(3rem, 8vw, 5.2rem);
     line-height: 1.06;
-    margin: 0 0 .75rem 0;
+    margin: 0 0 .6rem 0;
     text-shadow: 0 6px 24px rgba(63, 20, 184, .25);
+
+    /* AÑADIDO / CAMBIADO */
+    position: relative;
+    display: block;      /* ⬅️ en vez de inline-block */
+    padding-bottom: .35rem;
 }
+
 
 .title-gradient {
     background: linear-gradient(90deg, var(--violet, #3f14b8), var(--softviolet, #9982fd));
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
+    font-weight: 700;
+    font-size: 7rem;
+    margin-bottom: 30px;
+}
+
+.hero-title {
+  position: relative;
+  display: inline-block;
+  padding-bottom: .35rem;
+}
+
+/* Subrayado con degradado + animación */
+.hero-title::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: -6px;
+  transform: translateX(-50%);  /* ⬅️ centrado real */
+  width: 0%;
+  height: 6px;
+  border-radius: 999px;
+  background: linear-gradient(
+      90deg,
+      #ffb86c,
+      #ff6ea1,
+      var(--softviolet, #9982fd)
+  );
+  transition: width .45s ease;
+}
+
+
+.hero:hover .hero-title::after {
+  width: 70%;
 }
 
 .hero-subtitle {
-    font-size: clamp(1.1rem, 2.2vw, 1.35rem);
-    color: #312e4b;
-    font-weight: 600;
+    font-size: clamp(1.5rem, 2.2vw, 1.35rem);
+    color: white;
+    font-weight: 700;
     margin: 0 auto .75rem auto;
+    margin-top: 0px;
     max-width: 900px;
-    background: rgba(255, 255, 255, .55);
-    border: 1px solid var(--border, #e8e8ef);
-    padding: .85rem 1rem;
-    border-radius: 14px;
-    backdrop-filter: blur(6px);
+    padding: .9rem 1.1rem;
+    border-radius: 16px;}
+
+/* pill "por estudiantes / para estudiantes" */
+.pill {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.15rem 0.7rem;
+    margin-inline: .15rem;
+    border-radius: 999px;
+    font-size: .95em;
+    font-weight: 700;
+    color: #3f14b8;
 }
 
 .hero-body {
     font-size: clamp(1rem, 2vw, 1.125rem);
-    color: #3d3d3d;
-    margin: .5rem auto 0 auto;
-    max-width: 920px;
-    background: rgba(255, 255, 255, .45);
-    border: 1px solid var(--border, #e8e8ef);
-    padding: .85rem 1rem;
-    border-radius: 14px;
-    backdrop-filter: blur(6px);
+    color: #3f14b8;
+    margin: .6rem auto 0 auto;
+    padding: .9rem 1.1rem;
+    border-radius: 16px;
+    backdrop-filter: blur(10px);
+    font-weight: 800;
+    margin-bottom: 50px;
+    max-width: 1300px;
 }
 
 /* ====== NOTAS FLOTANTES ====== */
@@ -114,7 +130,7 @@ body {
     background:
         radial-gradient(40rem 26rem at 90% -10%, rgba(153, 130, 253, .18), transparent 60%),
         radial-gradient(30rem 20rem at 5% 110%, rgba(63, 20, 184, .12), transparent 60%),
-        rgba(255, 255, 255, .55);
+        rgba(255, 255, 255, .8);
     border-top: 1px solid var(--border, #e8e8ef);
     border-bottom: 1px solid var(--border, #e8e8ef);
 }
@@ -131,13 +147,13 @@ body {
     background: linear-gradient(180deg, #fff, #fafafe);
     padding: 1.1rem 1rem;
     box-shadow: 0 8px 24px rgba(63, 20, 184, .10);
-    animation: floaty 4s ease-in-out infinite;
-    animation-delay: var(--dly, 0s);
+    border: 1px solid transparent;
 }
 
-.note:hover {
-    border: 1px solid var(--violet, #3f14b8);
+/* ya hereda .hover-rise desde styles.css */
 
+.note:hover {
+    border-color: var(--violet, #3f14b8);
 }
 
 .note-icon {
@@ -155,12 +171,32 @@ body {
 }
 
 .note h3 {
-    margin: .2rem 0 .35rem 0;
+    margin: .2rem 0 .45rem 0;
     font-size: 1.15rem;
     background: linear-gradient(90deg, #2a1a5e, #6f5bff);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
+    position: relative;
+}
+
+/* subrayado degradado tipo footer-link */
+.note h3::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -4px;
+    width: 0;
+    height: 2px;
+    background: linear-gradient(90deg,
+            #ffb86c,
+            #ff6ea1,
+            var(--softviolet, #9982fd));
+    transition: width 0.22s ease;
+}
+
+.note:hover h3::after {
+    width: 70%;
 }
 
 .note p {
@@ -169,6 +205,7 @@ body {
     line-height: 1.45;
 }
 
+/* flotación suave */
 @keyframes floaty {
     0% {
         transform: translateY(0) rotate(0deg);
@@ -183,39 +220,7 @@ body {
     }
 }
 
-/* ====== CONTACTO ====== */
-.contact-strip {
-    padding: clamp(1.5rem, 4vw, 2rem) 0;
-    background: linear-gradient(90deg, var(--violet, #3f14b8), var(--softviolet, #9982fd));
-    color: #fff;
-}
-
-.contact-grid {
-    display: grid;
-    gap: 1rem;
-    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-}
-
-.contact-item {
-    display: flex;
-    gap: .9rem;
-    align-items: center;
-    background: rgba(255, 255, 255, .10);
-    border: 1px solid rgba(255, 255, 255, .25);
-    border-radius: 16px;
-    padding: .9rem 1rem;
-    backdrop-filter: blur(4px);
-}
-
-.contact-item i {
-    font-size: 1.4rem;
-}
-
-.hover-rise {
-    transition: transform .15s ease, box-shadow .2s ease;
-}
-
-.hover-rise:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 12px 32px rgba(0, 0, 0, .12);
+.note {
+    animation: floaty 4s ease-in-out infinite;
+    animation-delay: var(--dly, 0s);
 }

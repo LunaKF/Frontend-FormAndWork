@@ -1,23 +1,21 @@
 import { Component, OnInit } from '@angular/core';
-import { NavigationEnd, Router } from '@angular/router';
+import { NavigationEnd, Router, RouterLink } from '@angular/router';
 import { SessionService } from '../../../service/session.service';
-import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-shared-menu-unrouted',
   templateUrl: './shared.menu.unrouted.component.html',
   styleUrls: ['./shared.menu.unrouted.component.css'],
   standalone: true,
-  imports: [RouterLink ],  
+  imports: [RouterLink],
 })
 export class SharedMenuUnroutedComponent implements OnInit {
   strRuta: string = '';
   activeSession: boolean = false;
   userEmail: string = '';
-  
 
-  // NUEVO: rol y flags
-  userRole: string = '';           // 'admin' | 'empresa' | 'alumno' | ''
+  // Rol y flags
+  userRole: string = ''; // 'admin' | 'empresa' | 'alumno' | ''
   isAdmin: boolean = false;
   isEmpresa: boolean = false;
   isAlumno: boolean = false;
@@ -59,9 +57,12 @@ export class SharedMenuUnroutedComponent implements OnInit {
     });
   }
 
-  // --- PRIVADO: lee el rol desde SessionService y setea flags
+  // Lee el rol desde SessionService y setea flags
   private setRoleFromSession() {
-    const tipo = (this.oSessionService.getSessionTipoUsuario() || '').toLowerCase().trim();
+    const tipo = (this.oSessionService.getSessionTipoUsuario() || '')
+      .toLowerCase()
+      .trim();
+
     this.userRole = tipo;
     this.isAdmin = tipo === 'admin' || tipo === 'administrador';
     this.isEmpresa = tipo === 'empresa';

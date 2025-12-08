@@ -89,7 +89,7 @@ export const routes: Routes = [
       { path: 'empresa/view/:id', component: EmpresaAdminViewRoutedComponent, canActivate: [AdminAlumnoGuard] },
       { path: 'empresa/delete/:id', component: EmpresaAdminDeleteRoutedComponent, canActivate: [AdminGuard] },
 
-      { path: 'alumno/plist', component: AlumnoAdminPlistComponent, canActivate: [EmpresaGuard] },
+      { path: 'alumno/plist', component: AlumnoAdminPlistComponent, canActivate: [AdminEmpresaGuard] },
       { path: 'alumno/create', component: AlumnoAdminCreateComponent, canActivate: [AdminGuard] },
       { path: 'alumno/edit/:id', component: AlumnoAdminEditRoutedComponent, canActivate: [AdminGuard] },
       { path: 'alumno/view/:id', component: AlumnoAdminViewRoutedComponent, canActivate: [AdminEmpresaGuard] },
@@ -117,7 +117,7 @@ export const routes: Routes = [
       { path: 'candidatura/xoferta/plist/:id', component: CandidaturaXofertaAdminPlistRoutedComponent, canActivate: [AdminEmpresaGuard] },
 
       // POR ALUMNO
-      { path: 'candidatura/xalumno/plist/:id', component: CandidaturaXalumnoAdminPlistRoutedComponent, canActivate: [AdminGuard] },
+      { path: 'candidatura/xalumno/plist/:id', component: CandidaturaXalumnoAdminPlistRoutedComponent },
     ],
   },
 

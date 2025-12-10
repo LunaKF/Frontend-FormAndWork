@@ -33,6 +33,12 @@
     color: #6b6b6b;
 }
 
+.role-note {
+    margin-top: 0.35rem;
+    font-size: 0.85rem;
+    color: #7a6fd2;
+}
+
 /* ===== Toolbar ===== */
 .toolbar {
     display: flex;
@@ -67,11 +73,43 @@
     border-radius: 14px;
     border: 1px solid var(--border, #e8e8ef);
     transition: box-shadow .2s ease, transform .1s ease;
+    background: #fff;
 }
 
 .searchbox .form-control:focus {
     box-shadow: 0 6px 22px rgba(63, 20, 184, .12);
     transform: translateY(-1px);
+}
+
+/* ===== RPP pills ===== */
+.rpp-pills {
+    background: rgba(153,130,253,.12);
+    border-radius: 999px;
+    padding: 0.15rem;
+    border: 1px solid rgba(153,130,253,.25);
+}
+
+.rpp-pills .btn {
+    border-radius: 999px;
+    border: none;
+    padding: 0.25rem 0.8rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #4a4a4a;
+    background: transparent;
+    transition: background .2s ease, color .2s ease, transform .12s ease, box-shadow .18s ease;
+}
+
+.rpp-pills .btn:hover {
+    background: rgba(255,255,255,.9);
+    transform: translateY(-1px);
+    box-shadow: 0 8px 18px rgba(63,20,184,.12);
+}
+
+.rpp-pills .btn.active {
+    color: #fff;
+    background: linear-gradient(90deg, var(--violet), var(--softviolet));
+    box-shadow: 0 10px 22px rgba(63,20,184,.35);
 }
 
 /* ===== Chips ===== */
@@ -106,7 +144,6 @@
         radial-gradient(30rem 30rem at 10% 105%, rgba(63, 20, 184, .12), transparent 60%);
     border-top: 1px solid var(--border, #e8e8ef);
     padding: 1rem 0 1rem 0;
-    /* sin colchón extra para evitar hueco inferior */
 }
 
 .grid {
@@ -140,13 +177,11 @@
     padding: 1rem 1rem .9rem 1rem;
     transition: transform .15s ease, box-shadow .22s ease, border-color .2s ease;
     min-height: 230px;
-    /* altura uniforme = grid compacto (12/24/36) */
     overflow: hidden;
-    /* sombra base morada */
     box-shadow: 0 10px 26px rgba(63, 20, 184, .10), 0 0 0 1px rgba(63, 20, 184, .05) inset;
 }
 
-/* Glow inferior sutil */
+/* Glow inferior */
 .company-card::after {
     content: '';
     position: absolute;
@@ -376,7 +411,7 @@
     }
 }
 
-/* ===== Paginación SUPER BONITA ===== */
+/* ===== Paginación ===== */
 .pagination {
     gap: .4rem;
     justify-content: center;
@@ -407,7 +442,7 @@
     border-color: rgba(63, 20, 184, .25);
 }
 
-/* Números activos con degradado */
+/* activo */
 .page-item .page-link.active,
 .page-item.active .page-link {
     color: #fff !important;
@@ -416,7 +451,7 @@
     box-shadow: 0 12px 24px rgba(63, 20, 184, .18), 0 0 0 1px rgba(63, 20, 184, .10) inset;
 }
 
-/* Flechas: círculos con glow y animación de trazo */
+/* Flechas */
 .page-link.arrow {
     width: 46px;
     height: 46px;
@@ -483,7 +518,6 @@
     bottom: -4px;
 }
 
-/* Micro-interacciones */
 .page-link.arrow:hover .arrow-shaft {
     transform: translateX(0) scaleX(1.05);
 }
@@ -506,13 +540,13 @@
     padding: .5rem .4rem;
 }
 
-/* Estado disabled (general) */
+/* Estado disabled */
 .page-item.disabled .page-link {
     opacity: .55;
     pointer-events: none;
 }
 
-/* ===== Fondo general suave ===== */
+/* Fondo general suave */
 body {
     background:
         radial-gradient(1200px 600px at 20% -10%, rgba(153, 130, 253, .10), transparent 60%),

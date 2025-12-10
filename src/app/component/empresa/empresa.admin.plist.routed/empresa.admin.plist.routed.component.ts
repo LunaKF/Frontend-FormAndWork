@@ -1,37 +1,36 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { IEmpresa } from '../../../model/empresa.interface';
-import { EmpresaService } from '../../../service/empresa.service';
 import { CommonModule } from '@angular/common';
-import { IPage } from '../../../model/model.interface';
 import { FormsModule } from '@angular/forms';
-import { BotoneraService } from '../../../service/botonera.service';
-import { debounceTime, Subject } from 'rxjs';
 import { Router, RouterModule } from '@angular/router';
-import { TrimPipe } from '../../../pipe/trim.pipe';
+
+import { IEmpresa } from '../../../model/empresa.interface';
+import { IPage } from '../../../model/model.interface';
+import { EmpresaService } from '../../../service/empresa.service';
+import { BotoneraService } from '../../../service/botonera.service';
 import { SessionService } from '../../../service/session.service';
+import { TrimPipe } from '../../../pipe/trim.pipe';
 
 @Component({
   selector: 'app-empresa.admin.plist.routed',
+  standalone: true,
   templateUrl: './empresa.admin.plist.routed.component.html',
   styleUrls: ['./empresa.admin.plist.routed.component.css'],
-  standalone: true,
-  imports: [CommonModule, FormsModule, TrimPipe, RouterModule],
+  imports: [CommonModule, FormsModule, RouterModule, TrimPipe],
 })
 export class EmpresaAdminPlistRoutedComponent implements OnInit, OnDestroy {
   oPage: IPage<IEmpresa> | null = null;
 
-  // paginación (múltiplos de 6: 12 / 24 / 36 → así no queda hueco en 1, 2 o 3 columnas)
-  nPage = 0;    // 0-based
-  nRpp = 12;
+  // paginación
+  nPage = 0;   // 0-based
+  nRpp  = 12;  // 12 / 24 / 36
 
-  // filtro
-  strFiltro = '';
-  private debounceSubject = new Subject<string>();
+  // filtro tipo Sector: cadena única que filtra sobre la lista actual
+  query = '';
 
   // botonera
   arrBotonera: string[] = [];
 
-  // sesión/rol
+  // sesión / rol
   activeSession = false;
   userEmail = '';
   isAdmin = false;
@@ -49,11 +48,7 @@ export class EmpresaAdminPlistRoutedComponent implements OnInit, OnDestroy {
     private oRouter: Router,
     private oSessionService: SessionService
   ) {
-    this.debounceSubject.pipe(debounceTime(200)).subscribe(() => {
-      this.nPage = 0;
-      this.getPage();
-    });
-
+    // estado inicial de sesión
     this.activeSession = this.oSessionService.isSessionActive();
     if (this.activeSession) {
       this.userEmail = this.oSessionService.getSessionEmail();
@@ -61,7 +56,8 @@ export class EmpresaAdminPlistRoutedComponent implements OnInit, OnDestroy {
     }
   }
 
-  ngOnInit() {
+  ngOnInit(): void {
+    // cambios de sesión en caliente
     this.oSessionService.onLogin().subscribe({
       next: () => {
         this.activeSession = true;
@@ -69,6 +65,7 @@ export class EmpresaAdminPlistRoutedComponent implements OnInit, OnDestroy {
         this.setRoleFromSession();
       },
     });
+
     this.oSessionService.onLogout().subscribe({
       next: () => {
         this.activeSession = false;
@@ -77,7 +74,7 @@ export class EmpresaAdminPlistRoutedComponent implements OnInit, OnDestroy {
       },
     });
 
-    // Ajuste inicial opcional: mantener múltiplos de 6 según columnas visibles
+    // mantener RPP válido
     this.syncRppToColumns();
     window.addEventListener('resize', this.syncRppToColumns);
 
@@ -88,14 +85,18 @@ export class EmpresaAdminPlistRoutedComponent implements OnInit, OnDestroy {
     window.removeEventListener('resize', this.syncRppToColumns);
   }
 
-  private setRoleFromSession() {
-    const tipo = (this.oSessionService.getSessionTipoUsuario() || '').toLowerCase().trim();
-    this.isAdmin = tipo === 'admin' || tipo === 'administrador';
-    this.isEmpresa = tipo === 'empresa';
-    this.isAlumno = tipo === 'alumno';
+  // ========= ROLES =========
+  private setRoleFromSession(): void {
+    const tipo = (this.oSessionService.getSessionTipoUsuario() || '')
+      .toLowerCase()
+      .trim();
+
+    this.isAdmin   = (tipo === 'admin' || tipo === 'administrador');
+    this.isEmpresa = (tipo === 'empresa');
+    this.isAlumno  = (tipo === 'alumno');
   }
 
-  // columnas actuales (1 / 2 / 3) según media queries del grid
+  // ========= RPP / columnas =========
   private getCols = () => {
     const w = window.innerWidth;
     if (w >= 1200) return 3;
@@ -103,7 +104,6 @@ export class EmpresaAdminPlistRoutedComponent implements OnInit, OnDestroy {
     return 1;
   };
 
-  // Mantener RPP como múltiplo de 6 y que cuadre filas
   private syncRppToColumns = () => {
     if (this.userSetRpp) return;
     if (![12, 24, 36].includes(this.nRpp)) {
@@ -111,31 +111,100 @@ export class EmpresaAdminPlistRoutedComponent implements OnInit, OnDestroy {
     }
   };
 
-  getPage() {
+  // ========= DATA =========
+  getPage(): void {
     this.loading = true;
-    this.oEmpresaService.getPage(this.nPage, this.nRpp, '', '', this.strFiltro)
+    // filtro vacío en backend → filtramos en cliente como en sectores
+    this.oEmpresaService.getPage(this.nPage, this.nRpp, '', '', '')
       .subscribe({
         next: (oPageFromServer: IPage<IEmpresa>) => {
           this.oPage = oPageFromServer;
           this.arrBotonera = this.oBotoneraService.getBotonera(
-            this.nPage, oPageFromServer.totalPages
+            this.nPage,
+            oPageFromServer.totalPages
           );
           this.loading = false;
         },
-        error: (err) => { console.log(err); this.loading = false; },
+        error: (err) => {
+          console.log(err);
+          this.loading = false;
+        },
       });
   }
 
-  // navegación
-  edit(e: IEmpresa) { if (this.isAdmin) this.oRouter.navigate(['admin/empresa/edit', e.id]); }
-  view(e: IEmpresa) { this.oRouter.navigate(['admin/empresa/view', e.id]); }
-  remove(e: IEmpresa) { if (this.isAdmin) this.oRouter.navigate(['admin/empresa/delete', e.id]); }
+  // ========= FILTRO (referencia: SectorAdminPlistRouted) =========
+  get filteredEmpresas(): IEmpresa[] {
+    const q = (this.query || '').toLowerCase().trim();
+    const content = this.oPage?.content || [];
 
-  goToPage(p: number) { if (p) { this.nPage = p - 1; this.getPage(); } return false; }
-  goToNext() { this.nPage++; this.getPage(); return false; }
-  goToPrev() { this.nPage--; this.getPage(); return false; }
+    if (!q) return content;
 
-  goToRpp(nrpp: number) {
+    return content.filter(e =>
+      String(e.id).includes(q) ||
+      (e.nombre || '').toLowerCase().includes(q) ||
+      (e.email || '').toLowerCase().includes(q) ||
+      (e.sector?.nombre || '').toLowerCase().includes(q)
+    );
+  }
+
+  // ========= ACCIONES =========
+  edit(e: IEmpresa): void {
+    if (this.isAdmin) {
+      this.oRouter.navigate(['admin', 'empresa', 'edit', e.id]);
+    }
+  }
+
+  view(e: IEmpresa): void {
+    if (this.isAdmin) {
+      this.oRouter.navigate(['admin', 'empresa', 'view', e.id]);
+    }
+  }
+
+  remove(e: IEmpresa): void {
+    if (this.isAdmin) {
+      this.oRouter.navigate(['admin', 'empresa', 'delete', e.id]);
+    }
+  }
+
+  // Card completa clicable → solo admins
+  onCardClick(e: IEmpresa): void {
+    if (this.isAdmin) {
+      this.view(e);
+    }
+  }
+
+  // click “X ofertas”
+  onOffersClick(empresa: IEmpresa, event: MouseEvent): void {
+    event.stopPropagation();
+    if (!this.isAdmin || !empresa.ofertas) return;
+
+    this.oRouter.navigate(
+      ['admin', 'oferta', 'xempresa', 'plist', empresa.id]
+    );
+  }
+
+  // ========= Paginación =========
+  goToPage(p: number): boolean {
+    if (p) {
+      this.nPage = p - 1;
+      this.getPage();
+    }
+    return false;
+  }
+
+  goToNext(): boolean {
+    this.nPage++;
+    this.getPage();
+    return false;
+  }
+
+  goToPrev(): boolean {
+    this.nPage--;
+    this.getPage();
+    return false;
+  }
+
+  goToRpp(nrpp: number): boolean {
     this.userSetRpp = true;
     this.nPage = 0;
     this.nRpp = nrpp;
@@ -143,9 +212,11 @@ export class EmpresaAdminPlistRoutedComponent implements OnInit, OnDestroy {
     return false;
   }
 
-  filter() { this.debounceSubject.next(this.strFiltro); }
+  hasMultiplePages(): boolean {
+    return (this.oPage?.totalPages || 0) > 1;
+  }
 
-  hasMultiplePages(): boolean { return (this.oPage?.totalPages || 0) > 1; }
-
-  trackById(index: number, item: IEmpresa): number { return item.id; }
+  trackById(index: number, item: IEmpresa): number {
+    return item.id;
+  }
 }

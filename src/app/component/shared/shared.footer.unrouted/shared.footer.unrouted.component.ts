@@ -25,14 +25,13 @@ export class SharedFooterUnroutedComponent implements OnInit {
   mainLinks = [
     { label: 'Inicio', path: '/' },
     { label: 'Ofertas', path: '/ofertas' },
-    { label: 'Empresas', path: '/empresa/plist' },
-    { label: 'Alumnos', path: '/alumno/plist' },
+    { label: 'Empresas', path: '/admin/empresa/plist' },
+    { label: 'Alumnos', path: '/admin/alumno/plist' },
   ];
 
   infoLinks = [
-    { label: 'Sobre FormAndWork', path: '/sobre-nosotros' },
-    { label: 'Preguntas frecuentes', path: '/faq' },
-    { label: 'Contacto', path: '/contacto' },
+    { label: 'Sobre FormAndWork', path: '/' },
+   // { label: 'Contacto', path: '/contacto' },
   ];
 
   legalLinks = [

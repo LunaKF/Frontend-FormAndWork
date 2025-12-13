@@ -1,51 +1,192 @@
-<div class="row justify-content-center m-3">
-  <div class="col-lg-7 col-md-10 col-sm-12">
-    <h1 class="my-5 text-center">
-      Vista de la Empresa con Id: {{ oEmpresa.id }}
-    </h1>
-    
-    <br />
-    <table *ngIf="oEmpresa" class="table table-striped table-bordered my-5 text-center">
-      <tbody>
-        <tr class="text-center">
-          <th scope="row" class="bg-danger text-white text-end pe-5">Id</th>
-          <td class="text-start ps-5">{{ oEmpresa.id }}</td>
-        </tr>
-        <tr class="text-center">
-          <th scope="row" class="bg-primary text-white text-end pe-5">
-            Nombre
-          </th>
-          <td class="text-start ps-5">{{ oEmpresa.nombre }}</td>
-        </tr>
-        <tr class="text-center">
-          <th scope="row" class="bg-primary text-white text-end pe-5">
-            Correo
-          </th>
-          <td class="text-start ps-5">{{ oEmpresa.email }}</td>
-        </tr>
-        <tr class="text-center">
-          <th scope="row" class="bg-primary text-white text-end pe-5">
-            Sector
-          </th>
-          <td class="text-start ps-5">{{ oEmpresa.sector?.nombre }}</td>
-        </tr>
-      </tbody>
-    </table>
-    
+<div class="empresa-edit-page">
+
+  <!-- BANNER ROL -->
+  <div class="role-banner" *ngIf="isAdmin || isEmpresa || isAlumno">
+    <div class="container-xl role-banner-inner">
+
+      <span class="role-chip" *ngIf="isAdmin">
+        <i class="bi bi-shield-lock"></i>
+        Modo administración activo
+      </span>
+
+      <span class="role-chip soft" *ngIf="isEmpresa && !isAdmin">
+        <i class="bi bi-building"></i>
+        Panel de empresa
+      </span>
+
+      <span class="role-chip soft" *ngIf="isAlumno && !isAdmin && !isEmpresa">
+        <i class="bi bi-mortarboard"></i>
+        Vista de alumno
+      </span>
+
+      <span class="role-text" *ngIf="isAdmin">
+        Estás visualizando la ficha de una empresa colaboradora.
+      </span>
+
+      <span class="role-text" *ngIf="isEmpresa && !isAdmin">
+        Este es tu perfil de empresa: revisa cómo lo verán centros y alumnado.
+      </span>
+
+      <span class="role-text" *ngIf="isAlumno && !isAdmin && !isEmpresa">
+        Estás viendo el perfil público de una empresa.
+      </span>
+    </div>
   </div>
 
-  <div class="d-flex justify-content-center mt-4">
-    <a class="btn btn-warning mt-4 mx-1" href="admin/empresa/plist">
-      <i class="bi bi-list"></i>
-      Ir a listado de Empresas
-    </a>
-    <a class="btn btn-primary mt-4 mx-1" href="admin/empresa/edit/{{ oEmpresa.id }}">
-      <i class="bi bi-pencil"></i>
-      Editar
-    </a>
-    <a class="btn btn-danger mt-4 mx-1" href="admin/empresa/delete/{{ oEmpresa.id }}">
-      <i class="bi bi-trash"></i>
-      Borrar
-    </a>
-  </div>
+  <!-- HERO -->
+  <section class="empresa-hero">
+    <div class="empresa-hero-overlay"></div>
+
+    <div class="container-xl empresa-hero-inner">
+      <p class="empresa-kicker" *ngIf="isEmpresa && !isAdmin">Área privada de empresa</p>
+
+      <h1 class="empresa-title">
+        {{ isEmpresa && !isAdmin ? 'Tu perfil de empresa' : 'Perfil de empresa' }}
+      </h1>
+
+      <p class="empresa-subtitle" *ngIf="isEmpresa && !isAdmin">
+        Esta es la información que verán los centros y el alumnado cuando consulten tu ficha en FormAndWork.
+      </p>
+
+      <p class="empresa-subtitle" *ngIf="isAlumno && !isAdmin && !isEmpresa">
+        Consulta los datos de la empresa. Si te interesa, podrás revisar sus ofertas disponibles.
+      </p>
+
+      <p class="empresa-subtitle" *ngIf="isAdmin">
+        Vista completa para administración. Desde aquí podrás acceder a edición o borrado.
+      </p>
+    </div>
+  </section>
+
+  <!-- CONTENIDO -->
+  <section class="empresa-edit">
+    <div class="container-xl">
+
+      <div class="edit-layout" *ngIf="!loading">
+
+        <!-- Izquierda: resumen -->
+        <aside class="summary-card">
+          <div class="summary-avatar">
+            <span>
+              {{
+                ((oEmpresa?.nombre ?? 'NA') + '')
+                  .substring(0, 2)
+                  .toUpperCase()
+              }}
+            </span>
+          </div>
+
+          <div class="summary-body">
+            <h2 class="summary-name">{{ oEmpresa?.nombre || 'Empresa' }}</h2>
+
+            <!-- ID SOLO ADMIN -->
+            <p class="summary-id" *ngIf="isAdmin">
+              ID empresa: <strong>#{{ oEmpresa?.id }}</strong>
+            </p>
+
+            <p class="summary-email">
+              <i class="bi bi-envelope"></i>
+              {{ oEmpresa?.email || '—' }}
+            </p>
+
+            <p class="summary-sector">
+              <i class="bi bi-diagram-3"></i>
+              {{ oEmpresa?.sector?.nombre || '—' }}
+            </p>
+
+            <p class="summary-hint" *ngIf="isEmpresa && !isAdmin">
+              Consejo: mantén tu email y sector actualizados para facilitar el contacto.
+            </p>
+
+            <p class="summary-hint" *ngIf="isAlumno && !isAdmin && !isEmpresa">
+              Esta ficha es informativa. Para contactar, usa el email mostrado.
+            </p>
+
+            <p class="summary-hint" *ngIf="isAdmin">
+              Esta vista muestra datos de ficha. Acciones disponibles a la derecha.
+            </p>
+          </div>
+        </aside>
+
+        <!-- Derecha: ficha (modo “bonito”, lectura) -->
+        <div class="form-card">
+
+          <div class="detail-grid">
+
+            <div class="detail-item" *ngIf="isAdmin">
+              <div class="detail-label">ID</div>
+              <div class="detail-value">#{{ oEmpresa?.id }}</div>
+            </div>
+
+            <div class="detail-item">
+              <div class="detail-label">Nombre</div>
+              <div class="detail-value">{{ oEmpresa?.nombre }}</div>
+            </div>
+
+            <div class="detail-item">
+              <div class="detail-label">Email</div>
+              <div class="detail-value">
+                <i class="bi bi-envelope"></i>
+                {{ oEmpresa?.email }}
+              </div>
+            </div>
+
+            <div class="detail-item">
+              <div class="detail-label">Sector</div>
+              <div class="detail-value">
+                <i class="bi bi-diagram-3"></i>
+                {{ oEmpresa?.sector?.nombre || '—' }}
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Acciones -->
+          <div class="actions-row">
+            <button class="btn btn-ghost" type="button" [routerLink]="['/admin','empresa','plist']">
+              <i class="bi bi-arrow-left"></i>
+              Volver al listado
+            </button>
+
+            <div class="actions-right">
+
+              <!-- SOLO ADMIN y/o EMPRESA: editar -->
+              <a
+                class="btn btn-secondary"
+                *ngIf="isAdmin || isEmpresa"
+                [routerLink]="['/admin','empresa','edit', oEmpresa.id]"
+              >
+                <i class="bi bi-pencil"></i>
+                Editar
+              </a>
+
+              <!-- SOLO ADMIN: borrar -->
+              <a
+                class="btn btn-danger"
+                *ngIf="isAdmin"
+                [routerLink]="['/admin','empresa','delete', oEmpresa.id]"
+              >
+                <i class="bi bi-trash"></i>
+                Borrar
+              </a>
+
+            </div>
+          </div>
+
+          <p class="no-permission" *ngIf="isAlumno && !isAdmin && !isEmpresa">
+            Vista en modo lectura: no puedes editar ni borrar empresas.
+          </p>
+
+        </div>
+      </div>
+
+      <!-- Loading -->
+      <div class="loading-state" *ngIf="loading">
+        <div class="spinner-border" role="status"></div>
+        <p>Cargando perfil de empresa…</p>
+      </div>
+
+    </div>
+  </section>
+
 </div>

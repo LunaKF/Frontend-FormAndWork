@@ -76,18 +76,19 @@
       </div>
     </div>
 
-    <!-- Columna navegación -->
-    <nav class="footer-column">
-      <h3 class="footer-title">Explora</h3>
-      <a
-        *ngFor="let link of mainLinks"
-        [routerLink]="link.path"
-        class="footer-link"
-        [class.active]="isActive(link.path)"
-      >
-        {{ link.label }}
-      </a>
-    </nav>
+<!-- Columna navegación -->
+<nav class="footer-column">
+  <h3 class="footer-title">Explora</h3>
+  <a
+    *ngFor="let link of visibleMainLinks"
+    [routerLink]="link.path"
+    class="footer-link"
+    [class.active]="isActive(link.path)"
+  >
+    {{ link.label }}
+  </a>
+</nav>
+
 
     <!-- Columna info -->
     <nav class="footer-column">

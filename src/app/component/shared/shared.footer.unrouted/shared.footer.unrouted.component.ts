@@ -3,6 +3,12 @@ import { NavigationEnd, Router, RouterLink } from '@angular/router';
 import { SessionService } from '../../../service/session.service';
 import { NgIf, NgForOf } from '@angular/common';
 
+interface FooterLink {
+  label: string;
+  path: string;
+  roles: string[]; // 'public' | 'admin' | 'empresa' | 'alumno'
+}
+
 @Component({
   selector: 'app-shared-footer-unrouted',
   templateUrl: './shared.footer.unrouted.component.html',
@@ -21,17 +27,43 @@ export class SharedFooterUnroutedComponent implements OnInit {
   isEmpresa: boolean = false;
   isAlumno: boolean = false;
 
-  // Enlaces principales del footer (modifícalos según tus rutas)
-  mainLinks = [
-    { label: 'Inicio', path: '/' },
-    { label: 'Ofertas', path: '/ofertas' },
-    { label: 'Empresas', path: '/admin/empresa/plist' },
-    { label: 'Alumnos', path: '/admin/alumno/plist' },
+  // Enlaces principales del footer con roles permitidos
+  mainLinks: FooterLink[] = [
+    {
+      label: 'Inicio',
+      path: '/',
+      roles: ['public', 'admin', 'empresa', 'alumno'],
+    },
+    {
+      label: 'Ofertas',
+      path: '/admin/oferta/plist',
+      roles: ['public', 'admin', 'empresa', 'alumno'],
+    },
+    {
+      label: 'Empresas',
+      path: '/admin/empresa/plist',
+      roles: ['admin', 'alumno'], // empresa NO la ve
+    },
+    {
+      label: 'Alumnos',
+      path: '/admin/alumno/plist',
+      roles: ['admin'], // solo admin
+    },
+    {
+      label: 'Sectores',
+      path: '/admin/sector/plist',
+      roles: ['admin'], // solo admin
+    },
+    {
+      label: 'Candidaturas',
+      path: '/admin/candidatura/plist', // ajusta esta ruta si en tu app es otra
+      roles: ['admin', 'empresa', 'alumno'],
+    },
   ];
 
   infoLinks = [
     { label: 'Sobre FormAndWork', path: '/' },
-   // { label: 'Contacto', path: '/contacto' },
+    // { label: 'Contacto', path: '/contacto' },
   ];
 
   legalLinks = [
@@ -92,6 +124,23 @@ export class SharedFooterUnroutedComponent implements OnInit {
     this.isAdmin = tipo === 'admin' || tipo === 'administrador';
     this.isEmpresa = tipo === 'empresa';
     this.isAlumno = tipo === 'alumno';
+  }
+
+  // rol efectivo para pintar enlaces
+  private getEffectiveRole(): 'public' | 'admin' | 'empresa' | 'alumno' {
+    if (!this.activeSession) {
+      return 'public';
+    }
+    if (this.isAdmin) return 'admin';
+    if (this.isEmpresa) return 'empresa';
+    if (this.isAlumno) return 'alumno';
+    return 'public';
+  }
+
+  // enlaces visibles según el tipo de login
+  get visibleMainLinks(): FooterLink[] {
+    const role = this.getEffectiveRole();
+    return this.mainLinks.filter((link) => link.roles.includes(role));
   }
 
   isActive(path: string): boolean {

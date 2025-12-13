@@ -15,23 +15,23 @@ import { SectorAdminSelectorUnroutedComponent } from '../../sector/sector.admin.
 import { MatDialog } from '@angular/material/dialog';
 import { ISector } from '../../../model/sector.interface';
 import { CommonModule } from '@angular/common';
-import { SectorService } from '../../../service/sector.service';
-import { interval } from 'rxjs';
+import { SessionService } from '../../../service/session.service';
 
 declare let bootstrap: any;
 
 @Component({
-    selector: 'app-empresa.admin.edit.routed',
-    templateUrl: './empresa.admin.edit.routed.component.html',
-    standalone: true,
-    imports: [
-        MatFormFieldModule,
-        MatInputModule,
-        MatSelectModule,
-        ReactiveFormsModule,
-        RouterModule,
-    ],
-    styleUrls: ['./empresa.admin.edit.routed.component.css']
+  selector: 'app-empresa.admin.edit.routed',
+  templateUrl: './empresa.admin.edit.routed.component.html',
+  standalone: true,
+  imports: [
+    CommonModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatSelectModule,
+    ReactiveFormsModule,
+    RouterModule,
+  ],
+  styleUrls: ['./empresa.admin.edit.routed.component.css'],
 })
 export class EmpresaAdminEditRoutedComponent implements OnInit {
 
@@ -39,35 +39,57 @@ export class EmpresaAdminEditRoutedComponent implements OnInit {
   oEmpresaForm: FormGroup | undefined = undefined;
   oEmpresa: IEmpresa | null = null;
   oSector: ISector = {} as ISector;
-    readonly dialog = inject(MatDialog);
+  readonly dialog = inject(MatDialog);
   myModal: any;
   strMessage: string = '';
 
-  arrSectores: string[] = [
-    "Administración y gestión", "Agraria", "Artes gráficas", "Artes y artesanías",
-    "Comercio y marketing", "Electricidad y electrónica", "Energía y agua",
-    "Fabricación mecánica", "Hostelería y turismo", "Imagen personal",
-    "Imagen y sonido", "Informática y comunicaciones", "Instalación y mantenimiento",
-    "Madera, mueble y corcho", "Marítimo-pesquera", "Química", "Sanidad",
-    "Seguridad y medio ambiente", "Servicios socioculturales y a la comunidad",
-    "Textil, confección y piel", "Transporte y mantenimiento de vehículos", "Vidrio y cerámica"
-  ];
+  // roles
+  isAdmin = false;
+  isEmpresa = false;
+  isAlumno = false;
+
+  loading = true;
 
   constructor(
     private oActivatedRoute: ActivatedRoute,
     private oEmpresaService: EmpresaService,
-    private oRouter: Router
+    private oRouter: Router,
+    private oSessionService: SessionService
   ) {
     this.oActivatedRoute.params.subscribe((params) => {
       this.id = params['id'];
     });
-  }
 
+    // rol inicial
+    const tipo = (this.oSessionService.getSessionTipoUsuario() || '')
+      .toLowerCase()
+      .trim();
+    this.isAdmin   = (tipo === 'admin' || tipo === 'administrador');
+    this.isEmpresa = (tipo === 'empresa');
+    this.isAlumno  = (tipo === 'alumno');
+  }
 
   ngOnInit() {
     this.createForm();
     this.get();
-    this.oEmpresaForm?.markAllAsTouched();
+
+    // por si el rol cambia en caliente
+    this.oSessionService.onLogin().subscribe({
+      next: () => {
+        const tipo = (this.oSessionService.getSessionTipoUsuario() || '')
+          .toLowerCase()
+          .trim();
+        this.isAdmin   = (tipo === 'admin' || tipo === 'administrador');
+        this.isEmpresa = (tipo === 'empresa');
+        this.isAlumno  = (tipo === 'alumno');
+      },
+    });
+
+    this.oSessionService.onLogout().subscribe({
+      next: () => {
+        this.isAdmin = this.isEmpresa = this.isAlumno = false;
+      },
+    });
   }
 
   createForm() {
@@ -78,58 +100,60 @@ export class EmpresaAdminEditRoutedComponent implements OnInit {
         Validators.minLength(3),
         Validators.maxLength(50),
       ]),
-      
       email: new FormControl('', [
         Validators.required,
         Validators.email,
         Validators.minLength(5),
         Validators.maxLength(100),
       ]),
-
-      sector: new FormControl({
+      // sector como sub-formGroup para que encaje con formGroupName="sector"
+      sector: new FormGroup({
         id: new FormControl('', Validators.required),
         nombre: new FormControl('', Validators.required),
       }),
-    
     });
   }
 
-  onReset() {
+  // Cargar empresa del backend
+  get() {
+    this.loading = true;
     this.oEmpresaService.get(this.id).subscribe({
       next: (oEmpresa: IEmpresa) => {
         this.oEmpresa = oEmpresa;
+        this.oSector = oEmpresa.sector || {} as ISector;
         this.updateForm();
+        this.loading = false;
       },
       error: (error) => {
         console.error(error);
+        this.loading = false;
       },
     });
+  }
+
+  // Rellenar el formulario con datos de la empresa
+  updateForm() {
+    if (!this.oEmpresa || !this.oEmpresaForm) return;
+
+    this.oEmpresaForm.patchValue({
+      id: this.oEmpresa.id,
+      nombre: this.oEmpresa.nombre,
+      email: this.oEmpresa.email,
+      sector: {
+        id: this.oEmpresa.sector?.id || '',
+        nombre: this.oEmpresa.sector?.nombre || '',
+      },
+    });
+  }
+
+  // Resetear cambios → recargar datos desde el backend
+  onReset() {
+    this.get();
     return false;
   }
 
-  updateForm() {
-    this.oEmpresaForm?.controls['id'].setValue(this.oEmpresa?.id);
-    this.oEmpresaForm?.controls['nombre'].setValue('');
-    this.oEmpresaForm?.controls['sector'].setValue({
-      id: null,
-      nombre: null,
-    });
-    this.oEmpresaForm?.controls['email'].setValue('');
-  }
-
-  get() {
-    this.oEmpresaService.get(this.id).subscribe({
-      next: (oEmpresa: IEmpresa) => {
-        this.oEmpresa = oEmpresa;
-        this.updateForm();
-      },
-      error: (error) => {
-        console.error(error);
-      },
-    });
-  }
   showModal(mensaje: string) {
-    this.strMessage = mensaje; 
+    this.strMessage = mensaje;
     this.myModal = new bootstrap.Modal(document.getElementById('mimodal'), {
       keyboard: false,
     });
@@ -140,24 +164,28 @@ export class EmpresaAdminEditRoutedComponent implements OnInit {
     this.myModal.hide();
     this.oRouter.navigate(['/admin/empresa/view/' + this.oEmpresa?.id]);
   };
+
   onSubmit() {
+    console.log('SUBMIT!!', this.oEmpresaForm?.value, 'VALID?', this.oEmpresaForm?.valid);
     if (!this.oEmpresaForm?.valid) {
       this.showModal('Formulario no válido');
       return;
-    } else {
-      this.oEmpresaService.update(this.oEmpresaForm?.value).subscribe({
-        next: (oEmpresa: IEmpresa) => {
-          this.oEmpresa = oEmpresa;
-          this.updateForm();
-          this.showModal('Empresa ' + this.oEmpresa.id + ' actualizado');
-        },
-        error: (error) => {
-          this.showModal('Error al actualizar el usuario');
-          console.error(error);
-        },
-      });
     }
+
+    this.oEmpresaService.update(this.oEmpresaForm.value).subscribe({
+      next: (oEmpresa: IEmpresa) => {
+        this.oEmpresa = oEmpresa;
+        this.oSector = oEmpresa.sector || {} as ISector;
+        this.updateForm();
+        this.showModal('Empresa ' + this.oEmpresa.id + ' actualizada');
+      },
+      error: (error) => {
+        this.showModal('Error al actualizar la empresa');
+        console.error(error);
+      },
+    });
   }
+
   showSectorSelectorModal() {
     const dialogRef = this.dialog.open(SectorAdminSelectorUnroutedComponent, {
       height: '800px',
@@ -165,21 +193,18 @@ export class EmpresaAdminEditRoutedComponent implements OnInit {
       width: '80%',
       maxWidth: '90%',
       data: { origen: '', sector: '' },
-
     });
 
     dialogRef.afterClosed().subscribe(result => {
-      console.log('The dialog was closed');
       if (result !== undefined) {
-        console.log(result);
         this.oSector = result;
-        this.oEmpresaForm?.controls['sector'].setValue(this.oSector);
-        console.log(this.oEmpresaForm?.value);
+        // actualizamos el form con el sector elegido
+        this.oEmpresaForm?.get('sector')?.patchValue({
+          id: this.oSector.id,
+          nombre: this.oSector.nombre,
+        });
       }
     });
     return false;
   }
-
-
-
 }

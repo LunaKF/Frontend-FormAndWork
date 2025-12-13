@@ -1,90 +1,199 @@
-<div class="container mt-5 d-flex align-items-center justify-content-center">
-  <div class="row">
-    <div class="col text-center">
-      <h2 class="my-2">
-        <i class="bi bi-plus-square"></i>
-        Creación de Empresa
-        <i class="bi bi-person-circle"></i>
-      </h2>
-      <form [formGroup]="oEmpresaForm!" (ngSubmit)="onSubmit()" novalidate>
-        <div class="row mt-4">
-          <mat-form-field>
-            <mat-label>Nombre de la Empresa</mat-label>
-            <input matInput formControlName="nombre" placeholder="Nombre de la Empresa..." />
-            <mat-hint align="start">De 3 caracteres a 50 caracteres</mat-hint>
-            <mat-error *ngIf="oEmpresaForm?.get('nombre')?.hasError('required')">Este campo es obligatorio</mat-error>
-            <mat-error *ngIf="oEmpresaForm?.get('nombre')?.hasError('minlength')">El nombre debe ser más
-              largo</mat-error>
-            <mat-error *ngIf="oEmpresaForm?.get('nombre')?.hasError('maxlength')">El nombre debe ser más
-              corto</mat-error>
-          </mat-form-field>
-        </div>
+<div class="empresa-edit-page">
 
-        <div formGroupName="sector">
-          <div class="row mt-4">
-            <mat-form-field>
-              <mat-label>SECTORES</mat-label>
-              <div class="d-flex justify-content-end">
-                <button class="btn btn-primary" (click)="showSectorSelectorModal()">
-                  <i class="bi bi-search"></i>
-                  Buscar
-                </button>
-              </div>
-              <div class="d-flex justify-content-start">
-              </div>
-              {{ oSector?.id }} - {{ oSector?.nombre }}
-              <input matInput formControlName="id" placeholder="sector" />
-            </mat-form-field>
+  <!-- BANNER ROL -->
+  <div class="role-banner" *ngIf="isAdmin || isEmpresa">
+    <div class="container-xl role-banner-inner">
+      <span class="role-chip" *ngIf="isAdmin">
+        <i class="bi bi-shield-lock"></i>
+        Modo administración activo
+      </span>
+      <span class="role-chip soft" *ngIf="isEmpresa && !isAdmin">
+        <i class="bi bi-building"></i>
+        Panel de empresa
+      </span>
+
+      <span class="role-text" *ngIf="isAdmin">
+        Estás creando una nueva empresa colaboradora. Revisa los datos antes de guardar.
+      </span>
+      <span class="role-text" *ngIf="isEmpresa && !isAdmin">
+        No tienes permisos para crear empresas.
+      </span>
+    </div>
+  </div>
+
+  <!-- HERO -->
+  <section class="empresa-hero">
+    <div class="empresa-hero-overlay"></div>
+
+    <div class="container-xl empresa-hero-inner">
+
+      <h1 class="empresa-title">Crear empresa</h1>
+
+      <p class="empresa-subtitle" *ngIf="isAdmin">
+        Añade una empresa al ecosistema FormAndWork. Podrás asignarle un sector
+        y completar sus datos de contacto.
+      </p>
+
+      <p class="empresa-subtitle" *ngIf="isEmpresa && !isAdmin">
+        Esta sección es solo para administración.
+      </p>
+    </div>
+  </section>
+
+  <!-- CONTENIDO -->
+  <section class="empresa-edit">
+    <div class="container-xl">
+
+      <div class="edit-layout" *ngIf="oEmpresaForm">
+
+        <!-- Columna izquierda: resumen / preview -->
+        <aside class="summary-card">
+          <div class="summary-avatar">
+            <span>
+              {{
+              ((oEmpresaForm.get('nombre')?.value ?? 'NA') + '')
+              .substring(0, 2)
+              .toUpperCase()
+              }}
+            </span>
+
           </div>
-        </div>
-        <br />
-        <div class="row mt-4">
-          <mat-form-field>
-            <mat-label>Email</mat-label>
-            <input matInput formControlName="email" placeholder="Email de la empresa" required />
-            <mat-hint align="start">Formato email</mat-hint>
-            <mat-error *ngIf="oEmpresaForm?.get('email')?.hasError('required')">Debes introducir un email</mat-error>
-            <mat-error *ngIf="oEmpresaForm?.get('email')?.hasError('email')">Debes introducir un email
-              correcto</mat-error>
-          </mat-form-field>
-        </div>
-        <br />
 
-        <button class="btn btn-warning mt-4 mx-1" [routerLink]="['/admin', 'empresa', 'plist']">
-          <i class="bi bi-list"></i>
-          Ir a listado de Empresas
-        </button>
+          <div class="summary-body">
+            <h2 class="summary-name">
+              {{ oEmpresaForm.get('nombre')?.value || 'Nueva empresa' }}
+            </h2>
 
-        <button class="btn btn-secondary mt-4 mx-1" (click)="onReset()">
-          <i class="bi bi-x-lg"></i>
-          Reset
-        </button>
+            <p class="summary-email">
+              <i class="bi bi-envelope"></i>
+              {{ oEmpresaForm.get('email')?.value || 'Email pendiente' }}
+            </p>
 
-        <button class="btn btn-primary mt-4 mx-1" type="submit" [disabled]="!oEmpresaForm?.valid">
-          <i class="bi bi-floppy"></i>
-          Guardar
-        </button>
-        
-        <div class="modal fade" [id]="'mimodal'" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-          <div class="modal-dialog">
-            <div class="modal-content">
-              <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">FormAndWork</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
-                  (click)="hideModal()"></button>
+            <p class="summary-sector">
+              <i class="bi bi-diagram-3"></i>
+              {{ oSector?.nombre || 'Sector pendiente' }}
+            </p>
+
+            <p class="summary-hint" *ngIf="isAdmin">
+              Esto es una vista previa. La empresa se creará al guardar.
+            </p>
+          </div>
+        </aside>
+
+        <!-- Columna derecha: formulario -->
+        <div class="form-card" *ngIf="oEmpresaForm">
+
+          <form [formGroup]="oEmpresaForm" (ngSubmit)="onSubmit()" novalidate>
+
+            <!-- Nombre -->
+            <div class="field-row">
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Nombre de la empresa</mat-label>
+                <input matInput formControlName="nombre" placeholder="Nombre de la empresa…" />
+                <mat-hint align="start">Entre 3 y 50 caracteres</mat-hint>
+                <mat-error *ngIf="oEmpresaForm.get('nombre')?.hasError('required')">
+                  Este campo es obligatorio.
+                </mat-error>
+                <mat-error *ngIf="oEmpresaForm.get('nombre')?.hasError('minlength')">
+                  El nombre es demasiado corto.
+                </mat-error>
+                <mat-error *ngIf="oEmpresaForm.get('nombre')?.hasError('maxlength')">
+                  El nombre es demasiado largo.
+                </mat-error>
+              </mat-form-field>
+            </div>
+
+            <!-- Email -->
+            <div class="field-row">
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Email de contacto</mat-label>
+                <input matInput formControlName="email" placeholder="Email de la empresa" required />
+                <mat-hint align="start">Usa un email de contacto válido</mat-hint>
+                <mat-error *ngIf="oEmpresaForm.get('email')?.hasError('required')">
+                  Debes introducir un email.
+                </mat-error>
+                <mat-error *ngIf="oEmpresaForm.get('email')?.hasError('email')">
+                  Introduce un email con formato correcto.
+                </mat-error>
+              </mat-form-field>
+            </div>
+
+            <!-- Sector: SOLO ADMIN -->
+            <div formGroupName="sector" *ngIf="isAdmin">
+              <div class="field-row">
+                <label class="field-label">Sector</label>
+
+                <div class="sector-selector">
+                  <button type="button" class="btn btn-outline-primary" (click)="showSectorSelectorModal()">
+                    <i class="bi bi-search"></i>
+                    Buscar sector
+                  </button>
+
+                  <span class="sector-chip" *ngIf="oSector?.id">
+                    <i class="bi bi-diagram-3"></i>
+                    {{ oSector?.nombre }}
+                  </span>
+                </div>
+
+                <!-- ocultos para enviar id/nombre -->
+                <input type="hidden" formControlName="id" />
+                <input type="hidden" formControlName="nombre" />
               </div>
-              <div class="modal-body">
-                <p>{{ strMessage }}</p>
-              </div>
-              <div class="modal-footer">
-                <button type="button" class="btn btn-primary" data-bs-dismiss="modal" (click)="hideModal()">
-                  Cerrar
+            </div>
+
+            <!-- Acciones -->
+            <div class="actions-row">
+              <button class="btn btn-ghost" type="button" [routerLink]="['/admin','empresa','plist']">
+                <i class="bi bi-arrow-left"></i>
+                Volver al listado
+              </button>
+
+              <div class="actions-right">
+                <button class="btn btn-secondary" type="button" (click)="onReset()">
+                  <i class="bi bi-arrow-counterclockwise"></i>
+                  Limpiar formulario
+                </button>
+
+                <button class="btn btn-primary" type="submit" [disabled]="oEmpresaForm.invalid || !isAdmin">
+                  <i class="bi bi-floppy"></i>
+                  Crear empresa
                 </button>
               </div>
             </div>
-          </div>
+
+          </form>
         </div>
-      </form>
+
+      </div>
+
+      <!-- Loading (por si lo quieres usar) -->
+      <div class="loading-state" *ngIf="loading">
+        <div class="spinner-border" role="status"></div>
+        <p>Preparando formulario…</p>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- MODAL Bootstrap -->
+  <div class="modal fade" [id]="'mimodal'" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">FormAndWork</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
+            (click)="hideModal()"></button>
+        </div>
+        <div class="modal-body">
+          <p>{{ strMessage }}</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" data-bs-dismiss="modal" (click)="hideModal()">
+            Cerrar
+          </button>
+        </div>
+      </div>
     </div>
   </div>
+
 </div>

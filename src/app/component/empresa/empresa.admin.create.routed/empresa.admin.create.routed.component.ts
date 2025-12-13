@@ -15,27 +15,25 @@ import { SectorAdminSelectorUnroutedComponent } from '../../sector/sector.admin.
 import { MatDialog } from '@angular/material/dialog';
 import { ISector } from '../../../model/sector.interface';
 import { CommonModule } from '@angular/common';
-import { SectorService } from '../../../service/sector.service';
-import { interval } from 'rxjs';
+import { SessionService } from '../../../service/session.service';
 
 declare let bootstrap: any;
 
 @Component({
-    selector: 'app-empresa.admin.create.routed',
-    templateUrl: './empresa.admin.create.routed.component.html',
-    standalone: true,
-    imports: [
-        MatFormFieldModule,
-        MatInputModule,
-        MatSelectModule,
-        ReactiveFormsModule,
-        RouterModule,
-        CommonModule
-    ],
-    styleUrls: ['./empresa.admin.create.routed.component.css']
+  selector: 'app-empresa.admin.create.routed',
+  templateUrl: './empresa.admin.create.routed.component.html',
+  standalone: true,
+  imports: [
+    MatFormFieldModule,
+    MatInputModule,
+    MatSelectModule,
+    ReactiveFormsModule,
+    RouterModule,
+    CommonModule,
+  ],
+  styleUrls: ['./empresa.admin.create.routed.component.css'],
 })
 export class EmpresaAdminCreateRoutedComponent implements OnInit {
-
   id: number = 0;
   oEmpresaForm: FormGroup | undefined = undefined;
   oEmpresa: IEmpresa | null = null;
@@ -44,7 +42,14 @@ export class EmpresaAdminCreateRoutedComponent implements OnInit {
   oSector: ISector = {} as ISector;
   myModal: any;
 
-  form: FormGroup = new FormGroup({});
+  form: FormGroup = new FormGroup({}); // lo mantengo porque lo tienes
+
+  // roles
+  isAdmin = false;
+  isEmpresa = false;
+  isAlumno = false;
+
+  loading = false;
 
   arrSectores: string[] = [
     "Administración y gestión", "Agraria", "Artes gráficas", "Artes y artesanías",
@@ -58,61 +63,51 @@ export class EmpresaAdminCreateRoutedComponent implements OnInit {
 
   constructor(
     private oEmpresaService: EmpresaService,
-    private oSectorService: SectorService,
-    private oRouter: Router
+    private oRouter: Router,
+    private oSessionService: SessionService
   ) {
-    this.oEmpresaForm = new FormGroup({
-      id: new FormControl(''),
-
-      nombre: new FormControl('', [
-        Validators.required,
-        Validators.minLength(3),
-        Validators.maxLength(50),
-      ]),
-      sector: new FormControl('', Validators.required),
-      email: new FormControl('', [
-        Validators.required,
-        Validators.email,
-        Validators.minLength(5),
-        Validators.maxLength(100),
-      ]),
-    });
+    // rol inicial (como en edit)
+    const tipo = (this.oSessionService.getSessionTipoUsuario() || '')
+      .toLowerCase()
+      .trim();
+    this.isAdmin = (tipo === 'admin' || tipo === 'administrador');
+    this.isEmpresa = (tipo === 'empresa');
+    this.isAlumno = (tipo === 'alumno');
   }
 
   ngOnInit() {
     this.createForm();
     this.oEmpresaForm?.markAllAsTouched();
 
-    this.oEmpresaForm?.controls['sector'].valueChanges.subscribe(value => {
-      if (value) {
-        if (value.id) {
-          this.oSectorService.get(value.id).subscribe({
-            next: (oSector: ISector) => {
-              this.oSector = oSector;
-            },
-            error: (error) => {
-              console.error(error);
-              this.oSector = {} as ISector;
-              this.oEmpresaForm?.controls['sector'].setErrors({ invalid: true });
-            }
-          });
-      } else {
-        this.oSector = {} as ISector;
-      }
-    }
-  });
+    // por si cambia la sesión en caliente
+    this.oSessionService.onLogin().subscribe({
+      next: () => {
+        const tipo = (this.oSessionService.getSessionTipoUsuario() || '')
+          .toLowerCase()
+          .trim();
+        this.isAdmin = (tipo === 'admin' || tipo === 'administrador');
+        this.isEmpresa = (tipo === 'empresa');
+        this.isAlumno = (tipo === 'alumno');
+      },
+    });
+
+    this.oSessionService.onLogout().subscribe({
+      next: () => {
+        this.isAdmin = this.isEmpresa = this.isAlumno = false;
+      },
+    });
   }
 
   createForm() {
     this.oEmpresaForm = new FormGroup({
-      id: new FormControl(''),
+      id: new FormControl(''), // create: vacío
 
       nombre: new FormControl('', [
         Validators.required,
         Validators.minLength(3),
         Validators.maxLength(50),
       ]),
-      
+
       email: new FormControl('', [
         Validators.required,
         Validators.email,
@@ -120,39 +115,38 @@ export class EmpresaAdminCreateRoutedComponent implements OnInit {
         Validators.maxLength(100),
       ]),
 
+      // ✅ Igual que edit (sector como sub-formGroup)
       sector: new FormGroup({
         id: new FormControl('', Validators.required),
         nombre: new FormControl('', Validators.required),
       }),
-    
     });
   }
 
   updateForm() {
-    this.oEmpresaForm?.controls['nombre'].setValue('');
-    this.oEmpresaForm?.controls['sector'].setValue({
-      id: null,
-      nombre: null,
-    });
-    this.oEmpresaForm?.controls['email'].setValue('');
+    // “reset bonito”
+    this.oEmpresaForm?.reset();
+    this.oSector = {} as ISector;
+
+    // dejamos estructura sector en blanco pero válida de tipo
+    this.oEmpresaForm?.get('sector')?.patchValue({ id: '', nombre: '' });
+    return;
   }
 
   showModal(mensaje: string) {
-    this.strMessage = mensaje;  // Verifica si el modal existe en el DOM antes de inicializarlo
+    this.strMessage = mensaje;
     const modalElement = document.getElementById('mimodal');
     if (!modalElement) {
       console.error('Error: No se encontró el modal en el DOM');
       return;
     }
-  
-    // Inicializa el modal con backdrop definido explícitamente
-    this.myModal = new bootstrap.Modal(modalElement, {
-      backdrop: 'static', // Evita que se cierre al hacer clic fuera
-      keyboard: false
-    });
-  
-    this.myModal.show();
 
+    this.myModal = new bootstrap.Modal(modalElement, {
+      backdrop: 'static',
+      keyboard: false,
+    });
+
+    this.myModal.show();
   }
 
   onReset() {
@@ -161,27 +155,35 @@ export class EmpresaAdminCreateRoutedComponent implements OnInit {
   }
 
   hideModal = () => {
-    this.myModal.hide();
-    this.oRouter.navigate(['/admin/empresa/view/' + this.oEmpresa?.id]);
-  }
+    this.myModal?.hide();
+
+    // si ya creó → ir a view, si no → volver al plist
+    if (this.oEmpresa?.id) {
+      this.oRouter.navigate(['/admin/empresa/view/' + this.oEmpresa.id]);
+    } else {
+      this.oRouter.navigate(['/admin/empresa/plist']);
+    }
+  };
 
   onSubmit() {
     if (this.oEmpresaForm?.invalid) {
       this.showModal('Formulario inválido');
       return;
-    } else {
-      console.log(this.oEmpresaForm?.value);
-      this.oEmpresaService.create(this.oEmpresaForm?.value).subscribe({
-        next: (oEmpresa: IEmpresa) => {
-          this.oEmpresa = oEmpresa;
-          this.showModal('Empresa creada con el id: ' + this.oEmpresa.id);
-        },
-        error: (err) => {
-          this.showModal('Error al crear la Empresa');
-          console.log(err);
-        },
-      });
     }
+
+    // ⚠️ create: NO mandamos password desde aquí si tu backend ya lo gestiona.
+    // Si tu backend exige password en create, dímelo y lo añadimos a este form.
+
+    this.oEmpresaService.create(this.oEmpresaForm?.value).subscribe({
+      next: (oEmpresa: IEmpresa) => {
+        this.oEmpresa = oEmpresa;
+        this.showModal('Empresa creada con el id: ' + this.oEmpresa.id);
+      },
+      error: (err) => {
+        this.showModal('Error al crear la Empresa');
+        console.log(err);
+      },
+    });
   }
 
   showSectorSelectorModal() {
@@ -191,21 +193,20 @@ export class EmpresaAdminCreateRoutedComponent implements OnInit {
       width: '90%',
       maxWidth: '90%',
       data: { origen: '', sector: '' },
-      panelClass: 'custom-dialog'
+      panelClass: 'custom-dialog',
     });
 
-    dialogRef.afterClosed().subscribe(result => {
-      console.log('The dialog was closed');
+    dialogRef.afterClosed().subscribe((result) => {
       if (result !== undefined) {
-        console.log(result);
         this.oSector = result;
-        this.oEmpresaForm?.controls['sector'].setValue(this.oSector);
-        console.log(this.oEmpresaForm?.value);
+
+        // ✅ Igual que edit: rellenamos el subgrupo sector
+        this.oEmpresaForm?.get('sector')?.patchValue({
+          id: this.oSector.id,
+          nombre: this.oSector.nombre,
+        });
       }
     });
     return false;
   }
-
-
-
 }

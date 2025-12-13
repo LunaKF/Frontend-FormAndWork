@@ -1,0 +1,334 @@
+:root {
+  --violet: #3f14b8;
+  --softviolet: #9982fd;
+  --mint: #00b894;
+  --coral: #e749a0;
+  --amber: #f3bb53;
+  --soft-bg: #f8f9fb;
+  --border: #e8e8ef;
+}
+
+/* PAGE */
+.empresa-edit-page {
+  background: var(--soft-bg);
+  min-height: 100vh;
+}
+
+/* BANNER ROL */
+.role-banner {
+  background: #f4efff;
+  border-bottom: 1px solid rgba(108, 94, 180, .18);
+}
+
+.role-banner-inner {
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+  padding: .55rem 0;
+  font-size: .82rem;
+  color: #4c4575;
+}
+
+.role-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: .35rem;
+  padding: .3rem .9rem;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: .78rem;
+  color: #fff;
+  background: linear-gradient(90deg, #ff6ea1, #ffb86c);
+}
+
+.role-chip.soft {
+  background: rgba(255, 255, 255, .95);
+  color: #3f14b8;
+  border: 1px solid rgba(232, 232, 239, .95);
+}
+
+.role-text {
+  opacity: .9;
+}
+
+/* HERO */
+.empresa-hero {
+  position: relative;
+  min-height: 420px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(3rem, 6vw, 4rem) 0 4.5rem;
+  background-image: url('../../../../assets/img/uwu.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.empresa-hero-overlay {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(80rem 40rem at 50% 0%, rgba(63, 20, 184, .35), transparent 60%),
+    linear-gradient(180deg, rgba(255, 255, 255, .65), rgba(255, 255, 255, .18));
+  backdrop-filter: blur(4px) saturate(2.1);
+}
+
+.empresa-hero-inner {
+  position: relative;
+  z-index: 1;
+  max-width: 1080px;
+  text-align: center;
+  color: #262041;
+}
+
+.empresa-title {
+  margin: 0;
+  font-size: clamp(2.4rem, 4.5vw, 3.6rem);
+  font-weight: 800;
+  background: linear-gradient(90deg, var(--violet), var(--softviolet));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  position: relative;
+  display: inline-block;
+  padding-bottom: .55rem;
+}
+
+.empresa-title::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: -10px;
+  transform: translateX(-50%);
+  width: 70%;
+  height: 6px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #ffb86c, #ff6ea1, var(--softviolet));
+}
+
+.empresa-subtitle {
+  margin: 1.4rem auto 0;
+  max-width: 760px;
+  font-size: .98rem;
+  color: #504a86;
+  border-radius: 24px;
+  padding: .9rem 1.5rem;
+  background: rgba(255, 255, 255, .86);
+  border: 1px solid rgba(232, 232, 239, .9);
+}
+
+/* SECCIÓN EDIT */
+.empresa-edit {
+  margin-top: -4rem;
+  padding-bottom: 3rem;
+  position: relative;
+  z-index: 2;
+}
+
+.edit-layout {
+  display: grid;
+  gap: 1.8rem;
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 992px) {
+  .edit-layout {
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.6fr);
+    align-items: flex-start;
+  }
+}
+
+/* SUMMARY CARD */
+.summary-card {
+  background: #ffffff;
+  border-radius: 22px;
+  padding: 1.4rem 1.6rem;
+  box-shadow: 0 18px 36px rgba(0, 0, 0, .12);
+  border: 1px solid rgba(232, 232, 239, .96);
+  display: flex;
+  gap: 1.1rem;
+  align-items: flex-start;
+}
+
+.summary-avatar {
+  width: 64px;
+  height: 64px;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, var(--violet), var(--softviolet));
+  color: #fff;
+  font-weight: 800;
+  font-size: .95rem;
+  letter-spacing: .4px;
+  flex-shrink: 0;
+}
+
+.summary-body {
+  display: flex;
+  flex-direction: column;
+  gap: .25rem;
+}
+
+.summary-name {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #282242;
+}
+
+.summary-id {
+  margin: 0;
+  font-size: .82rem;
+  color: #7a72a8;
+}
+
+.summary-id strong {
+  font-weight: 700;
+}
+
+.summary-email,
+.summary-sector {
+  margin: 0;
+  font-size: .86rem;
+  color: #5f597f;
+  display: flex;
+  align-items: center;
+  gap: .35rem;
+}
+
+.summary-email i,
+.summary-sector i {
+  font-size: .95rem;
+}
+
+.summary-hint {
+  margin-top: .5rem;
+  font-size: .8rem;
+  color: #8a84af;
+}
+
+/* FORM CARD */
+.form-card {
+  background: #ffffff;
+  border-radius: 22px;
+  padding: 1.6rem 1.8rem 1.4rem;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, .14);
+  border: 1px solid rgba(232, 232, 239, .96);
+}
+
+.field-row {
+  margin-bottom: 1rem;
+}
+
+.full-width {
+  width: 100%;
+}
+
+/* MatFormField tweaks */
+.mat-mdc-form-field {
+  width: 100%;
+}
+
+.field-label {
+  display: block;
+  font-size: .82rem;
+  font-weight: 600;
+  color: #5a5676;
+  margin-bottom: .35rem;
+}
+
+/* sector selector */
+.sector-selector {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: .6rem;
+}
+
+.sector-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: .3rem;
+  padding: .3rem .75rem;
+  border-radius: 999px;
+  background: #f5f3ff;
+  color: #5b5485;
+  font-size: .82rem;
+  border: 1px solid rgba(151, 135, 255, .4);
+}
+
+/* Actions */
+.actions-row {
+  margin-top: 1.4rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: .8rem;
+  flex-wrap: wrap;
+}
+
+.actions-right {
+  display: flex;
+  gap: .6rem;
+}
+
+/* Botones (aprovechando bootstrap pero ajustando look) */
+.btn {
+  border-radius: 999px;
+  font-size: .85rem;
+  padding: .4rem .95rem;
+  display: inline-flex;
+  align-items: center;
+  gap: .35rem;
+}
+
+.btn i {
+  font-size: .95rem;
+}
+
+.btn-primary {
+  background: linear-gradient(90deg, #ffb86c, #ff6ea1, var(--softviolet));
+  border: none;
+}
+
+.btn-primary:hover {
+  filter: brightness(1.05);
+}
+
+.btn-secondary {
+  background: #f5f3ff;
+  color: #3f14b8;
+  border: 1px solid rgba(63, 20, 184, .25);
+}
+
+.btn-secondary:hover {
+  background: #ece7ff;
+}
+
+.btn-ghost {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: #5a5676;
+}
+
+.btn-ghost:hover {
+  background: #f5f5fb;
+}
+
+/* Loading */
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: .6rem;
+  padding: 3rem 0 2rem;
+  color: #7a7596;
+}
+
+/* Modal override (un poco de aire) */
+.modal-content {
+  border-radius: 18px;
+}

@@ -1,52 +1,233 @@
-<div class="row justify-content-center m-3">
-  <div class="col-lg-7 col-md-10 col-sm-12">
-    <h1 class="my-5 text-center">
-      Vista de la Candidatura con Id: {{ oCandidatura.id }}
-    </h1>
-    
-    <br />
-    <table *ngIf="oCandidatura" class="table table-striped table-bordered my-5 text-center">
-      <tbody>
-        <tr class="text-center">
-          <th scope="row" class="bg-danger text-white text-end pe-5">Id</th>
-          <td class="text-start ps-5">{{ oCandidatura.id }}</td>
-        </tr>
-        <tr class="text-center">
-          <th scope="row" class="bg-primary text-white text-end pe-5">
-            Alumno
-          </th>
-          <td class="text-start ps-5">{{ oCandidatura.alumno.id }}</td>
-        </tr>
-        <tr class="text-center">
-          <th scope="row" class="bg-primary text-white text-end pe-5">
-            Oferta
-          </th>
-          <td class="text-start ps-5">{{ oCandidatura.oferta.id }}</td>
+<div class="candidatura-view-page">
 
-        </tr>
-        <tr class="text-center">
-          <th scope="row" class="bg-primary text-white text-end pe-5">
-            Fecha
-          </th>
-          <td class="text-start ps-5">{{ oCandidatura.fecha }}</td>
-        </tr>
+  <!-- BANNER ROL (calcado al de empresa) -->
+  <div class="role-banner" *ngIf="isAdmin || isEmpresa || isAlumno">
+    <div class="container-xl role-banner-inner">
 
-    </table>
-    
+      <span class="role-chip" *ngIf="isAdmin">
+        <i class="bi bi-shield-lock"></i>
+        Modo administración activo
+      </span>
+
+      <span class="role-chip soft" *ngIf="isEmpresa && !isAdmin">
+        <i class="bi bi-building"></i>
+        Panel de empresa
+      </span>
+
+      <span class="role-chip soft" *ngIf="isAlumno && !isAdmin && !isEmpresa">
+        <i class="bi bi-mortarboard"></i>
+        Vista de alumno
+      </span>
+
+      <span class="role-text" *ngIf="isAdmin">
+        Estás visualizando una candidatura. Desde aquí podrás gestionar acciones.
+      </span>
+
+      <span class="role-text" *ngIf="isEmpresa && !isAdmin">
+        Estás viendo una candidatura recibida para una de tus ofertas.
+      </span>
+
+      <span class="role-text" *ngIf="isAlumno && !isAdmin && !isEmpresa">
+        Estás viendo tu candidatura y su relación con la oferta y empresa.
+      </span>
+    </div>
   </div>
 
-  <div class="d-flex justify-content-center mt-4">
-    <a class="btn btn-warning mt-4 mx-1" href="admin/candidatura/plist">
-      <i class="bi bi-list"></i>
-      Ir a listado de Candidaturas
-    </a>
-    <a class="btn btn-primary mt-4 mx-1" href="admin/candidatura/edit/{{ oCandidatura.id }}">
-      <i class="bi bi-pencil"></i>
-      Editar
-    </a>
-    <a class="btn btn-danger mt-4 mx-1" href="admin/candidatura/delete/{{ oCandidatura.id }}">
-      <i class="bi bi-trash"></i>
-      Borrar
-    </a>
-  </div>
+  <!-- HERO (mismo patrón que empresa view, sin crear kicker nuevo) -->
+  <section class="candidatura-hero">
+    <div class="candidatura-hero-overlay"></div>
+
+    <div class="container-xl candidatura-hero-inner">
+      <h1 class="candidatura-title">Detalle de candidatura</h1>
+
+      <p class="candidatura-subtitle" *ngIf="isAdmin">
+        Vista completa de la candidatura, con enlaces directos a alumno, oferta y empresa.
+      </p>
+
+      <p class="candidatura-subtitle" *ngIf="isEmpresa && !isAdmin">
+        Revisa el alumno candidato y accede a la oferta relacionada.
+      </p>
+
+      <p class="candidatura-subtitle" *ngIf="isAlumno && !isAdmin && !isEmpresa">
+        Aquí puedes ver la oferta y empresa a la que has postulado.
+      </p>
+    </div>
+  </section>
+
+  <!-- CONTENIDO -->
+  <section class="candidatura-view">
+    <div class="container-xl">
+
+      <!-- Loading -->
+      <div class="loading-state" *ngIf="loading">
+        <div class="spinner-border" role="status"></div>
+        <p>Cargando candidatura…</p>
+      </div>
+
+      <div class="edit-layout" *ngIf="!loading">
+
+        <!-- Izquierda: resumen -->
+        <aside class="summary-card">
+
+          <!-- Avatar: depende del rol -->
+          <div class="summary-avatar" *ngIf="isAlumno && !isAdmin && !isEmpresa">
+            <span>{{ initials(empresaNombre()) }}</span>
+          </div>
+
+          <div class="summary-avatar" *ngIf="isEmpresa && !isAdmin">
+            <span>{{ initials(alumnoNombre()) }}</span>
+          </div>
+
+          <div class="summary-avatar" *ngIf="isAdmin">
+            <span>{{ initials(ofertaTitulo()) }}</span>
+          </div>
+
+          <div class="summary-body">
+
+            <!-- ADMIN: título = oferta + alumno -->
+            <h2 class="summary-name" *ngIf="isAdmin">
+              {{ ofertaTitulo() }}
+            </h2>
+            <p class="summary-sub" *ngIf="isAdmin">
+              Candidato/a: <strong>{{ alumnoNombre() }}</strong>
+            </p>
+
+            <!-- ALUMNO: título = oferta -->
+            <h2 class="summary-name" *ngIf="isAlumno && !isAdmin && !isEmpresa">
+              {{ ofertaTitulo() }}
+            </h2>
+            <p class="summary-sub" *ngIf="isAlumno && !isAdmin && !isEmpresa">
+              Empresa: <strong>{{ empresaNombre() }}</strong>
+            </p>
+
+            <!-- EMPRESA: título = alumno -->
+            <h2 class="summary-name" *ngIf="isEmpresa && !isAdmin">
+              {{ alumnoNombre() }}
+            </h2>
+            <p class="summary-sub" *ngIf="isEmpresa && !isAdmin">
+              Oferta: <strong>{{ ofertaTitulo() }}</strong>
+            </p>
+
+            <!-- ID SOLO admin (muy discreto) -->
+            <p class="summary-id" *ngIf="isAdmin">
+              Referencia: <strong>#{{ oCandidatura?.id }}</strong>
+            </p>
+
+            <!-- Fecha: siempre visible -->
+            <p class="summary-meta">
+              <i class="bi bi-calendar-event"></i>
+              {{ oCandidatura?.fecha | date:'mediumDate' }}
+            </p>
+
+            <p class="summary-hint" *ngIf="isAdmin">
+              Usa los enlaces para saltar a la ficha relacionada.
+            </p>
+            <p class="summary-hint" *ngIf="isAlumno && !isAdmin && !isEmpresa">
+              No se muestran tus datos personales aquí; solo el contexto de la oferta.
+            </p>
+            <p class="summary-hint" *ngIf="isEmpresa && !isAdmin">
+              No se muestran tus datos de empresa aquí; revisa el candidato y la oferta.
+            </p>
+          </div>
+        </aside>
+
+        <!-- Derecha: detalles -->
+        <div class="form-card">
+
+          <div class="detail-grid">
+
+            <!-- ====== BLOQUE ALUMNO (solo admin/empresa) ====== -->
+            <ng-container *ngIf="(isAdmin || isEmpresa) && !isAlumno">
+
+              <div class="detail-item wide">
+                <div class="detail-label">Alumno</div>
+                <div class="detail-value">
+                  <i class="bi bi-person"></i>
+                  {{ alumnoNombre() }}
+                </div>
+
+                <button class="mini-link" type="button" (click)="goAlumno($event)">
+                  Ver perfil del alumno
+                  <i class="bi bi-arrow-up-right"></i>
+                </button>
+              </div>
+
+            </ng-container>
+
+            <!-- ====== BLOQUE EMPRESA (solo admin/alumno) ====== -->
+            <ng-container *ngIf="(isAdmin || isAlumno) && !isEmpresa">
+
+              <div class="detail-item wide">
+                <div class="detail-label">Empresa</div>
+                <div class="detail-value">
+                  <i class="bi bi-building"></i>
+                  {{ empresaNombre() }}
+                </div>
+
+                <button class="mini-link" type="button" (click)="goEmpresa($event)">
+                  Ver perfil de la empresa
+                  <i class="bi bi-arrow-up-right"></i>
+                </button>
+              </div>
+
+            </ng-container>
+
+            <!-- ====== OFERTA (siempre) ====== -->
+            <div class="detail-item wide">
+              <div class="detail-label">Oferta</div>
+              <div class="detail-value">
+                <i class="bi bi-briefcase"></i>
+                {{ ofertaTitulo() }}
+              </div>
+
+              <button class="mini-link" type="button" (click)="goOferta($event)">
+                Ver oferta
+                <i class="bi bi-arrow-up-right"></i>
+              </button>
+            </div>
+
+            <!-- Sector oferta (opcional, útil) -->
+            <div class="detail-item" *ngIf="oCandidatura?.oferta?.sector?.nombre">
+              <div class="detail-label">Sector</div>
+              <div class="detail-value">
+                <i class="bi bi-diagram-3"></i>
+                {{ oCandidatura?.oferta?.sector?.nombre }}
+              </div>
+            </div>
+
+            <!-- Estado (simple) -->
+            <div class="detail-item">
+              <div class="detail-label">Estado</div>
+              <div class="detail-value">
+                <i class="bi bi-check2-circle"></i>
+                Registrada
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Acciones -->
+          <div class="actions-row">
+            <button class="btn btn-ghost" type="button" (click)="goBack()">
+              <i class="bi bi-arrow-left"></i>
+              Volver al listado
+            </button>
+
+            <div class="actions-right">
+
+              <!-- Borrar (solo admin) -->
+              <button class="btn btn-danger" type="button" *ngIf="isAdmin" (click)="remove()">
+                <i class="bi bi-trash"></i>
+                Borrar
+              </button>
+
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </section>
+
 </div>

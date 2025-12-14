@@ -94,10 +94,6 @@
           <article class="offer-group" *ngFor="let g of groupsByOferta">
             <header class="offer-head" (click)="viewOferta(g.ofertaId)">
               <div class="offer-left">
-                <div class="offer-badge">
-                  <i class="bi bi-briefcase"></i>
-                  Oferta #{{ g.ofertaId }}
-                </div>
                 <h2 class="offer-title">{{ g.ofertaTitulo || ('Oferta ' + g.ofertaId) }}</h2>
                 <div class="offer-meta">
                   <span class="meta-pill">
@@ -184,9 +180,6 @@
             </div>
 
             <div class="cand-actions">
-              <button class="btn" type="button" (click)="$event.stopPropagation(); view(c)">
-                <i class="bi bi-eye"></i> Ver
-              </button>
 
               <button *ngIf="isAdmin" class="btn" type="button" (click)="$event.stopPropagation(); edit(c)">
                 <i class="bi bi-pen"></i> Editar
@@ -194,7 +187,7 @@
 
               <button *ngIf="isAdmin || isAlumno" class="btn danger" type="button"
                 (click)="$event.stopPropagation(); remove(c)">
-                <i class="bi bi-trash"></i> Eliminar
+                <i class="bi bi-trash"></i> Eliminar 
               </button>
             </div>
           </article>

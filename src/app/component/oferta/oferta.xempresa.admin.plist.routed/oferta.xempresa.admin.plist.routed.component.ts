@@ -1,75 +1,156 @@
-import { Component, OnInit } from '@angular/core';
-import { IOferta } from '../../../model/oferta.interface';
-import { OfertaService } from '../../../service/oferta.service';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { IPage } from '../../../model/model.interface';
 import { FormsModule } from '@angular/forms';
-import { BotoneraService } from '../../../service/botonera.service';
-import { debounceTime, Subject } from 'rxjs';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { TrimPipe } from '../../../pipe/trim.pipe';
-import { IEmpresa } from '../../../model/empresa.interface';
-import { HttpErrorResponse } from '@angular/common/http';
-import { EmpresaService } from '../../../service/empresa.service';
 
+import { IPage } from '../../../model/model.interface';
+import { IOferta } from '../../../model/oferta.interface';
+import { IEmpresa } from '../../../model/empresa.interface';
+
+import { OfertaService } from '../../../service/oferta.service';
+import { EmpresaService } from '../../../service/empresa.service';
+import { BotoneraService } from '../../../service/botonera.service';
+import { SessionService } from '../../../service/session.service';
+
+import { TrimPipe } from '../../../pipe/trim.pipe';
 
 @Component({
   selector: 'app-oferta.xempresa.admin.plist.routed',
-  templateUrl: './oferta.xempresa.admin.plist.routed.component.html',
-  styleUrls: ['./oferta.xempresa.admin.plist.routed.component.css'] ,
   standalone: true,
-  imports: [CommonModule, FormsModule, TrimPipe, RouterModule],
+  templateUrl: './oferta.xempresa.admin.plist.routed.component.html',
+  styleUrls: ['./oferta.xempresa.admin.plist.routed.component.css'],
+  imports: [CommonModule, FormsModule, RouterModule, TrimPipe],
 })
-
-export class OfertaXempresaAdminPlistRoutedComponent implements OnInit {
-   
+export class OfertaXempresaAdminPlistRoutedComponent implements OnInit, OnDestroy {
+  // data
   oPage: IPage<IOferta> | null = null;
-   oEmpresa: IEmpresa | null = null;
-    //
-    nPage: number = 0; // 0-based server count
-    nRpp: number = 10;
-    //
-    strField: string = '';
-    strDir: string = '';
-    //
-    strFiltro: string = '';
-    //
-    arrBotonera: string[] = [];
-    //
-    private debounceSubject = new Subject<string>();
+  oEmpresa: IEmpresa | null = null;
+
+  // route param
+  empresaId = 0;
+
+  // paginación
+  nPage = 0;   // 0-based
+  nRpp = 12;   // 12 / 24 / 36
+
+  // filtro
+  query = '';
+
+  // botonera
+  arrBotonera: string[] = [];
+
+  // sesión / rol
+  activeSession = false;
+  userEmail = '';
+  isAdmin = false;
+  isEmpresa = false;
+  isAlumno = false;
+
+  loading = true;
+
+  // si el usuario toca manualmente el RPP, dejamos de auto-ajustar
+  private userSetRpp = false;
 
   constructor(
-      private oOfertaService: OfertaService,
-      private oBotoneraService: BotoneraService,
-      private oActivatedRoute: ActivatedRoute,
-      private oEmpresaService: EmpresaService,
-      private oRouter: Router
-    ) {
-      // obtener el id de la ruta del cliente
-      this.oActivatedRoute.params.subscribe((params) => {
-  
-        this.oEmpresaService.get(params['id']).subscribe({
-          next: (oEmpresa: IEmpresa) => {
-            this.oEmpresa = oEmpresa;
-            this.getPage(oEmpresa.id);
-          },
-          error: (err: HttpErrorResponse) => {
-            console.log();
-          },
-        });
-      });
-  
-      this.debounceSubject.pipe(debounceTime(10)).subscribe((value) => {
-        this.getPage(this.oEmpresa?.id);
-      });
+    private oOfertaService: OfertaService,
+    private oEmpresaService: EmpresaService,
+    private oBotoneraService: BotoneraService,
+    private oActivatedRoute: ActivatedRoute,
+    private oRouter: Router,
+    private oSessionService: SessionService
+  ) {
+    // estado inicial de sesión
+    this.activeSession = this.oSessionService.isSessionActive();
+    if (this.activeSession) {
+      this.userEmail = this.oSessionService.getSessionEmail();
+      this.setRoleFromSession();
     }
-  
- ngOnInit() {
   }
 
-  getPage(id: number = 0) {
-    this.oOfertaService
-      .getPageXempresa(this.nPage, this.nRpp, this.strField, this.strDir, this.strFiltro, id)
+  ngOnInit(): void {
+    this.empresaId = +this.oActivatedRoute.snapshot.params['id'];
+
+    // cambios de sesión en caliente
+    this.oSessionService.onLogin().subscribe({
+      next: () => {
+        this.activeSession = true;
+        this.userEmail = this.oSessionService.getSessionEmail();
+        this.setRoleFromSession();
+      },
+    });
+
+    this.oSessionService.onLogout().subscribe({
+      next: () => {
+        this.activeSession = false;
+        this.userEmail = '';
+        this.isAdmin = this.isEmpresa = this.isAlumno = false;
+      },
+    });
+
+    // mantener RPP válido
+    this.syncRppToColumns();
+    window.addEventListener('resize', this.syncRppToColumns);
+
+    // cargar empresa para el HERO
+    this.loadEmpresa();
+
+    // cargar ofertas
+    this.getPage();
+  }
+
+  ngOnDestroy(): void {
+    window.removeEventListener('resize', this.syncRppToColumns);
+  }
+
+  // ========= ROLES =========
+  private setRoleFromSession(): void {
+    const tipo = (this.oSessionService.getSessionTipoUsuario() || '')
+      .toLowerCase()
+      .trim();
+
+    this.isAdmin = (tipo === 'admin' || tipo === 'administrador');
+    this.isEmpresa = (tipo === 'empresa');
+    this.isAlumno = (tipo === 'alumno');
+  }
+
+  // alumno: solo ver
+  get canCreateEditDelete(): boolean {
+    return this.isAdmin;
+  }
+
+  // ========= RPP / columnas =========
+  private getCols = () => {
+    const w = window.innerWidth;
+    if (w >= 1200) return 3;
+    if (w >= 768) return 2;
+    return 1;
+  };
+
+  private syncRppToColumns = () => {
+    if (this.userSetRpp) return;
+    if (![12, 24, 36].includes(this.nRpp)) {
+      this.nRpp = 12;
+    }
+  };
+
+  // ========= DATA =========
+  private loadEmpresa(): void {
+    this.oEmpresaService.get(this.empresaId).subscribe({
+      next: (e: IEmpresa) => {
+        this.oEmpresa = e;
+      },
+      error: () => {
+        // si falla, no rompemos el layout
+        this.oEmpresa = null;
+      },
+    });
+  }
+
+  getPage(): void {
+    this.loading = true;
+
+    // backend: page x empresa
+    this.oOfertaService.getPageXempresa(this.nPage, this.nRpp, '', '', '', this.empresaId)
       .subscribe({
         next: (oPageFromServer: IPage<IOferta>) => {
           this.oPage = oPageFromServer;
@@ -77,63 +158,107 @@ export class OfertaXempresaAdminPlistRoutedComponent implements OnInit {
             this.nPage,
             oPageFromServer.totalPages
           );
+          this.loading = false;
         },
-
-        
         error: (err) => {
           console.log(err);
+          this.loading = false;
         },
       });
   }
 
-  edit(oOferta: IOferta) {
-    //navegar a la página de edición
-    this.oRouter.navigate(['admin/oferta/edit', oOferta.id]);
+  // ========= FILTRO (idéntico al plist) =========
+  get filteredOfertas(): IOferta[] {
+    const q = (this.query || '').toLowerCase().trim();
+    const content = this.oPage?.content || [];
+
+    if (!q) return content;
+
+    return content.filter(o =>
+      String(o.id).includes(q) ||
+      (o.titulo || '').toLowerCase().includes(q) ||
+      (o.descripcion || '').toLowerCase().includes(q) ||
+      (o.sector?.nombre || '').toLowerCase().includes(q) ||
+      // por si tu modelo tiene empresa dentro
+      ((o as any).empresa?.nombre || '').toLowerCase().includes(q)
+    );
   }
 
-  view(oOferta: IOferta) {
-    //navegar a la página de edición
-    this.oRouter.navigate(['admin/oferta/view', oOferta.id]);
+  // ========= SCROLL TOP =========
+  private scrollToTop(): void {
+    setTimeout(() => {
+      window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+    }, 0);
   }
 
-  remove(oOferta: IOferta) {
-    this.oRouter.navigate(['admin/oferta/delete/', oOferta.id]);
+  // ========= ACCIONES =========
+  view(o: IOferta): void {
+    this.oRouter.navigate(['admin', 'oferta', 'view', o.id]).then(() => {
+      this.scrollToTop();
+    });
   }
 
-  goToPage(p: number) {
+  create(): void {
+    if (!this.canCreateEditDelete) return;
+
+    // si tu create necesita empresaId por ruta, usa esto:
+    // this.oRouter.navigate(['admin', 'oferta', 'create', this.empresaId])
+    // si NO, deja create normal:
+    this.oRouter.navigate(['admin', 'oferta', 'create']).then(() => {
+      this.scrollToTop();
+    });
+  }
+
+  edit(o: IOferta): void {
+    if (!this.canCreateEditDelete) return;
+
+    this.oRouter.navigate(['admin', 'oferta', 'edit', o.id]).then(() => {
+      this.scrollToTop();
+    });
+  }
+
+  remove(o: IOferta): void {
+    if (!this.canCreateEditDelete) return;
+
+    this.oRouter.navigate(['admin', 'oferta', 'delete', o.id]).then(() => {
+      this.scrollToTop();
+    });
+  }
+
+  // ========= Paginación =========
+  goToPage(p: number): boolean {
     if (p) {
       this.nPage = p - 1;
-      this.getPage( this.oEmpresa?.id);
+      this.getPage();
     }
     return false;
   }
 
-  goToNext() {
+  goToNext(): boolean {
     this.nPage++;
-    this.getPage( this.oEmpresa?.id);
+    this.getPage();
     return false;
   }
 
-  goToPrev() {
+  goToPrev(): boolean {
     this.nPage--;
-    this.getPage(   this.oEmpresa?.id);
+    this.getPage();
     return false;
   }
 
-  sort(field: string) {
-    this.strField = field;
-    this.strDir = this.strDir === 'asc' ? 'desc' : 'asc';
-    this.getPage( this.oEmpresa?.id);
-  }
-
-  goToRpp(nrpp: number) {
+  goToRpp(nrpp: number): boolean {
+    this.userSetRpp = true;
     this.nPage = 0;
     this.nRpp = nrpp;
-    this.getPage( this.oEmpresa?.id);
+    this.getPage();
     return false;
   }
 
-  filter(event: KeyboardEvent) {
-    this.debounceSubject.next(this.strFiltro);
+  hasMultiplePages(): boolean {
+    return (this.oPage?.totalPages || 0) > 1;
+  }
+
+  trackById(index: number, item: IOferta): number {
+    return item.id;
   }
 }

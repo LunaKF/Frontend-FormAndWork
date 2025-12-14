@@ -22,6 +22,7 @@ export class EmpresaAdminSelectorUnroutedComponent implements OnInit {
   filteredEmpresas: IEmpresa[] = []; // Array para los empresaes filtrados
   searchText: string = ''; // Campo para almacenar el texto de búsqueda
 
+  private searchSubject = new Subject<string>();
 
   readonly dialogRef = inject(MatDialogRef<EmpresaAdminSelectorUnroutedComponent>);
   readonly data = inject(MAT_DIALOG_DATA);
@@ -35,12 +36,18 @@ export class EmpresaAdminSelectorUnroutedComponent implements OnInit {
     this.oEmpresaService.getAll().subscribe({
       next: (data: IEmpresa[]) => {
         this.oEmpresa = data;
-        this.filteredEmpresas = data; // Inicializamos con todos los empresaes
+        this.filteredEmpresas = data;
       },
-      error: (err) => {
-        console.error('Error al obtener empresas:', err.message || err);
-      }
+      error: (err) => console.error(err)
     });
+
+    this.searchSubject.pipe(debounceTime(150)).subscribe(() => {
+      this.filterEmpresas();
+    });
+  }
+
+  onSearchChange() {
+    this.searchSubject.next(this.searchText);
   }
   getAll() {
     this.oEmpresaService.getAll().subscribe({
@@ -72,5 +79,8 @@ export class EmpresaAdminSelectorUnroutedComponent implements OnInit {
     oEmpresa = { ...oEmpresa };
     this.dialogRef.close(oEmpresa); // Cierra el modal y pasa el empresa seleccionado
   }
+
+
+
 }
 

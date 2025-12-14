@@ -1,104 +1,167 @@
-<div class="page soft-bg">
-  <!-- Header / Toolbar -->
-  <header class="header-ofertas">
-    <div class="container-xl">
-      <div class="toolbar">
-        <div class="title-group">
-          <h1 class="title-gradient">Sectores</h1>
-          <p class="subtitle">Explora los sectores del ecosistema FormAndWork.</p>
-        </div>
+<div class="empresa-page">
 
-        <div class="tools">
-          <div class="searchbox">
-            <i class="bi bi-search"></i>
-            <input type="text" class="form-control" placeholder="Buscar por nombre o ID…" [(ngModel)]="query"
-              aria-label="Buscar sectores" />
-          </div>
+  <!-- BANNER ROL ARRIBA DEL TODO (SOLO ADMIN) -->
+  <div class="role-banner" *ngIf="isAdmin">
+    <div class="container-xl role-banner-inner">
+      <span class="role-chip">
+        <i class="bi bi-shield-lock"></i>
+        Modo administración activo
+      </span>
+      <span class="role-text">
+        Accede a empresas, alumnado y ofertas filtrando por sector.
+      </span>
+    </div>
+  </div>
 
-          <button *ngIf="isAdmin" class="btn btn-primary lift" type="button" (click)="create()">
-            <i class="bi bi-plus-lg"></i> Nuevo sector
-          </button>
-        </div>
-      </div>
+  <!-- HERO (SIN KICKER) -->
+  <section class="empresa-hero">
+    <div class="empresa-hero-overlay"></div>
 
-      <!-- Chips -->
-      <div class="chips">
-        <span class="chip" [class.chip-muted]="!(query.length>0)">
-          <i class="bi bi-funnel"></i>
-          @if (query.length>0) { Filtro: <strong class="text-danger">{{ query }}</strong> } @else { Sin filtro }
-        </span>
+    <div class="container-xl empresa-hero-inner">
+      <h1 class="empresa-title">Sectores</h1>
 
-        <span class="chip">
-          <i class="bi bi-collection"></i>
-          {{ filtered.length }} sectores
+      <p class="empresa-subtitle">
+        Explora el ecosistema de FormAndWork por sector y navega a los listados relacionados.
+      </p>
+
+      <div class="empresa-roles">
+        <span class="role-pill soft">
+          <i class="bi bi-diagram-3"></i>
+          Panel de administración
         </span>
       </div>
     </div>
-  </header>
+  </section>
 
-  <!-- Grid de tarjetas -->
-  <section class="sectors-grid">
+  <!-- TOOLBAR (igual vibes que plist de empresas) -->
+  <section class="empresa-toolbar">
+    <div class="container-xl">
+      <div class="toolbar-card">
+        <div class="toolbar-left">
+          <div class="searchbox">
+            <i class="bi bi-search"></i>
+            <input
+              type="text"
+              class="form-control"
+              placeholder="Buscar por nombre o ID…"
+              [(ngModel)]="query"
+              aria-label="Buscar sectores"
+            />
+          </div>
+
+          <div class="chips">
+            <span class="chip" [class.chip-muted]="!(query.length>0)">
+              <i class="bi bi-funnel"></i>
+              @if (query.length>0) {
+                Filtro: <strong>{{ query }}</strong>
+              } @else {
+                Sin filtro activo
+              }
+            </span>
+
+            <span class="chip">
+              <i class="bi bi-collection"></i>
+              {{ filtered.length }} sectores
+            </span>
+          </div>
+        </div>
+
+        <!-- derecha vacía a propósito: no hay create/edit/delete -->
+        <div class="toolbar-right">
+          <span class="chip chip-muted">
+            <i class="bi bi-info-circle"></i>
+            Solo navegación por sector
+          </span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- GRID -->
+  <section class="empresa-grid">
     <div class="container-xl">
       <div class="grid">
 
         <!-- Skeleton -->
         <ng-container *ngIf="loading">
-          <div class="sector-card skeleton" *ngFor="let i of [1,2,3,4,5,6]">
-            <div class="sk-line"></div>
-            <div class="sk-line"></div>
-            <div class="sk-line short"></div>
-          </div>
+          <article class="company-card skeleton" *ngFor="let i of [1,2,3,4,5,6]">
+            <div class="card-main">
+              <div class="avatar sk"></div>
+              <div class="info">
+                <div class="sk-line"></div>
+                <div class="sk-line short"></div>
+              </div>
+            </div>
+          </article>
         </ng-container>
 
-        <!-- Tarjetas -->
-        <article class="sector-card hover-rise clickable" *ngFor="let s of filtered; trackBy: trackById"
-          (click)="view(s)" tabindex="0" role="button" (keydown.enter)="view(s)"
-          (keydown.space)="$event.preventDefault(); view(s)">
-          <div class="card-head">
-            <span class="badge-id">{{ s.id }}</span>
-            <h2 class="sector-name">{{ s.nombre }}</h2>
-          </div>
-          <div class="stats">
-            <!-- Empresas: visible para todos -->
-            <a class="pill" [class.disabled]="!(s.empresas>0)"
-              [routerLink]="s.empresas>0 ? ['/admin','empresa','xsector','plist', s.id] : null"
-              (click)="$event.stopPropagation()" aria-label="Empresas del sector">
-              <i class="bi bi-building"></i> Empresas <strong>{{ s.empresas || 0 }}</strong>
-            </a>
+        <!-- Cards -->
+        <article
+          class="company-card"
+          *ngFor="let s of filtered; trackBy: trackById"
+          tabindex="0"
+        >
+          <div class="card-main">
+            <div class="avatar" aria-hidden="true">
+              <span>· {{ s.id }} ·</span>
+            </div>
 
-            <!-- Alumnos: SOLO admin (no mostrar número ni enlace a no-admin) -->
-            <a *ngIf="isAdmin" class="pill" [class.disabled]="!(s.alumnos>0)"
-              [routerLink]="s.alumnos>0 ? ['/admin','alumno','xsector','plist', s.id] : null"
-              (click)="$event.stopPropagation()" aria-label="Alumnos del sector">
-              <i class="bi bi-people"></i> Alumnos <strong>{{ s.alumnos || 0 }}</strong>
-            </a>
+            <div class="info">
+              <div class="title-row">
+                <h2 class="company-name">{{ s.nombre }}</h2>
+              </div>
 
-            <!-- Ofertas: visible para todos -->
-            <a class="pill" [class.disabled]="!(s.ofertas>0)"
-              [routerLink]="s.ofertas>0 ? ['/admin','oferta','xsector','plist', s.id] : null"
-              (click)="$event.stopPropagation()" aria-label="Ofertas del sector">
-              <i class="bi bi-briefcase"></i> Ofertas <strong>{{ s.ofertas || 0 }}</strong>
-            </a>
+              <div class="descripcion">
+                <i class="bi bi-arrow-up-right-square"></i>
+                Abre listados filtrados por este sector:
+              </div>
+            </div>
           </div>
 
-          <!-- Acciones (solo admin) -->
-          <div class="actions" *ngIf="isAdmin" (click)="$event.stopPropagation()">
-            <button class="btn btn-light lift" type="button" (click)="edit(s)">
-              <i class="bi bi-pen"></i> Editar
-            </button>
-            <button class="btn btn-light danger lift" type="button" (click)="remove(s)">
-              <i class="bi bi-trash"></i> Eliminar
-            </button>
+          <!-- Footer = botones útiles (solo navegación) -->
+          <div class="card-footer">
+            <div class="nav-pills">
+              <a
+                class="btn"
+                [class.disabled]="!(s.empresas>0)"
+                [routerLink]="s.empresas>0 ? ['/admin','empresa','xsector','plist', s.id] : null"
+                (click)="goEmpresas(s, $event)"
+              >
+                <i class="bi bi-building"></i>
+                Empresas <span class="count">{{ s.empresas || 0 }}</span>
+              </a>
+
+              <a
+                class="btn"
+                [class.disabled]="!(s.alumnos>0)"
+                [routerLink]="s.alumnos>0 ? ['/admin','alumno','xsector','plist', s.id] : null"
+                (click)="goAlumnos(s, $event)"
+              >
+                <i class="bi bi-people"></i>
+                Alumnos <span class="count">{{ s.alumnos || 0 }}</span>
+              </a>
+
+              <a
+                class="btn"
+                [class.disabled]="!(s.ofertas>0)"
+                [routerLink]="s.ofertas>0 ? ['/admin','oferta','xsector','plist', s.id] : null"
+                (click)="goOfertas(s, $event)"
+              >
+                <i class="bi bi-briefcase"></i>
+                Ofertas <span class="count">{{ s.ofertas || 0 }}</span>
+              </a>
+            </div>
           </div>
         </article>
 
         <!-- Vacío -->
-        <div class="empty" *ngIf="!loading && filtered.length===0">
+        <div class="empty" *ngIf="!loading && filtered.length === 0">
           <i class="bi bi-emoji-neutral"></i>
-          <p>No hay sectores que coincidan.</p>
+          <p>No hay sectores que coincidan con la búsqueda.</p>
         </div>
 
       </div>
     </div>
   </section>
+
 </div>

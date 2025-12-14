@@ -1,41 +1,58 @@
-<div class="container mt-5  d-flex align-items-center justify-content-center">
-  <div class="row">
-    <div class="col text-center">
-      <h2 class="my-2">
-        <i class="bi bi-list"></i>
-        Selector de empresa
-        <i class="bi bi-credit-card-fill"></i>
-      </h2>
+<div class="empresa-selector">
 
-      <div class="d-flex flex-column">
-        <!-- Campo de búsqueda para filtrar empresas por nombre -->
-        <input type="text" [(ngModel)]="searchText" (input)="filterEmpresas()" placeholder="Buscar por nombre..." class="form-control my-2">
+  <header class="selector-header">
+    <h2 class="selector-title">
+      Seleccionar empresa
+    </h2>
+    <p class="selector-subtitle">
+      Busca y elige la empresa que deseas asociar
+    </p>
+  </header>
 
-        <table class="table table-striped table-bordered my-2" style="table-layout: fixed; width: 100%; word-break: break-all">
-          <thead>
-            <tr>
-              <th class="bg-danger text-white">Id</th>
-              <th class="bg-primary text-white">Nombre de la empresa</th>
-            </tr>
-          </thead>
+  <!-- SEARCH -->
+  <div class="search-wrapper">
+    <i class="bi bi-search"></i>
+    <input
+      type="text"
+      [(ngModel)]="searchText"
+      (input)="filterEmpresas()"
+      placeholder="Buscar empresa por nombre…"
+      class="search-input"
+    />
+  </div>
 
-          <tbody>
-            <tr *ngFor="let empresa of filteredEmpresas">
-              <td class="text-center">{{ empresa.id }}</td>
-              <td class="text-start">{{ empresa.nombre }}</td>
-              <td>
-                <div class="btn-group" role="group" aria-label="Basic example">
-                  <button type="button" class="btn btn-success" (click)="select(empresa)">
-                    <i class="bi bi-check-circle icon-15"></i>
-                  </button>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+  <!-- LIST -->
+  <div class="empresa-list">
 
-        <br><br>
+    <div
+      class="empresa-card"
+      *ngFor="let empresa of filteredEmpresas; trackBy: trackByNombre"
+      (click)="select(empresa)"
+    >
+      <div class="empresa-avatar">
+        {{ empresa.nombre.substring(0,2).toUpperCase() }}
+      </div>
+
+      <div class="empresa-info">
+        <h3 class="empresa-name">
+          {{ empresa.nombre }}
+        </h3>
+        <span class="empresa-id">
+          ID {{ empresa.id }}
+        </span>
+      </div>
+
+      <div class="empresa-action">
+        <i class="bi bi-check-circle"></i>
       </div>
     </div>
+
+    <!-- EMPTY STATE -->
+    <div class="empty-state" *ngIf="filteredEmpresas.length === 0">
+      <i class="bi bi-building-slash"></i>
+      <p>No se han encontrado empresas</p>
+    </div>
+
   </div>
+
 </div>

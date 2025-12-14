@@ -5,7 +5,7 @@ import { Router, RouterModule } from '@angular/router';
 
 import { ISector } from '../../../model/sector.interface';
 import { SectorService } from '../../../service/sector.service';
-import { SessionService } from '../../../service/session.service'; // ⬅️ NUEVO
+import { SessionService } from '../../../service/session.service';
 
 @Component({
   selector: 'app-sector.admin.plist.routed',
@@ -20,7 +20,7 @@ export class SectorAdminPlistRoutedComponent implements OnInit {
   query = '';
   loading = true;
 
-  // flags de rol (como en tu SharedMenuUnroutedComponent)
+  // flags de rol
   isAdmin = false;
   isEmpresa = false;
   isAlumno = false;
@@ -28,27 +28,33 @@ export class SectorAdminPlistRoutedComponent implements OnInit {
   constructor(
     private sectorService: SectorService,
     private router: Router,
-    private oSessionService: SessionService      // ⬅️ NUEVO
+    private oSessionService: SessionService
   ) {}
 
   ngOnInit() {
-    // rol desde la sesión (misma fuente de verdad que tu menú)
+    // rol desde sesión
     this.setRoleFromSession();
 
-    // si el rol cambia en caliente:
+    // cambios de sesión en caliente
     this.oSessionService.onLogin().subscribe({ next: () => this.setRoleFromSession() });
-    this.oSessionService.onLogout().subscribe({ next: () => {
-      this.isAdmin = this.isEmpresa = this.isAlumno = false;
-    }});
+    this.oSessionService.onLogout().subscribe({
+      next: () => { this.isAdmin = this.isEmpresa = this.isAlumno = false; }
+    });
+
+    // si NO es admin → fuera (403 o home, como prefieras)
+    if (!this.isAdmin) {
+      this.router.navigate(['/forbidden']);
+      return;
+    }
 
     this.cargar();
   }
 
   private setRoleFromSession() {
     const tipo = (this.oSessionService.getSessionTipoUsuario() || '').toLowerCase().trim();
-    this.isAdmin   = (tipo === 'admin' || tipo === 'administrador');
+    this.isAdmin = (tipo === 'admin' || tipo === 'administrador');
     this.isEmpresa = (tipo === 'empresa');
-    this.isAlumno  = (tipo === 'alumno');
+    this.isAlumno = (tipo === 'alumno');
   }
 
   private cargar() {
@@ -62,8 +68,6 @@ export class SectorAdminPlistRoutedComponent implements OnInit {
         console.error('Error al obtener sectores:', err?.message || err);
         this.loading = false;
       }
-
-      
     });
   }
 
@@ -79,9 +83,22 @@ export class SectorAdminPlistRoutedComponent implements OnInit {
 
   trackById = (_: number, item: ISector) => item.id;
 
-  // Navegación
-  view(s: ISector)  { this.router.navigate(['sector','view',  s.id]); }
-  edit(s: ISector)  { if (this.isAdmin) this.router.navigate(['sector','edit',  s.id]); }
-  remove(s: ISector){ if (this.isAdmin) this.router.navigate(['sector','delete',s.id]); }
-  create()          { if (this.isAdmin) this.router.navigate(['sector','new']); }
+  // Navegación a listados por sector (esto SÍ existe)
+  goEmpresas(s: ISector, ev?: Event) {
+    ev?.stopPropagation();
+    if (!s.empresas || s.empresas <= 0) return;
+    this.router.navigate(['/admin', 'empresa', 'xsector', 'plist', s.id]);
+  }
+
+  goAlumnos(s: ISector, ev?: Event) {
+    ev?.stopPropagation();
+    if (!s.alumnos || s.alumnos <= 0) return;
+    this.router.navigate(['/admin', 'alumno', 'xsector', 'plist', s.id]);
+  }
+
+  goOfertas(s: ISector, ev?: Event) {
+    ev?.stopPropagation();
+    if (!s.ofertas || s.ofertas <= 0) return;
+    this.router.navigate(['/admin', 'oferta', 'xsector', 'plist', s.id]);
+  }
 }

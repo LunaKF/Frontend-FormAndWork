@@ -1,0 +1,154 @@
+:root {
+  --violet: #3f14b8;
+  --softviolet: #9982fd;
+  --border: #e8e8ef;
+  --bg: #f8f9fb;
+}
+
+/* CONTAINER */
+.empresa-selector {
+  padding: 1.5rem 1.6rem 2rem;
+  background: var(--bg);
+}
+
+/* HEADER */
+.selector-header {
+  text-align: center;
+  margin-bottom: 1.2rem;
+}
+
+.selector-title {
+  font-size: 1.6rem;
+  font-weight: 800;
+  background: linear-gradient(90deg, var(--violet), var(--softviolet));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin: 0;
+}
+
+.selector-subtitle {
+  font-size: .85rem;
+  color: #6b6690;
+  margin-top: .35rem;
+}
+
+/* SEARCH */
+.search-wrapper {
+  position: relative;
+  margin-bottom: 1.2rem;
+}
+
+.search-wrapper i {
+  position: absolute;
+  left: .85rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #7b75a8;
+  font-size: .95rem;
+}
+
+.search-input {
+  width: 100%;
+  padding: .65rem .9rem .65rem 2.2rem;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  font-size: .85rem;
+  outline: none;
+  transition: all .25s ease;
+  background: #fff;
+}
+
+.search-input:focus {
+  border-color: var(--softviolet);
+  box-shadow: 0 0 0 3px rgba(153,130,253,.18);
+}
+
+/* LIST */
+.empresa-list {
+  display: flex;
+  flex-direction: column;
+  gap: .6rem;
+  max-height: 520px;
+  overflow-y: auto;
+  padding-right: .3rem;
+}
+
+/* CARD */
+.empresa-card {
+  display: flex;
+  align-items: center;
+  gap: .85rem;
+  padding: .65rem .9rem;
+  border-radius: 16px;
+  background: #fff;
+  border: 1px solid var(--border);
+  cursor: pointer;
+  transition: all .25s ease;
+}
+
+.empresa-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px rgba(0,0,0,.12);
+  border-color: rgba(153,130,253,.6);
+}
+
+/* AVATAR */
+.empresa-avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, var(--violet), var(--softviolet));
+  color: #fff;
+  font-weight: 800;
+  font-size: .85rem;
+  flex-shrink: 0;
+}
+
+/* INFO */
+.empresa-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: .15rem;
+}
+
+.empresa-name {
+  margin: 0;
+  font-size: .9rem;
+  font-weight: 800;
+  color: #2d2750;
+}
+
+.empresa-id {
+  font-size: .75rem;
+  color: #7a7596;
+}
+
+/* ACTION */
+.empresa-action i {
+  font-size: 1.2rem;
+  color: var(--softviolet);
+  opacity: .6;
+  transition: transform .25s ease, opacity .25s ease;
+}
+
+.empresa-card:hover .empresa-action i {
+  transform: scale(1.15);
+  opacity: 1;
+}
+
+/* EMPTY */
+.empty-state {
+  text-align: center;
+  padding: 2rem 1rem;
+  color: #8b86a8;
+}
+
+.empty-state i {
+  font-size: 1.6rem;
+  margin-bottom: .4rem;
+  display: block;
+}

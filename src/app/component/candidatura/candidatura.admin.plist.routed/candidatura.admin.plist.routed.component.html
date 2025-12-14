@@ -181,10 +181,6 @@
 
             <div class="cand-actions">
 
-              <button *ngIf="isAdmin" class="btn" type="button" (click)="$event.stopPropagation(); edit(c)">
-                <i class="bi bi-pen"></i> Editar
-              </button>
-
               <button *ngIf="isAdmin || isAlumno" class="btn danger" type="button"
                 (click)="$event.stopPropagation(); remove(c)">
                 <i class="bi bi-trash"></i> Eliminar 

@@ -1,63 +1,197 @@
-<div class="row justify-content-center m-3">
-  <div class="col-lg-7 col-md-10 col-sm-12">
-    <h1 class="my-5 text-center">
-      Vista del Alumno con Id: {{ oAlumno.id }}
-    </h1>
-    
-    <br />
-    <table *ngIf="oAlumno" class="table table-striped table-bordered my-5 text-center">
-      <tbody>
-        <tr class="text-center">
-          <th scope="row" class="bg-danger text-white text-end pe-5">Id</th>
-          <td class="text-start ps-5">{{ oAlumno.id }}</td>
-        </tr>
-        <tr class="text-center">
-          <th scope="row" class="bg-primary text-white text-end pe-5">
-            Nombre
-          </th>
-          <td class="text-start ps-5">{{ oAlumno.nombre }}</td>
-        </tr>
-        <tr class="text-center">
-          <th scope="row" class="bg-primary text-white text-end pe-5">
-            Primer Apellido
-          </th>
-          <td class="text-start ps-5">{{ oAlumno.ape1 }}</td>
+<div class="empresa-edit-page">
 
-        </tr>
-        <tr class="text-center">
-          <th scope="row" class="bg-primary text-white text-end pe-5">
-            Segundo Apellido
-          </th>
-          <td class="text-start ps-5">{{ oAlumno.ape2 }}</td>
-        <tr class="text-center">
-          <th scope="row" class="bg-primary text-white text-end pe-5">
-            Correo
-          </th>
-          <td class="text-start ps-5">{{ oAlumno.email }}</td>
-        </tr>
-        <tr class="text-center">
-          <th scope="row" class="bg-primary text-white text-end pe-5">
-            Sector
-          </th>
-          <td class="text-start ps-5">{{ oAlumno.sector?.nombre }}</td>
-        </tr>
-      </tbody>
-    </table>
-    
+  <!-- BANNER ROL -->
+  <div class="role-banner" *ngIf="isAdmin || isEmpresa || isAlumno">
+    <div class="container-xl role-banner-inner">
+
+      <span class="role-chip" *ngIf="isAdmin">
+        <i class="bi bi-shield-lock"></i>
+        Modo administración activo
+      </span>
+
+      <span class="role-chip soft" *ngIf="isEmpresa && !isAdmin">
+        <i class="bi bi-building"></i>
+        Panel de empresa
+      </span>
+
+      <span class="role-chip soft" *ngIf="isAlumno && !isAdmin && !isEmpresa">
+        <i class="bi bi-mortarboard"></i>
+        Vista de alumno
+      </span>
+
+      <span class="role-text" *ngIf="isAdmin">
+        Estás visualizando la ficha de un alumno. Acciones de edición/borrado disponibles.
+      </span>
+
+      <span class="role-text" *ngIf="isEmpresa && !isAdmin">
+        Estás viendo el perfil del alumno. Puedes consultar sus candidaturas.
+      </span>
+
+      <span class="role-text" *ngIf="isAlumno && !isAdmin && !isEmpresa">
+        Estás viendo un perfil de alumno.
+      </span>
+    </div>
   </div>
 
-  <div class="d-flex justify-content-center mt-4">
-    <a class="btn btn-warning mt-4 mx-1" href="admin/alumno/plist">
-      <i class="bi bi-list"></i>
-      Ir a listado de Alumnos
-    </a>
-    <a class="btn btn-primary mt-4 mx-1" href="admin/alumno/edit/{{ oAlumno.id }}">
-      <i class="bi bi-pencil"></i>
-      Editar
-    </a>
-    <a class="btn btn-danger mt-4 mx-1" href="admin/alumno/delete/{{ oAlumno.id }}">
-      <i class="bi bi-trash"></i>
-      Borrar
-    </a>
-  </div>
+  <!-- HERO -->
+  <section class="empresa-hero">
+    <div class="empresa-hero-overlay"></div>
+
+    <div class="container-xl empresa-hero-inner">
+      <h1 class="empresa-title">Perfil de alumno</h1>
+
+      <p class="empresa-subtitle" *ngIf="isAdmin">
+        Vista completa para administración. Desde aquí podrás editar, borrar y revisar candidaturas.
+      </p>
+
+      <p class="empresa-subtitle" *ngIf="isEmpresa && !isAdmin">
+        Consulta la información del alumno y revisa las candidaturas que ha realizado.
+      </p>
+
+      <p class="empresa-subtitle" *ngIf="isAlumno && !isAdmin && !isEmpresa">
+        Vista de perfil de alumno.
+      </p>
+    </div>
+  </section>
+
+  <!-- CONTENIDO -->
+  <section class="empresa-edit">
+    <div class="container-xl">
+
+      <!-- Loading -->
+      <div class="loading-state" *ngIf="loading">
+        <div class="spinner-border" role="status"></div>
+        <p>Cargando perfil de alumno…</p>
+      </div>
+
+      <div class="edit-layout" *ngIf="!loading">
+
+        <!-- Izquierda: resumen -->
+        <aside class="summary-card">
+          <div class="summary-avatar">
+            <span>{{ initials() }}</span>
+          </div>
+
+          <div class="summary-body">
+            <h2 class="summary-name">{{ fullName() }}</h2>
+
+            <!-- ID SOLO ADMIN -->
+            <p class="summary-id" *ngIf="canSeeAlumnoId">
+              ID alumno: <strong>#{{ oAlumno?.id }}</strong>
+            </p>
+
+            <p class="summary-email">
+              <i class="bi bi-envelope"></i>
+              {{ oAlumno?.email || '—' }}
+            </p>
+
+            <p class="summary-sector">
+              <i class="bi bi-diagram-3"></i>
+              {{ oAlumno?.sector?.nombre || '—' }}
+            </p>
+
+            <p class="summary-hint" *ngIf="isEmpresa && !isAdmin">
+              Puedes consultar sus candidaturas desde el botón de la derecha.
+            </p>
+
+            <p class="summary-hint" *ngIf="isAdmin">
+              Vista completa: incluye acciones de edición/borrado y candidaturas.
+            </p>
+          </div>
+        </aside>
+
+        <!-- Derecha: ficha -->
+        <div class="form-card">
+
+          <div class="detail-grid">
+
+            <!-- ID SOLO ADMIN -->
+            <div class="detail-item" *ngIf="canSeeAlumnoId">
+              <div class="detail-label">ID</div>
+              <div class="detail-value">#{{ oAlumno?.id }}</div>
+            </div>
+
+            <div class="detail-item">
+              <div class="detail-label">Nombre</div>
+              <div class="detail-value">
+                <i class="bi bi-person"></i>
+                {{ oAlumno?.nombre || '—' }}
+              </div>
+            </div>
+
+            <div class="detail-item">
+              <div class="detail-label">Primer apellido</div>
+              <div class="detail-value">
+                <i class="bi bi-person-badge"></i>
+                {{ oAlumno?.ape1 || '—' }}
+              </div>
+            </div>
+
+            <div class="detail-item">
+              <div class="detail-label">Segundo apellido</div>
+              <div class="detail-value">
+                <i class="bi bi-person-badge"></i>
+                {{ oAlumno?.ape2 || '—' }}
+              </div>
+            </div>
+
+            <div class="detail-item">
+              <div class="detail-label">Email</div>
+              <div class="detail-value">
+                <i class="bi bi-envelope"></i>
+                {{ oAlumno?.email || '—' }}
+              </div>
+            </div>
+
+            <div class="detail-item">
+              <div class="detail-label">Sector</div>
+              <div class="detail-value">
+                <i class="bi bi-diagram-3"></i>
+                {{ oAlumno?.sector?.nombre || '—' }}
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Acciones -->
+          <div class="actions-row">
+            <button class="btn btn-ghost" type="button" (click)="goBack()">
+              <i class="bi bi-arrow-left"></i>
+              Volver al listado
+            </button>
+
+            <div class="actions-right">
+
+              <!-- Candidaturas: ADMIN / EMPRESA -->
+              <button
+                class="btn btn-secondary"
+                type="button"
+                *ngIf="canSeeCandidaturasBtn"
+                (click)="goCandidaturas($event)"
+              >
+                <i class="bi bi-send-check"></i>
+                Candidaturas
+                <span class="count-pill">{{ oAlumno?.candidaturas || 0 }}</span>
+              </button>
+
+              <!-- Editar/Borrar: SOLO ADMIN -->
+              <button class="btn btn-secondary" type="button" *ngIf="isAdmin" (click)="edit()">
+                <i class="bi bi-pencil"></i>
+                Editar
+              </button>
+
+              <button class="btn btn-danger" type="button" *ngIf="isAdmin" (click)="remove()">
+                <i class="bi bi-trash"></i>
+                Borrar
+              </button>
+
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </section>
+
 </div>

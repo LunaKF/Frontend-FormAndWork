@@ -1,42 +1,197 @@
-<div class="row justify-content-center m-4">
-  <div class="col-lg-8 col-md-10 col-sm-12">
-    <div class="card shadow-lg rounded-4 oferta-view-card">
-      <div class="card-body p-5">
-        <h2 class="titulo-oferta">
-          {{ oOferta.titulo }}
-        </h2>
+<div class="empresa-edit-page">
 
-        <hr class="mb-4" />
+  <!-- BANNER ROL -->
+  <div class="role-banner" *ngIf="isAdmin || isEmpresa || isAlumno">
+    <div class="container-xl role-banner-inner">
 
-        <div class="info-row">
-          <span class="label bg-danger text-white">ID</span>
-          <span class="value">{{ oOferta.id }}</span>
+      <span class="role-chip" *ngIf="isAdmin">
+        <i class="bi bi-shield-lock"></i>
+        Modo administración activo
+      </span>
 
+      <span class="role-chip soft" *ngIf="isEmpresa && !isAdmin">
+        <i class="bi bi-building"></i>
+        Panel de empresa
+      </span>
 
-          <div class="info-row">
-            <span class="label bg-primary text-white">Sector</span>
-            <span class="value">{{ oOferta.sector?.nombre }}</span>
-          </div>
-          <div class="info-row">
-            <span class="label bg-primary text-white">Empresa</span>
-            <span class="value">{{ oOferta.empresa?.nombre }}</span>
-          </div>
+      <span class="role-chip soft" *ngIf="isAlumno && !isAdmin && !isEmpresa">
+        <i class="bi bi-mortarboard"></i>
+        Vista de alumno
+      </span>
 
+      <span class="role-text" *ngIf="isAdmin">
+        Estás visualizando el detalle de una oferta. Acciones avanzadas disponibles.
+      </span>
 
+      <span class="role-text" *ngIf="isEmpresa && !isAdmin">
+        Estás visualizando tu oferta. Revisa la información y las candidaturas.
+      </span>
 
-        </div>
-        <div class="info-row">
-          <span class="label bg-primary text-white">Descripción</span>
-          <span class="value">{{ oOferta.descripcion }}</span>
-        </div>
-
-
-        <div class="d-flex justify-content-center mt-5 gap-3 flex-wrap">
-          <a class="btn btn-warning" href="/admin/oferta/plist">
-            <i class="bi bi-list"></i> Listado
-          </a>
-        </div>
-      </div>
+      <span class="role-text" *ngIf="isAlumno && !isAdmin && !isEmpresa">
+        Estás visualizando una oferta. Consulta la empresa y su descripción.
+      </span>
     </div>
   </div>
+
+  <!-- HERO -->
+  <section class="empresa-hero">
+    <div class="empresa-hero-overlay"></div>
+
+    <div class="container-xl empresa-hero-inner">
+      <h1 class="empresa-title">Detalle de oferta</h1>
+
+      <p class="empresa-subtitle" *ngIf="isAlumno && !isAdmin && !isEmpresa">
+        Consulta la oferta, su sector y la empresa que la publica.
+      </p>
+
+      <p class="empresa-subtitle" *ngIf="isEmpresa && !isAdmin">
+        Vista de empresa: revisa el contenido y accede a las candidaturas recibidas.
+      </p>
+
+      <p class="empresa-subtitle" *ngIf="isAdmin">
+        Vista completa de administración: incluye enlaces y accesos a candidaturas.
+      </p>
+    </div>
+  </section>
+
+  <!-- CONTENIDO -->
+  <section class="empresa-edit">
+    <div class="container-xl">
+
+      <!-- Loading -->
+      <div class="loading-state" *ngIf="loading">
+        <div class="spinner-border" role="status"></div>
+        <p>Cargando oferta…</p>
+      </div>
+
+      <div class="edit-layout" *ngIf="!loading">
+
+        <!-- Izquierda: resumen -->
+        <aside class="summary-card">
+          <div class="summary-avatar">
+            <span>{{ initials(ofertaTitulo()) }}</span>
+          </div>
+
+          <div class="summary-body">
+            <h2 class="summary-name">{{ ofertaTitulo() }}</h2>
+
+            <!-- ID SOLO ADMIN -->
+            <p class="summary-id" *ngIf="canSeeOfertaId">
+              ID oferta: <strong>#{{ oOferta?.id }}</strong>
+            </p>
+
+            <!-- Sector siempre -->
+            <p class="summary-sector">
+              <i class="bi bi-diagram-3"></i>
+              {{ oOferta?.sector?.nombre || '—' }}
+            </p>
+
+            <!-- Empresa (solo alumno/admin, empresa NO) -->
+            <p class="summary-email" *ngIf="canSeeEmpresaName">
+              <i class="bi bi-building"></i>
+              {{ empresaNombre() }}
+            </p>
+
+            <p class="summary-email" *ngIf="canSeeEmpresaEmail">
+              <i class="bi bi-envelope"></i>
+              {{ oOferta?.empresa?.email || '—' }}
+            </p>
+
+            <p class="summary-hint" *ngIf="isAlumno && !isAdmin && !isEmpresa">
+              Pulsa en “Ver empresa” para abrir su ficha.
+            </p>
+
+            <p class="summary-hint" *ngIf="isEmpresa && !isAdmin">
+              Consejo: revisa la descripción y gestiona candidaturas si las hay.
+            </p>
+
+            <p class="summary-hint" *ngIf="isAdmin">
+              Accede a candidaturas por oferta y revisa la información de publicación.
+            </p>
+          </div>
+        </aside>
+
+        <!-- Derecha: ficha -->
+        <div class="form-card">
+
+          <div class="detail-grid">
+
+            <!-- ID SOLO ADMIN -->
+            <div class="detail-item" *ngIf="canSeeOfertaId">
+              <div class="detail-label">ID</div>
+              <div class="detail-value">#{{ oOferta?.id }}</div>
+            </div>
+
+            <!-- Sector -->
+            <div class="detail-item">
+              <div class="detail-label">Sector</div>
+              <div class="detail-value">
+                <i class="bi bi-diagram-3"></i>
+                {{ oOferta?.sector?.nombre || '—' }}
+              </div>
+            </div>
+
+            <!-- Empresa (solo alumno/admin) -->
+            <div class="detail-item" *ngIf="canSeeEmpresaName">
+              <div class="detail-label">Empresa</div>
+              <div class="detail-value">
+                <i class="bi bi-building"></i>
+                {{ empresaNombre() }}
+              </div>
+
+              <button class="mini-link" type="button" (click)="goEmpresa($event)">
+                Ver empresa
+                <i class="bi bi-arrow-up-right"></i>
+              </button>
+            </div>
+
+            <div class="detail-item" *ngIf="canSeeEmpresaEmail">
+              <div class="detail-label">Email empresa</div>
+              <div class="detail-value">
+                <i class="bi bi-envelope"></i>
+                {{ oOferta?.empresa?.email || '—' }}
+              </div>
+            </div>
+
+            <!-- Descripción (ocupa ancho completo) -->
+            <div class="detail-item wide">
+              <div class="detail-label">Descripción</div>
+              <div class="detail-value desc">
+                <i class="bi bi-card-text"></i>
+                <span>{{ oOferta?.descripcion || '—' }}</span>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Acciones -->
+          <div class="actions-row">
+            <button class="btn btn-ghost" type="button" (click)="goBack()">
+              <i class="bi bi-arrow-left"></i>
+              Volver al listado
+            </button>
+
+            <div class="actions-right">
+
+              <!-- Candidaturas por oferta (admin/empresa) -->
+              <button
+                class="btn btn-secondary"
+                type="button"
+                *ngIf="canSeeCandidaturasBtn"
+                (click)="goCandidaturas($event)"
+              >
+                <i class="bi bi-people"></i>
+                Candidaturas
+                <span class="count-pill">{{ oOferta?.candidaturas || 0 }}</span>
+              </button>
+
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </section>
+
 </div>

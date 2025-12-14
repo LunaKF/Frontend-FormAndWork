@@ -111,7 +111,7 @@ export const routes: Routes = [
       { path: 'oferta/xsector/plist/:id', component: OfertaXsectorAdminPlistRoutedComponent , canActivate: [AdminAlumnoGuard] },
 
       // POR EMPRESA
-      { path: 'oferta/xempresa/plist/:id', component: OfertaXempresaAdminPlistRoutedComponent, canActivate: [AdminEmpresaGuard] },
+      { path: 'oferta/xempresa/plist/:id', component: OfertaXempresaAdminPlistRoutedComponent, canActivate: [AdminAlumnoGuard] },
 
       // POR OFERTA
       { path: 'candidatura/xoferta/plist/:id', component: CandidaturaXofertaAdminPlistRoutedComponent, canActivate: [AdminEmpresaGuard] },

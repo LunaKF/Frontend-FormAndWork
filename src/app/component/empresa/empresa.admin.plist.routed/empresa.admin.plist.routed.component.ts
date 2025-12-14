@@ -96,6 +96,16 @@ export class EmpresaAdminPlistRoutedComponent implements OnInit, OnDestroy {
     this.isAlumno  = (tipo === 'alumno');
   }
 
+  // Permisos para abrir VIEW (empresa ya podía, alumno ahora también)
+  get canOpenView(): boolean {
+    return this.isAdmin || this.isEmpresa || this.isAlumno;
+  }
+
+  // Permisos para abrir OFERTAS por empresa (alumno ahora también)
+  get canOpenOffers(): boolean {
+    return this.isAdmin || this.isEmpresa || this.isAlumno;
+  }
+
   // ========= RPP / columnas =========
   private getCols = () => {
     const w = window.innerWidth;
@@ -147,40 +157,58 @@ export class EmpresaAdminPlistRoutedComponent implements OnInit, OnDestroy {
     );
   }
 
+  // ========= SCROLL TOP (fix “me manda abajo”) =========
+  private scrollToTop(): void {
+    // setTimeout para asegurar que navega y luego fuerza arriba
+    setTimeout(() => {
+      window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+    }, 0);
+  }
+
   // ========= ACCIONES =========
   edit(e: IEmpresa): void {
     if (this.isAdmin) {
-      this.oRouter.navigate(['admin', 'empresa', 'edit', e.id]);
+      this.oRouter.navigate(['admin', 'empresa', 'edit', e.id]).then(() => {
+        this.scrollToTop();
+      });
     }
   }
 
   view(e: IEmpresa): void {
-    if (this.isAdmin) {
-      this.oRouter.navigate(['admin', 'empresa', 'view', e.id]);
+    if (this.canOpenView) {
+      this.oRouter.navigate(['admin', 'empresa', 'view', e.id]).then(() => {
+        this.scrollToTop();
+      });
     }
   }
 
   remove(e: IEmpresa): void {
     if (this.isAdmin) {
-      this.oRouter.navigate(['admin', 'empresa', 'delete', e.id]);
+      this.oRouter.navigate(['admin', 'empresa', 'delete', e.id]).then(() => {
+        this.scrollToTop();
+      });
     }
   }
 
-  // Card completa clicable → solo admins
+  // Card completa clicable → ahora: admin/empresa/alumno (según tu requisito)
   onCardClick(e: IEmpresa): void {
-    if (this.isAdmin) {
+    if (this.canOpenView) {
       this.view(e);
     }
   }
 
-  // click “X ofertas”
+  // click “X ofertas” → SOLO cuando clickas el botón (event.stopPropagation)
   onOffersClick(empresa: IEmpresa, event: MouseEvent): void {
     event.stopPropagation();
-    if (!this.isAdmin || !empresa.ofertas) return;
+
+    if (!this.canOpenOffers) return;
+    if (!empresa.ofertas) return;
 
     this.oRouter.navigate(
       ['admin', 'oferta', 'xempresa', 'plist', empresa.id]
-    );
+    ).then(() => {
+      this.scrollToTop();
+    });
   }
 
   // ========= Paginación =========

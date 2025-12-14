@@ -112,7 +112,7 @@
           tabindex="0"
           (click)="onCardClick(empresa)"
           (keydown.enter)="onCardClick(empresa)"
-          [class.clickable]="isAdmin"
+          [class.clickable]="canOpenView"
         >
           <div class="card-main">
             <div class="avatar" aria-hidden="true">
@@ -139,12 +139,14 @@
             </div>
           </div>
 
-          <div
-            class="offers"
-            [class.offers--clickable]="isAdmin && empresa.ofertas"
-            (click)="onOffersClick(empresa, $event)"
-          >
-            <div class="btn">
+          <div class="offers" [class.offers--clickable]="canOpenOffers && empresa.ofertas">
+            <!-- ✅ CLICK SOLO AQUÍ (en el botón), NO en toda la franja -->
+            <div
+              class="btn"
+              (click)="onOffersClick(empresa, $event)"
+              [style.pointer-events]="(canOpenOffers && empresa.ofertas) ? 'auto' : 'none'"
+              [style.opacity]="(empresa.ofertas ? '1' : '0.9')"
+            >
               <i class="bi bi-briefcase"></i>
               <span *ngIf="empresa.ofertas; else noOffers">
                 {{ empresa.ofertas }} ofertas

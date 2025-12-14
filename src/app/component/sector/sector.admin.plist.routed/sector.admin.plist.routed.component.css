@@ -111,33 +111,6 @@
   margin-top: 2rem;
 }
 
-.empresa-roles {
-  display: flex;
-  justify-content: center;
-  gap: .6rem;
-  flex-wrap: wrap;
-  margin-top: .6rem;
-}
-
-.role-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: .35rem;
-  padding: .4rem .9rem;
-  border-radius: 999px;
-  font-size: .8rem;
-  font-weight: 600;
-  color: #fff;
-  background: linear-gradient(135deg, #ff6ea1, #ffb86c);
-  box-shadow: 0 10px 22px rgba(0, 0, 0, .18);
-}
-
-.role-pill.soft {
-  background: rgba(255, 255, 255, .92);
-  color: #3f14b8;
-  box-shadow: none;
-  border: 1px solid rgba(232, 232, 239, .95);
-}
 
 /* ===== TOOLBAR ===== */
 .empresa-toolbar {

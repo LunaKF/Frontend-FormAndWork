@@ -1,13 +1,15 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { debounceTime, Subject } from 'rxjs';
 import { Router, RouterModule } from '@angular/router';
+import { debounceTime, Subject, Subscription } from 'rxjs';
+
 import { TrimPipe } from '../../../pipe/trim.pipe';
 import { IPage } from '../../../model/model.interface';
 import { IAlumno } from '../../../model/alumno.interface';
 import { AlumnoService } from '../../../service/alumno.service';
 import { BotoneraService } from '../../../service/botonera.service';
+import { SessionService } from '../../../service/session.service';
 
 @Component({
   selector: 'app-alumno.admin.plist',
@@ -17,108 +19,120 @@ import { BotoneraService } from '../../../service/botonera.service';
   imports: [CommonModule, FormsModule, TrimPipe, RouterModule],
 })
 export class AlumnoAdminPlistComponent implements OnInit, OnDestroy {
-
   oPage: IPage<IAlumno> | null = null;
-  nPage: number = 0;
-  nRpp: number = 12;   // múltiplo de 3 para cuadrar filas
-  strField: string = '';
-  strDir: string = '';
-  strFiltro: string = '';
+
+  // paginación
+  nPage = 0;   // 0-based
+  nRpp = 12;   // 12 / 24 / 36
   arrBotonera: string[] = [];
 
-  isAdmin: boolean = false;
-  isEmpresa: boolean = false;
+  // orden + filtro (si tu backend lo usa)
+  strField = '';
+  strDir = '';
+  strFiltro = '';
 
-  private debounceSubject = new Subject<string>();
+  // sesión / rol
+  activeSession = false;
+  userEmail = '';
+  isAdmin = false;
+  isEmpresa = false;
+  isAlumno = false;
+
+  loading = true;
+
+  // si el usuario toca RPP, no auto-ajustamos
   private userSetRpp = false;
+
+  // debounce filtro
+  private debounceSubject = new Subject<string>();
+  private subs: Subscription[] = [];
 
   constructor(
     private oAlumnoService: AlumnoService,
     private oBotoneraService: BotoneraService,
-    private oRouter: Router
+    private oRouter: Router,
+    private oSessionService: SessionService
   ) {
-    this.debounceSubject.pipe(debounceTime(200)).subscribe(() => {
-      this.nPage = 0;
-      this.getPage();
-    });
+    this.subs.push(
+      this.debounceSubject.pipe(debounceTime(200)).subscribe(() => {
+        this.nPage = 0;
+        this.getPage();
+      })
+    );
+
+    // estado inicial sesión
+    this.activeSession = this.oSessionService.isSessionActive();
+    if (this.activeSession) {
+      this.userEmail = this.oSessionService.getSessionEmail();
+      this.setRoleFromSession();
+    }
   }
 
   ngOnInit(): void {
-    this.loadRoles();
+    // sesión “en caliente” (igual que empresas)
+    this.subs.push(
+      this.oSessionService.onLogin().subscribe({
+        next: () => {
+          this.activeSession = true;
+          this.userEmail = this.oSessionService.getSessionEmail();
+          this.setRoleFromSession();
+        },
+      })
+    );
+
+    this.subs.push(
+      this.oSessionService.onLogout().subscribe({
+        next: () => {
+          this.activeSession = false;
+          this.userEmail = '';
+          this.isAdmin = this.isEmpresa = this.isAlumno = false;
+        },
+      })
+    );
+
+    // mantener RPP válido (sin cosas raras)
     this.syncRppToColumns();
-    this.getPage();
     window.addEventListener('resize', this.syncRppToColumns);
+
+    this.getPage();
   }
 
   ngOnDestroy(): void {
     window.removeEventListener('resize', this.syncRppToColumns);
+    this.subs.forEach(s => s.unsubscribe());
   }
 
-  private getCols = () => {
-    const w = window.innerWidth;
-    if (w >= 1200) return 3;
-    if (w >= 768) return 2;
-    return 1;
-  };
+  // ========= ROLES =========
+  private setRoleFromSession(): void {
+    const tipo = (this.oSessionService.getSessionTipoUsuario() || '')
+      .toLowerCase()
+      .trim();
 
+    this.isAdmin = (tipo === 'admin' || tipo === 'administrador');
+    this.isEmpresa = (tipo === 'empresa');
+    this.isAlumno = (tipo === 'alumno');
+  }
+
+  // Solo admin debe ver acciones de admin
+  get canAdmin(): boolean {
+    return this.isAdmin;
+  }
+
+  // Card clicable a VIEW (en esta pantalla solo entran admins, pero lo dejamos bien)
+  get canOpenView(): boolean {
+    return this.isAdmin;
+  }
+
+  // ========= RPP / columnas =========
   private syncRppToColumns = () => {
     if (this.userSetRpp) return;
-    const cols = this.getCols();
-    const ideal = cols * 4;
-    if (this.nRpp !== ideal) {
-      this.nRpp = ideal;
-      if (this.oPage) this.getPage();
-    }
+    if (![12, 24, 36].includes(this.nRpp)) this.nRpp = 12;
   };
 
-  private loadRoles(): void {
-    const roleFromStorage =
-      localStorage.getItem('role') ||
-      sessionStorage.getItem('role') ||
-      '';
-
-    let roleFromToken = '';
-    try {
-      const token = localStorage.getItem('token') || sessionStorage.getItem('token');
-      if (token && token.split('.').length === 3) {
-        const payload = this.safeJwtDecode(token);
-        if (payload) {
-          if (payload.role) {
-            roleFromToken = String(payload.role);
-          } else if (Array.isArray(payload.authorities) && payload.authorities.length) {
-            roleFromToken = String(payload.authorities[0]);
-          }
-        }
-      }
-    } catch {}
-
-    const role = (roleFromStorage || roleFromToken || '').toUpperCase();
-    this.isAdmin = role.includes('ADMIN');
-    this.isEmpresa = !this.isAdmin && role.includes('EMPRESA');
-  }
-
-  private safeJwtDecode(token: string): any | null {
-    try {
-      const base64Url = token.split('.')[1];
-      const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-      const jsonPayload = decodeURIComponent(
-        atob(this.padBase64(base64))
-          .split('')
-          .map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
-          .join('')
-      );
-      return JSON.parse(jsonPayload);
-    } catch {
-      return null;
-    }
-  }
-
-  private padBase64(b64: string): string {
-    const m = b64.length % 4;
-    return m ? b64 + '='.repeat(4 - m) : b64;
-  }
-
+  // ========= DATA =========
   getPage(): void {
+    this.loading = true;
+
     this.oAlumnoService
       .getPage(this.nPage, this.nRpp, this.strField, this.strDir, this.strFiltro)
       .subscribe({
@@ -128,25 +142,61 @@ export class AlumnoAdminPlistComponent implements OnInit, OnDestroy {
             this.nPage,
             oPageFromServer.totalPages
           );
+          this.loading = false;
         },
         error: (err) => {
           console.error(err);
+          this.loading = false;
         },
       });
   }
 
-  edit(oAlumno: IAlumno): void {
-    this.oRouter.navigate(['admin/alumno/edit', oAlumno.id]);
+  // ========= SCROLL TOP (fix “me manda abajo”) =========
+  private scrollToTop(): void {
+    setTimeout(() => {
+      window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+    }, 0);
   }
 
-  view(oAlumno: IAlumno): void {
-    this.oRouter.navigate(['admin/alumno/view', oAlumno.id]);
+  // ========= ACCIONES =========
+  create(): void {
+    if (!this.canAdmin) return;
+    this.oRouter.navigate(['admin', 'alumno', 'create']).then(() => this.scrollToTop());
   }
 
-  remove(oAlumno: IAlumno): void {
-    this.oRouter.navigate(['admin/alumno/delete', oAlumno.id]);
+  edit(a: IAlumno): void {
+    if (!this.canAdmin) return;
+    this.oRouter.navigate(['admin', 'alumno', 'edit', a.id]).then(() => this.scrollToTop());
   }
 
+  view(a: IAlumno): void {
+    if (!this.canOpenView) return;
+    this.oRouter.navigate(['admin', 'alumno', 'view', a.id]).then(() => this.scrollToTop());
+  }
+
+  remove(a: IAlumno): void {
+    if (!this.canAdmin) return;
+    this.oRouter.navigate(['admin', 'alumno', 'delete', a.id]).then(() => this.scrollToTop());
+  }
+
+  onCardClick(a: IAlumno): void {
+    if (this.canOpenView) this.view(a);
+  }
+
+  onCandidaturasClick(a: IAlumno, ev: MouseEvent): void {
+    ev.stopPropagation();
+    if (!this.canAdmin) return;
+    this.oRouter.navigate(['admin', 'candidatura', 'xalumno', 'plist', a.id]).then(() => {
+      this.scrollToTop();
+    });
+  }
+
+  // ========= FILTRO =========
+  filter(): void {
+    this.debounceSubject.next(this.strFiltro);
+  }
+
+  // ========= PAGINACIÓN =========
   goToPage(p: number): boolean {
     if (p) {
       this.nPage = p - 1;
@@ -167,12 +217,6 @@ export class AlumnoAdminPlistComponent implements OnInit, OnDestroy {
     return false;
   }
 
-  sort(field: string): void {
-    this.strField = field;
-    this.strDir = this.strDir === 'asc' ? 'desc' : 'asc';
-    this.getPage();
-  }
-
   goToRpp(nrpp: number): boolean {
     this.userSetRpp = true;
     this.nPage = 0;
@@ -181,7 +225,25 @@ export class AlumnoAdminPlistComponent implements OnInit, OnDestroy {
     return false;
   }
 
-  filter(_: KeyboardEvent): void {
-    this.debounceSubject.next(this.strFiltro);
+  sort(field: string): void {
+    this.strField = field;
+    this.strDir = this.strDir === 'asc' ? 'desc' : 'asc';
+    this.getPage();
+  }
+
+  hasMultiplePages(): boolean {
+    return (this.oPage?.totalPages || 0) > 1;
+  }
+
+  trackById(index: number, item: IAlumno): number {
+    return item.id;
+  }
+
+  // helper UI
+  get fullName(): (a: IAlumno) => string {
+    return (a: IAlumno) => {
+      const parts = [a?.nombre, a?.ape1, a?.ape2].filter(Boolean);
+      return parts.join(' ');
+    };
   }
 }

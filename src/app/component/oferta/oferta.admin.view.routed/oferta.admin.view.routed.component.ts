@@ -15,6 +15,7 @@ import { OfertaService } from '../../../service/oferta.service';
 export class OfertaAdminViewRoutedComponent implements OnInit {
 
   id: number = 0;
+
   oOferta: IOferta = {
     id: 0,
     titulo: '',
@@ -41,7 +42,7 @@ export class OfertaAdminViewRoutedComponent implements OnInit {
   }
 
   getOne(): void {
-    this.oOfertaService.getOne(this.id).subscribe({
+    this.oOfertaService.get(this.id).subscribe({
       next: (data: IOferta) => this.oOferta = data,
       error: (err) => console.error('Error cargando la oferta:', err)
     });

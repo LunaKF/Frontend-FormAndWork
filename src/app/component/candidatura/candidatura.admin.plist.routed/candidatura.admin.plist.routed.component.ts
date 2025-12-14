@@ -18,7 +18,6 @@ import { SessionService } from '../../../service/session.service';
   imports: [CommonModule, FormsModule, RouterModule],
 })
 export class CandidaturaAdminPlistRoutedComponent implements OnInit {
-
   // rol
   isAdmin = false;
   isEmpresa = false;
@@ -28,8 +27,8 @@ export class CandidaturaAdminPlistRoutedComponent implements OnInit {
   oPage: IPage<ICandidatura> | null = null;
 
   // paginación
-  nPage = 0;      // 0-based
-  nRpp = 10;
+  nPage = 0; // 0-based
+  nRpp = 12;
 
   // filtro
   strFiltro = '';
@@ -46,52 +45,76 @@ export class CandidaturaAdminPlistRoutedComponent implements OnInit {
     private oRouter: Router,
     private oSessionService: SessionService
   ) {
-    // Debounce REAL: reaccionamos a cambios del modelo (no keyup)
     this.debounceSubject.pipe(debounceTime(250)).subscribe(() => {
-      this.nPage = 0; // al cambiar filtro, volvemos a página 1
+      this.nPage = 0;
       this.getPage();
     });
   }
 
   ngOnInit() {
     this.setRoleFromSession();
-    this.oSessionService.onLogin().subscribe({ next: () => { this.setRoleFromSession(); this.getPage(); } });
-    this.oSessionService.onLogout().subscribe({ next: () => { this.isAdmin = this.isEmpresa = this.isAlumno = false; this.getPage(); } });
+
+    this.oSessionService.onLogin().subscribe({
+      next: () => {
+        this.setRoleFromSession();
+        this.getPage();
+      },
+    });
+
+    this.oSessionService.onLogout().subscribe({
+      next: () => {
+        this.isAdmin = this.isEmpresa = this.isAlumno = false;
+        this.getPage();
+      },
+    });
+
     this.getPage();
   }
 
   private setRoleFromSession() {
-    const tipo = (this.oSessionService.getSessionTipoUsuario() || '').toLowerCase().trim();
-    this.isAdmin = (tipo === 'admin' || tipo === 'administrador');
-    this.isEmpresa = (tipo === 'empresa');
-    this.isAlumno = (tipo === 'alumno');
+    const tipo = (this.oSessionService.getSessionTipoUsuario() || '')
+      .toLowerCase()
+      .trim();
+    this.isAdmin = tipo === 'admin' || tipo === 'administrador';
+    this.isEmpresa = tipo === 'empresa';
+    this.isAlumno = tipo === 'alumno';
   }
 
-  /** ===== Carga de datos desde backend ===== */
+  // ===== helper UI =====
+  private scrollToTop(): void {
+    setTimeout(() => window.scrollTo({ top: 0, left: 0, behavior: 'auto' }), 0);
+  }
+
+  get filterLen(): number {
+    return (this.strFiltro || '').trim().length;
+  }
+
+  /** ===== Carga de datos ===== */
   getPage() {
     this.loading = true;
-    // Normalizamos el filtro (evita falsos negativos)
     const q = this.strFiltro.trim();
-    this.oCandidaturaService
-      .getPage(this.nPage, this.nRpp, '', '', q)
-      .subscribe({
-        next: (oPageFromServer: IPage<ICandidatura>) => {
-          this.oPage = oPageFromServer;
-          this.arrBotonera = this.oBotoneraService.getBotonera(this.nPage, oPageFromServer.totalPages);
-          this.loading = false;
-        },
-        error: (err) => { console.error(err); this.loading = false; },
-      });
+
+    this.oCandidaturaService.getPage(this.nPage, this.nRpp, '', '', q).subscribe({
+      next: (oPageFromServer: IPage<ICandidatura>) => {
+        this.oPage = oPageFromServer;
+        this.arrBotonera = this.oBotoneraService.getBotonera(
+          this.nPage,
+          oPageFromServer.totalPages
+        );
+        this.loading = false;
+      },
+      error: (err) => {
+        console.error(err);
+        this.loading = false;
+      },
+    });
   }
 
-  /** ===== Filtro en cliente (refuerzo) =====
-   * Si el backend no filtra bien, aplicamos un filtro "suave"
-   * sobre la página actual para que el usuario vea lo que espera.
-   * - No rompe paginación del servidor porque solo actúa sobre el contenido de la página.
-   */
+  /** ===== filtro cliente (refuerzo) ===== */
   private matches(c: ICandidatura, q: string): boolean {
     if (!q) return true;
     const qq = q.toLowerCase();
+
     const campos = [
       String(c.id || '').toLowerCase(),
       String(c.oferta?.id || '').toLowerCase(),
@@ -101,42 +124,29 @@ export class CandidaturaAdminPlistRoutedComponent implements OnInit {
       (c.alumno?.ape2 || '').toLowerCase(),
       String(c.fecha || '').toLowerCase(),
     ];
-    return campos.some(v => v.includes(qq));
+
+    return campos.some((v) => v.includes(qq));
   }
 
-  /** Filas mostradas en tabla (admin/alumno) */
-  get displayedRows(): ICandidatura[] {
+  /** Admin/Alumno: cards directas */
+  get displayedCards(): ICandidatura[] {
     const items = this.oPage?.content || [];
     const q = this.strFiltro.trim();
-    // si el filtro tiene 0-1 caracteres, no filtramos en cliente (evita "doble filtro")
     if (q.length <= 1) return items;
-    return items.filter(c => this.matches(c, q));
+    return items.filter((c) => this.matches(c, q));
   }
 
-  /** Conteos para chips */
-  get displayedCount(): number {
-    if (!this.oPage) return 0;
-    // Empresa (agrupada) cuenta ítems filtrados dentro de los grupos
-    if (this.isEmpresa && !this.isAdmin) {
-      return this.groupsByOferta.reduce((acc, g) => acc + g.items.length, 0);
-    }
-    // Admin/Alumno: cuenta filas de tabla que realmente mostramos
-    return this.displayedRows.length;
-  }
-  get totalCount(): number {
-    return this.oPage?.totalElements || 0;
-  }
-
-  /** Longitud segura del filtro para el template */
-  get filterLen(): number { return (this.strFiltro || '').trim().length; }
-
-  /** ===== Agrupación por oferta (EMPRESA) con refuerzo de filtro en cliente ===== */
+  /** Empresa: agrupado por oferta */
   get groupsByOferta() {
     const src = this.oPage?.content || [];
     const q = this.strFiltro.trim();
-    const items = (q.length <= 1) ? src : src.filter(c => this.matches(c, q));
+    const items = q.length <= 1 ? src : src.filter((c) => this.matches(c, q));
 
-    const map = new Map<number, { ofertaId: number; ofertaTitulo: string; items: ICandidatura[] }>();
+    const map = new Map<
+      number,
+      { ofertaId: number; ofertaTitulo: string; items: ICandidatura[] }
+    >();
+
     for (const c of items) {
       const id = c?.oferta?.id || 0;
       const titulo = (c?.oferta?.titulo || '').trim();
@@ -146,18 +156,48 @@ export class CandidaturaAdminPlistRoutedComponent implements OnInit {
     return Array.from(map.values());
   }
 
+  /** Conteos chips */
+  get displayedCount(): number {
+    if (!this.oPage) return 0;
+    if (this.isEmpresa && !this.isAdmin) {
+      return this.groupsByOferta.reduce((acc, g) => acc + g.items.length, 0);
+    }
+    return this.displayedCards.length;
+  }
+
+  get totalCount(): number {
+    return this.oPage?.totalElements || 0;
+  }
+
   hasMultiplePages(): boolean {
     return (this.oPage?.totalPages || 0) > 1;
   }
 
-  /** ===== Navegación ===== */
-  view(c: ICandidatura) { this.oRouter.navigate(['admin/candidatura/view', c.id]); }
-  edit(c: ICandidatura) { if (this.isAdmin) this.oRouter.navigate(['admin/candidatura/edit', c.id]); }
-  remove(c: ICandidatura) {
-    // Admin o Alumno pueden eliminar (según tu regla)
-    if (this.isAdmin || this.isAlumno) this.oRouter.navigate(['admin/candidatura/delete', c.id]);
+  /** ===== navegación ===== */
+  view(c: ICandidatura) {
+    this.oRouter.navigate(['admin', 'candidatura', 'view', c.id]).then(() => this.scrollToTop());
   }
 
+  edit(c: ICandidatura) {
+    if (this.isAdmin) {
+      this.oRouter.navigate(['admin', 'candidatura', 'edit', c.id]).then(() => this.scrollToTop());
+    }
+  }
+
+  remove(c: ICandidatura) {
+    if (this.isAdmin || this.isAlumno) {
+      this.oRouter
+        .navigate(['admin', 'candidatura', 'delete', c.id])
+        .then(() => this.scrollToTop());
+    }
+  }
+
+  viewOferta(ofertaId: number, ev?: MouseEvent) {
+    if (ev) ev.stopPropagation();
+    this.oRouter.navigate(['admin', 'oferta', 'view', ofertaId]).then(() => this.scrollToTop());
+  }
+
+  /** ===== paginación ===== */
   goToPage(p: number) {
     if (!p) return false;
     const target = p - 1;
@@ -167,6 +207,7 @@ export class CandidaturaAdminPlistRoutedComponent implements OnInit {
     this.getPage();
     return false;
   }
+
   goToNext() {
     const totalPages = this.oPage?.totalPages || 0;
     if (totalPages === 0) return false;
@@ -176,6 +217,7 @@ export class CandidaturaAdminPlistRoutedComponent implements OnInit {
     }
     return false;
   }
+
   goToPrev() {
     if (this.nPage > 0) {
       this.nPage--;
@@ -191,9 +233,19 @@ export class CandidaturaAdminPlistRoutedComponent implements OnInit {
     return false;
   }
 
-  /** Cambios en el input del filtro (debounced) */
+  /** ===== filtro (debounced) ===== */
   onFilterChange(value: string) {
     this.strFiltro = value ?? '';
     this.debounceSubject.next(this.strFiltro);
+  }
+
+  // helpers de texto
+  alumnoNombre(c: ICandidatura): string {
+    const a = c?.alumno;
+    return [a?.nombre, a?.ape1, a?.ape2].filter(Boolean).join(' ') || 'Alumno';
+  }
+
+  ofertaTitulo(c: ICandidatura): string {
+    return c?.oferta?.titulo || `Oferta ${c?.oferta?.id || ''}`.trim();
   }
 }

@@ -1,137 +1,188 @@
-<div class="container fw-wrap">
-  <!-- Toolbar -->
-  <div class="fw-head">
-    <div>
-      @if (isAdmin) {
-        <a class="fw-btn" [routerLink]="'/admin/alumno/create'">
-          <i class="bi bi-plus-square"></i> Crear alumno
-        </a>
-      }
-    </div>
+<div class="alumno-page">
 
-    <h2 class="fw-title">
-      <i class="bi bi-list"></i> Lista de Alumnos
-    </h2>
-
-    <div class="fw-controls">
-      <div class="fw-search">
-        <i class="bi bi-search"></i>
-        <input
-          type="text"
-          class="form-control"
-          placeholder="Buscar alumnos..."
-          (keyup)="filter($event)"
-          [(ngModel)]="strFiltro"
-        />
-      </div>
-      <div class="fw-rpp" aria-label="Resultados por página">
-        <span class="fw-chip" [class.active]="nRpp===12" (click)="goToRpp(12)">12</span>
-        <span class="fw-chip" [class.active]="nRpp===24" (click)="goToRpp(24)">24</span>
-        <span class="fw-chip" [class.active]="nRpp===36" (click)="goToRpp(36)">36</span>
-      </div>
+  <!-- BANNER ROL ARRIBA DEL TODO -->
+  <div class="role-banner" *ngIf="canAdmin">
+    <div class="container-xl role-banner-inner">
+      <span class="role-chip">
+        <i class="bi bi-shield-lock"></i>
+        Modo administración activo
+      </span>
+      <span class="role-text">
+        Estás viendo la vista completa de alumnado. Accede a edición y borrado con cuidado.
+      </span>
     </div>
   </div>
 
-  <div class="fw-meta">
-    <div>
-      @if (strFiltro.length > 0) {
-        Filtrado por: <span class="highlight">{{ strFiltro }}</span>
-      } @else {
-        Sin filtrar
-      }
+  <!-- HERO -->
+  <section class="alumno-hero">
+    <div class="alumno-hero-overlay"></div>
+
+    <div class="container-xl alumno-hero-inner">
+      <h1 class="alumno-title">Alumnado</h1>
+
+      <p class="alumno-subtitle">
+        Gestiona el alumnado registrado en FormAndWork. Desde aquí puedes acceder al detalle,
+        editar, eliminar y consultar candidaturas por alumno.
+      </p>
     </div>
-    <div>
-      Mostrando {{ oPage?.numberOfElements | number:'1.0-0' }}
-      de {{ oPage?.totalElements | number:'1.0-0' }}
+  </section>
+
+  <!-- TOOLBAR -->
+  <section class="alumno-toolbar">
+    <div class="container-xl">
+      <div class="toolbar-card">
+
+        <div class="toolbar-left">
+          <div class="searchbox">
+            <i class="bi bi-search"></i>
+            <input type="text" class="form-control" placeholder="Buscar por nombre, apellidos, email, ID o sector…"
+              [(ngModel)]="strFiltro" (input)="filter()" aria-label="Buscar alumnos" />
+          </div>
+
+          <div class="chips">
+            <span class="chip" [class.chip-muted]="!(strFiltro.length>0)">
+              <i class="bi bi-funnel"></i>
+              @if (strFiltro.length>0) {
+              Filtro: <strong>{{ strFiltro }}</strong>
+              } @else {
+              Sin filtro activo
+              }
+            </span>
+
+            <span class="chip" *ngIf="oPage">
+              <i class="bi bi-collection"></i>
+              {{ oPage.numberOfElements }} de {{ oPage.totalElements }} alumnos
+            </span>
+          </div>
+        </div>
+
+        <div class="toolbar-right">
+          <div class="rpp-pills" aria-label="Resultados por página">
+            <button type="button" class="pill-rpp" [class.active]="nRpp === 12" (click)="goToRpp(12)">12</button>
+            <button type="button" class="pill-rpp" [class.active]="nRpp === 24" (click)="goToRpp(24)">24</button>
+            <button type="button" class="pill-rpp" [class.active]="nRpp === 36" (click)="goToRpp(36)">36</button>
+          </div>
+
+          <button *ngIf="canAdmin" type="button" class="btn-cta" (click)="create()">
+            <span class="btn-cta-bg"></span>
+            <span class="btn-cta-label">
+              <i class="bi bi-plus-lg"></i>
+              Nuevo alumno
+            </span>
+          </button>
+        </div>
+
+      </div>
     </div>
-  </div>
+  </section>
 
   <!-- GRID -->
-  <div class="fw-grid">
-    @for (alumno of (oPage?.content ?? []); track alumno.id) {
-      <div class="fw-col">
-        <!-- TARJETA CLICABLE -->
-        <article
-          class="fw-card"
-          tabindex="0"
-          (click)="view(alumno)"
-          (keydown.enter)="view(alumno)"
-          [attr.aria-label]="'Abrir detalle de ' + (alumno?.nombre || '')"
-        >
-          <img src="img/PerfilUsuario.jpg" alt="Perfil" class="corner-img" />
+  <section class="alumno-grid">
+    <div class="container-xl">
+      <div class="grid">
 
-          <div class="fw-card-body">
-            <h5 class="fw-name">{{ alumno.nombre }} {{ alumno.ape1 }} {{ alumno.ape2 }}</h5>
+        <!-- Skeleton -->
+        <ng-container *ngIf="loading">
+          <article class="student-card skeleton" *ngFor="let i of [1,2,3,4,5,6]">
+            <div class="card-main">
+              <div class="avatar-img sk"></div>
+              <div class="info">
+                <div class="sk-line"></div>
+                <div class="sk-line short"></div>
+              </div>
+            </div>
+          </article>
+        </ng-container>
 
-            <p class="fw-field"><strong>Email:</strong> {{ alumno.email }}</p>
+        <!-- Cards -->
+        <article class="student-card" *ngFor="let alumno of (oPage?.content ?? []); trackBy: trackById" tabindex="0"
+          (click)="onCardClick(alumno)" (keydown.enter)="onCardClick(alumno)" [class.clickable]="canOpenView">
+          <div class="card-main">
 
-            <p class="fw-field">
-              <strong>Sector:</strong>
-              <span class="fw-tag">{{ alumno.sector?.nombre || '—' }}</span>
-            </p>
+            <!-- ✅ AVATAR CON IMAGEN -->
+            <div class="avatar-img" aria-hidden="true">
+              <img src="img/PerfilUsuario.jpg" alt="Perfil del alumno" loading="lazy" />
+            </div>
 
-            <div class="d-flex justify-content-between align-items-center gap-2 mt-2">
-              <!-- Postulaciones -->
-              <a
-                class="fw-ghost"
-                [routerLink]="'/admin/candidatura/xalumno/plist/' + alumno.id"
-                (click)="$event.stopPropagation()"
-              >
-                <span class="fw-count">{{ alumno.candidaturas || 0 }}</span>
-                Postulaciones
-                <i class="bi bi-arrow-up-right-square"></i>
-              </a>
+            <div class="info">
+              <div class="title-row">
+                <h2 class="student-name">{{ fullName(alumno) }}</h2>
+                <span *ngIf="canAdmin" class="student-id">#{{ alumno.id }}</span>
+              </div>
 
-              <!-- Acciones -->
-              <div class="fw-actions">
-                @if (isAdmin) {
-                  <button
-                    type="button"
-                    class="fw-iconbtn edit"
-                    title="Editar"
-                    (click)="$event.stopPropagation(); edit(alumno)"
-                  >
-                    <i class="bi bi-pen"></i>
-                  </button>
-                  <button
-                    type="button"
-                    class="fw-iconbtn del"
-                    title="Eliminar"
-                    (click)="$event.stopPropagation(); remove(alumno)"
-                  >
-                    <i class="bi bi-trash"></i>
-                  </button>
-                }
+              <div class="sector-line">
+                <i class="bi bi-diagram-3"></i>
+                <span class="sector-text">
+                  {{ alumno.sector?.nombre || 'Sector sin asignar' }}
+                </span>
+              </div>
+
+              <div class="email">
+                <i class="bi bi-envelope"></i>
+                {{ alumno.email }}
               </div>
             </div>
           </div>
+
+          <div class="card-footer">
+            <!-- Candidaturas -->
+            <button type="button" class="btn candidaturas" (click)="onCandidaturasClick(alumno, $event)">
+              <i class="bi bi-send-check"></i>
+              <span>
+                {{ alumno.candidaturas || 0 }} candidaturas
+              </span>
+            </button>
+
+            <!-- Acciones admin -->
+            <div class="actions" *ngIf="canAdmin">
+              <button class="btn" type="button" (click)="$event.stopPropagation(); edit(alumno)">
+                <i class="bi bi-pen"></i> Editar
+              </button>
+
+              <button class="btn danger" type="button" (click)="$event.stopPropagation(); remove(alumno)">
+                <i class="bi bi-trash"></i> Eliminar
+              </button>
+            </div>
+          </div>
         </article>
+
+        <!-- Vacío -->
+        <div class="empty" *ngIf="!loading && (oPage?.content?.length || 0) === 0">
+          <i class="bi bi-emoji-neutral"></i>
+          <p>No hay alumnos que coincidan con la búsqueda.</p>
+        </div>
+
       </div>
-    } @empty {
-      <div class="fw-col">
-        <div class="fw-empty">No hay alumnos</div>
-      </div>
-    }
-  </div>
 
-  <!-- PAGINACIÓN -->
-  <nav class="fw-pager" aria-label="Paginación">
-    <span class="fw-page" [class.disabled]="nPage - -1 === 1" (click)="goToPrev()">
-      <i class="bi bi-caret-left-square-fill"></i> Anterior
-    </span>
+      <!-- Paginación -->
+      <nav class="my-3" aria-label="Paginación" *ngIf="hasMultiplePages()">
+        <ul class="pagination justify-content-center flex-wrap">
 
-    <ng-container *ngFor="let pag of arrBotonera">
-      @if (pag==='...') {
-        <span class="fw-page disabled">...</span>
-      } @else {
-        <span class="fw-page" [class.active]="nPage - -1 === -(-pag)" (click)="goToPage(-(-pag))">
-          {{ pag }}
-        </span>
-      }
-    </ng-container>
+          <li class="page-item" [class.disabled]="(nPage + 1) === 1">
+            <a class="page-link" href="#" (click)="goToPrev()" aria-label="Página anterior">
+              <span aria-hidden="true">&laquo;</span>
+            </a>
+          </li>
 
-    <span class="fw-page" [class.disabled]="nPage - -1 === oPage?.totalPages" (click)="goToNext()">
-      Siguiente <i class="bi bi-caret-right-square-fill"></i>
-    </span>
-  </nav>
+          <li class="page-item" *ngFor="let pag of arrBotonera">
+            @if (pag === '...') {
+            <span class="page-link dots" aria-hidden="true">…</span>
+            } @else {
+            <a class="page-link" href="#" (click)="goToPage(+pag)" [class.active]="(nPage + 1) === +pag">
+              {{ pag }}
+            </a>
+            }
+          </li>
+
+          <li class="page-item" [class.disabled]="(nPage + 1) === (oPage?.totalPages || 0)">
+            <a class="page-link" href="#" (click)="goToNext()" aria-label="Página siguiente">
+              <span aria-hidden="true">&raquo;</span>
+            </a>
+          </li>
+
+        </ul>
+      </nav>
+
+    </div>
+  </section>
 </div>

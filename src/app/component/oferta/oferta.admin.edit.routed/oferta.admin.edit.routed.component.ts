@@ -40,7 +40,7 @@ export class OfertaAdminEditRoutedComponent implements OnInit {
   // Form sencillo: SOLO lo editable
   oOfertaForm = new FormGroup({
     titulo: new FormControl<string>('', [Validators.required, Validators.minLength(3), Validators.maxLength(255)]),
-    descripcion: new FormControl<string>('', [Validators.required, Validators.minLength(5), Validators.maxLength(255)]),
+    descripcion: new FormControl<string>('', [Validators.required, Validators.minLength(5), Validators.maxLength(555)]),
     sectorId: new FormControl<number | null>(null, Validators.required),
   });
 

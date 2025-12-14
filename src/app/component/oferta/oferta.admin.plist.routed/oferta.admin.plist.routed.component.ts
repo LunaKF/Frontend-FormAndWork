@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router, RouterModule, NavigationEnd } from '@angular/router';
-import { debounceTime, Subject, filter } from 'rxjs';
+import { Router, RouterModule } from '@angular/router';
+import { debounceTime, Subject } from 'rxjs';
 
 import { TrimPipe } from '../../../pipe/trim.pipe';
 import { IOferta } from '../../../model/oferta.interface';
@@ -22,7 +22,7 @@ export class OfertaAdminPlistRoutedComponent implements OnInit {
   oPage: IPage<IOferta> | null = null;
 
   /** Paginación y orden */
-  nPage = 0;            // 0-based
+  nPage = 0; // 0-based
   nRpp = 10;
   strField = '';
   strDir: 'asc' | 'desc' | '' = '';
@@ -31,31 +31,37 @@ export class OfertaAdminPlistRoutedComponent implements OnInit {
   strFiltro = '';
   private debounceSubject = new Subject<string>();
 
+  /** Botonera */
+  arrBotonera: string[] = [];
+
   /** Sesión */
   activeSession = false;
   userEmail = '';
 
-  /** Contexto: true si estamos bajo /admin/... */
-  adminContext = false;
+  /** flags de rol */
+  isAdmin = false;
+  isEmpresa = false;
+  isAlumno = false;
+
+  /** UI */
+  loading = true;
 
   constructor(
     private oOfertaService: OfertaService,
     private oBotoneraService: BotoneraService,
     private oRouter: Router,
-    private oSessionService: SessionService,
+    private oSessionService: SessionService
   ) {
-    this.debounceSubject.pipe(debounceTime(300)).subscribe(() => this.getPage());
+    this.debounceSubject.pipe(debounceTime(300)).subscribe(() => {
+      this.nPage = 0;
+      this.getPage();
+    });
 
     this.activeSession = this.oSessionService.isSessionActive();
-    if (this.activeSession) this.userEmail = this.oSessionService.getSessionEmail();
-
-    // Detectar si estamos en /admin/ para habilitar acciones y enlaces internos
-    this.adminContext = this.oRouter.url.startsWith('/admin/');
-    this.oRouter.events
-      .pipe(filter(ev => ev instanceof NavigationEnd))
-      .subscribe(() => {
-        this.adminContext = this.oRouter.url.startsWith('/admin/');
-      });
+    if (this.activeSession) {
+      this.userEmail = this.oSessionService.getSessionEmail();
+      this.setRoleFromSession();
+    }
   }
 
   ngOnInit(): void {
@@ -63,6 +69,7 @@ export class OfertaAdminPlistRoutedComponent implements OnInit {
       next: () => {
         this.activeSession = true;
         this.userEmail = this.oSessionService.getSessionEmail();
+        this.setRoleFromSession();
         this.getPage();
       },
     });
@@ -71,6 +78,7 @@ export class OfertaAdminPlistRoutedComponent implements OnInit {
       next: () => {
         this.activeSession = false;
         this.userEmail = '';
+        this.isAdmin = this.isEmpresa = this.isAlumno = false;
         this.getPage();
       },
     });
@@ -78,59 +86,173 @@ export class OfertaAdminPlistRoutedComponent implements OnInit {
     this.getPage();
   }
 
-  /** Getters de ayuda */
-  get currentPage(): number { return this.nPage + 1; }
-  hasPrev(): boolean { return this.currentPage > 1; }
-  hasNext(): boolean { return !!this.oPage && this.currentPage < (this.oPage.totalPages || 0); }
+  // ========= ROLES =========
+  private setRoleFromSession(): void {
+    const tipo = (this.oSessionService.getSessionTipoUsuario() || '')
+      .toLowerCase()
+      .trim();
 
-  /** Datos */
+    this.isAdmin = tipo === 'admin' || tipo === 'administrador';
+    this.isEmpresa = tipo === 'empresa';
+    this.isAlumno = tipo === 'alumno';
+  }
+
+  // ========= PERMISOS =========
+  get canOpenView(): boolean {
+    return this.activeSession && (this.isAdmin || this.isEmpresa || this.isAlumno);
+  }
+
+  get canManageOferta(): boolean {
+    return this.activeSession && (this.isAdmin || this.isEmpresa);
+  }
+
+  get canSeeCandidaturas(): boolean {
+    return this.activeSession && (this.isAdmin || this.isEmpresa);
+  }
+
+  // ========= HELPERS =========
+  get currentPage(): number {
+    return this.nPage + 1;
+  }
+
+  hasPrev(): boolean {
+    return this.currentPage > 1;
+  }
+
+  hasNext(): boolean {
+    return !!this.oPage && this.currentPage < (this.oPage.totalPages || 0);
+  }
+
+  hasMultiplePages(): boolean {
+    return (this.oPage?.totalPages || 0) > 1;
+  }
+
+  private scrollToTop(): void {
+    setTimeout(() => {
+      window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+    }, 0);
+  }
+
+  // ========= DATA =========
   getPage(): void {
+    this.loading = true;
+
     this.oOfertaService
       .getPage(this.nPage, this.nRpp, this.strField, this.strDir, this.strFiltro)
       .subscribe({
         next: (oPageFromServer: IPage<IOferta>) => {
           this.oPage = oPageFromServer;
-          // Genera la botonera (1..N con posibles …)
-          this.arrBotonera = this.oBotoneraService.getBotonera(this.nPage, oPageFromServer.totalPages);
+          this.arrBotonera = this.oBotoneraService.getBotonera(
+            this.nPage,
+            oPageFromServer.totalPages
+          );
+          this.loading = false;
         },
-        error: (err) => console.error(err),
+        error: (err) => {
+          console.error(err);
+          this.loading = false;
+        },
       });
   }
 
-  /** Botonera */
-  arrBotonera: string[] = [];
+  // ========= BOTONERA =========
   goToPage(p: number): false {
-    if (p) { this.nPage = p - 1; this.getPage(); }
+    if (p) {
+      this.nPage = p - 1;
+      this.getPage();
+      this.scrollToTop();
+    }
     return false;
   }
-  goToNext(): false { if (this.hasNext()) { this.nPage++; this.getPage(); } return false; }
-  goToPrev(): false { if (this.hasPrev()) { this.nPage--; this.getPage(); } return false; }
 
-  /** Ordenación */
+  goToNext(): false {
+    if (this.hasNext()) {
+      this.nPage++;
+      this.getPage();
+      this.scrollToTop();
+    }
+    return false;
+  }
+
+  goToPrev(): false {
+    if (this.hasPrev()) {
+      this.nPage--;
+      this.getPage();
+      this.scrollToTop();
+    }
+    return false;
+  }
+
+  // ========= ORDEN =========
   sort(field: string): void {
     this.strField = field;
     this.strDir = this.strDir === 'asc' ? 'desc' : 'asc';
     this.getPage();
   }
 
-  /** Resultados por página */
+  // ========= RPP =========
   goToRpp(nrpp: number): false {
-    this.nPage = 0; this.nRpp = nrpp; this.getPage();
+    this.nPage = 0;
+    this.nRpp = nrpp;
+    this.getPage();
+    this.scrollToTop();
     return false;
   }
 
-  /** Filtro con debounce */
-  filter(_: KeyboardEvent): void { this.debounceSubject.next(this.strFiltro); }
+  // ========= FILTRO =========
+  filter(_: KeyboardEvent): void {
+    this.debounceSubject.next(this.strFiltro);
+  }
 
-  /** Acciones */
-  edit(o: IOferta): void { if (this.adminContext) this.oRouter.navigate(['admin/oferta/edit', o.id]); }
-  view(o: IOferta): void {
-    // En admin -> siempre ver. En público:
-    //   - si loggeada -> ver detalle protegido
-    //   - si no loggeada -> no hace nada (tooltip ya avisa)
-    if (this.adminContext || this.activeSession) {
-      this.oRouter.navigate(['admin/oferta/view', o.id]);
+  // ========= CLICK CARD =========
+  onCardClick(o: IOferta): void {
+    if (this.canOpenView) this.view(o);
+  }
+
+  // ========= ACCIONES (RUTAS CORRECTAS ✅) =========
+  // OJO: en tus routes están dentro de /admin/...
+  create(): void {
+    if (this.canManageOferta) {
+      this.oRouter.navigate(['admin', 'oferta', 'create']).then(() => this.scrollToTop());
     }
   }
-  remove(o: IOferta): void { if (this.adminContext) this.oRouter.navigate(['admin/oferta/delete', o.id]); }
+
+  view(o: IOferta): void {
+    if (this.canOpenView) {
+      this.oRouter.navigate(['admin', 'oferta', 'view', o.id]).then(() => this.scrollToTop());
+    }
+  }
+
+  edit(o: IOferta): void {
+    if (this.canManageOferta) {
+      this.oRouter.navigate(['admin', 'oferta', 'edit', o.id]).then(() => this.scrollToTop());
+    }
+  }
+
+  remove(o: IOferta): void {
+    if (this.canManageOferta) {
+      this.oRouter.navigate(['admin', 'oferta', 'delete', o.id]).then(() => this.scrollToTop());
+    }
+  }
+
+  candidaturas(o: IOferta, ev?: MouseEvent): void {
+    ev?.stopPropagation();
+    if (this.canSeeCandidaturas) {
+      this.oRouter
+        .navigate(['admin', 'candidatura', 'xoferta', 'plist', o.id])
+        .then(() => this.scrollToTop());
+    }
+  }
+
+  // ========= UI HELPERS =========
+  excerpt(text: string | undefined | null, max = 160): string {
+    const t = (text || '').trim().replace(/\s+/g, ' ');
+    if (!t) return '—';
+    if (t.length <= max) return t;
+    return t.slice(0, max).trim() + '…';
+  }
+
+  trackById(_: number, item: IOferta): number {
+    return item.id;
+  }
 }

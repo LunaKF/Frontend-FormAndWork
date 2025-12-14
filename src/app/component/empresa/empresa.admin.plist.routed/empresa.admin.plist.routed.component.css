@@ -47,7 +47,7 @@
 /* ===== HERO ===== */
 .empresa-hero {
   position: relative;
-  min-height: 600px; /* lo que pedías */
+  min-height: 600px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -62,9 +62,9 @@
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(80rem 40rem at 50% 0%, rgba(63, 20, 184, .35), transparent 60%),
-    linear-gradient(180deg, rgba(255, 255, 255, .65), rgba(255, 255, 255, .18));
-  backdrop-filter: blur(4px) saturate(2.1);
+    radial-gradient(80rem 40rem at 50% 0%, rgba(64, 20, 184, 0.336), transparent 60%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.438), rgba(255, 255, 255, .18));
+  backdrop-filter: blur(2px) saturate(2.1);
 }
 
 .empresa-hero-inner {

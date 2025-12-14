@@ -102,7 +102,7 @@ export class OfertaAdminCreateRoutedComponent implements OnInit {
       descripcion: new FormControl('', [
         Validators.required,
         Validators.minLength(5),
-        Validators.maxLength(255),
+        Validators.maxLength(555),
       ]),
 
       sector: new FormGroup({

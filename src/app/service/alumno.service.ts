@@ -101,7 +101,7 @@ export class AlumnoService {
   update(oAlumno: IAlumno): Observable<IAlumno> {
     let URL: string = '';
     URL += this.serverURL;
-    return this.oHttp.put<IAlumno>(URL, oAlumno);
+    return this.oHttp.post<IAlumno>(URL, oAlumno);
   }
 
   getOne(id: number): Observable<IAlumno> {

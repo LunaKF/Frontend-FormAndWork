@@ -12,8 +12,9 @@ import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { OfertaService } from '../../../service/oferta.service';
 import { IOferta } from '../../../model/oferta.interface';
 import { ISector } from '../../../model/sector.interface';
-import { EmpresaAdminSelectorUnroutedComponent } from '../../empresa/empresa.admin.selector.unrouted/empresa.admin.selector.unrouted.component';
+
 import { SectorAdminSelectorUnroutedComponent } from '../../sector/sector.admin.selector.unrouted/sector.admin.selector.unrouted.component';
+import { SessionService } from '../../../service/session.service';
 
 declare let bootstrap: any;
 
@@ -29,26 +30,33 @@ declare let bootstrap: any;
     MatFormFieldModule,
     MatInputModule,
     MatSelectModule,
-    SectorAdminSelectorUnroutedComponent,
-    EmpresaAdminSelectorUnroutedComponent,
   ],
 })
 export class OfertaAdminEditRoutedComponent implements OnInit {
 
   id = 0;
 
-  // Form sencillo: SOLO lo editable
+  // ✅ Solo lo editable
   oOfertaForm = new FormGroup({
     titulo: new FormControl<string>('', [Validators.required, Validators.minLength(3), Validators.maxLength(255)]),
     descripcion: new FormControl<string>('', [Validators.required, Validators.minLength(5), Validators.maxLength(555)]),
     sectorId: new FormControl<number | null>(null, Validators.required),
   });
 
-  // Datos para mostrar (no se editan)
   oOferta: IOferta | null = null;
+
   empresaNombre = '';
   empresaEmail = '';
   sectorNombre = '';
+
+  // roles
+  isAdmin = false;
+  isEmpresa = false;
+  isAlumno = false;
+
+  // session
+  activeSession = false;
+  userEmail = '';
 
   // UI
   loading = true;
@@ -60,29 +68,61 @@ export class OfertaAdminEditRoutedComponent implements OnInit {
   constructor(
     private readonly route: ActivatedRoute,
     private readonly ofertaService: OfertaService,
-    private readonly router: Router
+    private readonly router: Router,
+    private readonly sessionService: SessionService
   ) {
     this.route.params.subscribe(p => this.id = +p['id']);
   }
 
   ngOnInit(): void {
+    this.activeSession = this.sessionService.isSessionActive();
+    this.userEmail = (this.sessionService.getSessionEmail() || '').trim();
+
+    this.setRoleFromSession();
+
+    // alumno fuera
+    if (this.isAlumno || !this.activeSession) {
+      this.router.navigate(['/']);
+      return;
+    }
+
     this.cargar();
   }
 
-  private cargar() {
+  private setRoleFromSession(): void {
+    const tipo = (this.sessionService.getSessionTipoUsuario() || '').toLowerCase().trim();
+    this.isAdmin = (tipo === 'admin' || tipo === 'administrador');
+    this.isEmpresa = (tipo === 'empresa');
+    this.isAlumno = (tipo === 'alumno');
+  }
+
+  private cargar(): void {
     this.loading = true;
+
     this.ofertaService.get(this.id).subscribe({
       next: (o: IOferta) => {
         this.oOferta = o;
 
-        // Relleno del form (solo lo editable)
+        // ✅ Si es empresa: comprobar propiedad por email
+        if (this.isEmpresa && !this.isAdmin) {
+          const ownerEmail = (o.empresa?.email || '').trim().toLowerCase();
+          const me = (this.userEmail || '').trim().toLowerCase();
+
+          if (!me || !ownerEmail || me !== ownerEmail) {
+            this.loading = false;
+            this.showModal('No tienes permisos para editar esta oferta (no pertenece a tu empresa).');
+            return;
+          }
+        }
+
+        // Form (editable)
         this.oOfertaForm.patchValue({
           titulo: o.titulo ?? '',
           descripcion: o.descripcion ?? '',
           sectorId: o.sector?.id ?? null
         });
 
-        // Datos de solo lectura
+        // Readonly
         this.empresaNombre = o.empresa?.nombre ?? '';
         this.empresaEmail = o.empresa?.email ?? '';
         this.sectorNombre = o.sector?.nombre ?? '';
@@ -97,8 +137,8 @@ export class OfertaAdminEditRoutedComponent implements OnInit {
     });
   }
 
-  // Selector de sector (sí se permite cambiar)
-  showSectorSelectorModal() {
+  // Selector de sector
+  showSectorSelectorModal(): false {
     const dialogRef = this.dialog.open(SectorAdminSelectorUnroutedComponent, {
       height: '800px',
       width: '80%',
@@ -115,26 +155,38 @@ export class OfertaAdminEditRoutedComponent implements OnInit {
     return false;
   }
 
-  onReset() {
+  onReset(): false {
     if (!this.oOferta) return false;
+
     this.oOfertaForm.patchValue({
       titulo: this.oOferta.titulo ?? '',
       descripcion: this.oOferta.descripcion ?? '',
       sectorId: this.oOferta.sector?.id ?? null
     });
+
     this.sectorNombre = this.oOferta.sector?.nombre ?? '';
     return false;
   }
 
-  onSubmit() {
+  onSubmit(): void {
     if (!this.oOferta || this.oOfertaForm.invalid) {
       this.showModal('Formulario no válido');
       return;
     }
 
+    // ✅ Seguridad extra: si empresa, vuelve a comprobar
+    if (this.isEmpresa && !this.isAdmin) {
+      const ownerEmail = (this.oOferta.empresa?.email || '').trim().toLowerCase();
+      const me = (this.userEmail || '').trim().toLowerCase();
+      if (!me || !ownerEmail || me !== ownerEmail) {
+        this.showModal('No tienes permisos para editar esta oferta.');
+        return;
+      }
+    }
+
     const { titulo, descripcion, sectorId } = this.oOfertaForm.getRawValue();
 
-    // Construimos payload forzando id y empresa ORIGINAL
+    // ✅ payload: empresa SIEMPRE la original
     const payload: IOferta = {
       ...this.oOferta,
       titulo: titulo ?? '',
@@ -144,19 +196,29 @@ export class OfertaAdminEditRoutedComponent implements OnInit {
       id: this.oOferta.id            // inmutable
     };
 
+    this.loading = true;
+
     this.ofertaService.update(payload).subscribe({
       next: oUpd => {
         this.oOferta = oUpd;
-        this.showModal(`Oferta ${oUpd.id} actualizada correctamente`);
+
+        // refrescar textos
+        this.empresaNombre = oUpd.empresa?.nombre ?? this.empresaNombre;
+        this.empresaEmail = oUpd.empresa?.email ?? this.empresaEmail;
+        this.sectorNombre = oUpd.sector?.nombre ?? this.sectorNombre;
+
+        this.loading = false;
+        this.showModal(`Oferta actualizada correctamente`);
       },
       error: err => {
         console.error(err);
+        this.loading = false;
         this.showModal('Error al actualizar la oferta');
       }
     });
   }
 
-  showModal(msg: string) {
+  showModal(msg: string): void {
     this.strMessage = msg;
     const el = document.getElementById('mimodal');
     if (!el) return;
@@ -164,8 +226,19 @@ export class OfertaAdminEditRoutedComponent implements OnInit {
     this.myModal.show();
   }
 
-  hideModal = () => {
+  hideModal = (): void => {
     this.myModal?.hide();
-    if (this.oOferta?.id) this.router.navigate(['/admin/oferta/view', this.oOferta.id]);
+
+    // si fue “no permitido”, vuelvo a un sitio seguro
+    if (this.strMessage?.toLowerCase().includes('no tienes permisos')) {
+      this.router.navigate([this.isEmpresa && !this.isAdmin ? '/empresa/oferta/plist' : '/admin/oferta/plist']);
+      return;
+    }
+
+    if (this.oOferta?.id) {
+      this.router.navigate(['/admin/oferta/view', this.oOferta.id]);
+    } else {
+      this.router.navigate(['/admin/oferta/plist']);
+    }
   };
 }

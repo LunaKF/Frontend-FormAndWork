@@ -47,6 +47,7 @@
               class="form-control"
               placeholder="Buscar por título, descripción, sector o empresa…"
               [(ngModel)]="strFiltro"
+              (keyup)="filter($event)"
               aria-label="Buscar ofertas"
             />
           </div>
@@ -63,7 +64,7 @@
 
             <span class="chip" *ngIf="oPage">
               <i class="bi bi-collection"></i>
-              {{ filteredOfertas.length }}
+              Mostrando {{ oPage.numberOfElements || 0 | number:'1.0-0' }}
               de {{ oPage.totalElements || 0 | number:'1.0-0' }}
             </span>
           </div>
@@ -111,7 +112,7 @@
       <div class="offer-list" *ngIf="!loading">
         <article
           class="offer-card"
-          *ngFor="let oferta of filteredOfertas; trackBy: trackById"
+          *ngFor="let oferta of (oPage?.content ?? []); trackBy: trackById"
           [class.clickable]="canOpenView"
           tabindex="0"
           (click)="onCardClick(oferta)"
@@ -179,7 +180,7 @@
         </article>
 
         <!-- Vacío -->
-        <div class="empty" *ngIf="filteredOfertas.length === 0">
+        <div class="empty" *ngIf="(oPage?.content?.length || 0) === 0">
           <i class="bi bi-emoji-neutral"></i>
           <p>No hay ofertas que coincidan.</p>
         </div>

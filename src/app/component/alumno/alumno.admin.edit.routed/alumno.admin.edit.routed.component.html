@@ -1,120 +1,212 @@
-<div class="container mt-5 d-flex align-items-center justify-content-center">
-  <div class="row">
-    <div class="col text-center">
-      <h2 class="my-5">
-        <i class="bi bi-pencil"></i>
-        Edición del alumno {{ oAlumno?.nombre }} {{ oAlumno?.ape1 }} {{ oAlumno?.ape2 }}
-        <i class="bi bi-person-circle"></i>
-      </h2>
+<div class="alumno-edit-page">
 
-      <form [formGroup]="oAlumnoForm!" (ngSubmit)="onSubmit()" novalidate>
-        <div class="row mt-4">
-          <mat-form-field>
-            <mat-label>Id </mat-label>
-            <input matInput formControlName="id" placeholder="Id" readonly />
-            <mat-hint align="end">No se puede cambiar</mat-hint>
-          </mat-form-field>
-        </div>
+  <!-- BANNER ROL (solo admin) -->
+  <div class="role-banner" *ngIf="isAdmin">
+    <div class="container-xl role-banner-inner">
+      <span class="role-chip">
+        <i class="bi bi-shield-lock"></i>
+        Modo administración activo
+      </span>
+      <span class="role-text">
+        Estás editando los datos de un alumno. Revisa los cambios antes de guardar.
+      </span>
+    </div>
+  </div>
 
-        <div class="row mt-4">
-          <mat-form-field>
-            <mat-label>Nombre de la Alumno</mat-label>
-            <input matInput formControlName="nombre" placeholder="Nombre de la Alumno..." />
-            <mat-hint align="start">De 3 caracteres a 50 caracteres</mat-hint>
-            <mat-error *ngIf="oAlumnoForm?.get('nombre')?.hasError('required')">Este campo es obligatorio</mat-error>
-            <mat-error *ngIf="oAlumnoForm?.get('nombre')?.hasError('minlength')">El nombre debe ser más
-              largo</mat-error>
-            <mat-error *ngIf="oAlumnoForm?.get('nombre')?.hasError('maxlength')">El nombre debe ser más
-              corto</mat-error>
-          </mat-form-field>
-        </div>
+  <!-- HERO -->
+  <section class="alumno-hero">
+    <div class="alumno-hero-overlay"></div>
 
-        <div class="row mt-4">
-          <mat-form-field>
-            <mat-label>Apellido 1</mat-label>
-            <input matInput formControlName="ape1" placeholder="Apellido 1 del Alumno..." />
-            <mat-hint align="start">De 3 caracteres a 50 caracteres</mat-hint>
-            <mat-error *ngIf="oAlumnoForm?.get('ape1')?.hasError('required')">Este campo es obligatorio</mat-error>
-            <mat-error *ngIf="oAlumnoForm?.get('ape1')?.hasError('minlength')">El apellido debe ser más
-              largo</mat-error>
-            <mat-error *ngIf="oAlumnoForm?.get('ape1')?.hasError('maxlength')">El apellido debe ser más
-              corto</mat-error>
-          </mat-form-field>
-        </div>
+    <div class="container-xl alumno-hero-inner">
+      <h1 class="alumno-title">Editar alumno</h1>
 
-        <div class="row mt-4">
-          <mat-form-field>
-            <mat-label>Apellido 2</mat-label>
-            <input matInput formControlName="ape2" placeholder="Apellido 2 del Alumno..." />
-            <mat-hint align="start">De 3 caracteres a 50 caracteres</mat-hint>
-            <mat-error *ngIf="oAlumnoForm?.get('ape2')?.hasError('required')">Este campo es obligatorio</mat-error> 
-            <mat-error *ngIf="oAlumnoForm?.get('ape2')?.hasError('minlength')">El apellido debe ser más
-              largo</mat-error>
-            <mat-error *ngIf="oAlumnoForm?.get('ape2')?.hasError('maxlength')">El apellido debe ser más
-              corto</mat-error>
-          </mat-form-field>
-        </div>
+      <p class="alumno-subtitle">
+        Modifica los datos del alumno y accede rápidamente a sus candidaturas.
+      </p>
+    </div>
+  </section>
 
-        <div formGroupName="sector">
-          <div class="row mt-4">
-            <mat-form-field>
-              <mat-label>SECTORES</mat-label>
-              <div class="d-flex justify-content-end">
-                <button class="btn btn-primary" (click)="showSectorSelectorModal()">
-                  <i class="bi bi-search"></i>
-                  Buscar
-                </button>
-              </div>
-              <div class="d-flex justify-content-start">
-              </div>
-              {{ oSector?.id }} {{ oSector?.nombre }}
-              <input matInput formControlName="id" placeholder="Sector" />
-            </mat-form-field>
+  <!-- CONTENIDO -->
+  <section class="alumno-edit">
+    <div class="container-xl">
+
+      <div class="edit-layout" *ngIf="oAlumnoForm && oAlumno">
+
+        <!-- Resumen alumno -->
+        <aside class="summary-card">
+          <div class="summary-avatar">
+            <span>{{ ((oAlumno.nombre || '') | slice:0:1) + ((oAlumno.ape1 || '') | slice:0:1) | uppercase }}</span>
           </div>
-        </div>
-        <div class="row mt-4">
-          <mat-form-field>
-            <mat-label>Email</mat-label>
-            <input matInput formControlName="email" placeholder="Email de la alumno" required />
-            <mat-hint align="start">Formato email</mat-hint>
-            <mat-error *ngIf="oAlumnoForm?.get('email')?.hasError('required')">Debes introducir un email</mat-error>
-            <mat-error *ngIf="oAlumnoForm?.get('email')?.hasError('email')">Debes introducir un email
-              correcto</mat-error>
-          </mat-form-field>
-        </div>
-        <br />
 
-        <button class="btn btn-warning mt-4 mx-1" [routerLink]="['/admin', 'alumno', 'plist']">
-          <i class="bi bi-list"></i>
-          Ir a listado de Alumnos
-        </button>
+          <div class="summary-body">
+            <h2 class="summary-name">
+              {{ oAlumno.nombre }} {{ oAlumno.ape1 }} {{ oAlumno.ape2 }}
+            </h2>
 
-        <button class="btn btn-secondary mt-4 mx-1" (click)="onReset()">
-          <i class="bi bi-x-lg"></i>
-          Reset
-        </button>
+            <p class="summary-id">
+              ID alumno: <strong>#{{ oAlumno.id }}</strong>
+            </p>
 
-        <button class="btn btn-primary mt-4 mx-1" type="submit" [disabled]="!oAlumnoForm?.valid">
-          <i class="bi bi-floppy"></i>
-          Guardar
-        </button>
+            <p class="summary-email">
+              <i class="bi bi-envelope"></i>
+              {{ oAlumno.email }}
+            </p>
 
-        <div class="modal fade" [id]="'mimodal'" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-          <div class="modal-dialog">
-            <div class="modal-content">
-              <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">FormAndWork</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
-                  (click)="hideModal()"></button>
-              </div>
-              <div class="modal-body">
-                <p>{{ strMessage }}</p>
-              </div>
-              <div class="modal-footer">
-                <button type="button" class="btn btn-primary" data-bs-dismiss="modal" (click)="hideModal()">
-                  Cerrar
+            <p class="summary-sector" *ngIf="oAlumno.sector">
+              <i class="bi bi-diagram-3"></i>
+              {{ oAlumno.sector.nombre }}
+            </p>
+
+            <p class="summary-hint">
+              Los cambios afectarán a su perfil y a lo que se muestra en la plataforma.
+            </p>
+
+            <div class="summary-actions">
+              <!-- ✅ BOTÓN CANDIDATURAS -->
+              <button type="button" class="btn btn-secondary"
+                [routerLink]="['/admin','candidatura','xalumno', 'plist', oAlumno.id]">
+                <i class="bi bi-briefcase"></i>
+                Ver candidaturas
+              </button>
+
+              <button type="button" class="btn btn-ghost" [routerLink]="['/admin','alumno','view', oAlumno.id]">
+                <i class="bi bi-eye"></i>
+                Ver ficha
+              </button>
+            </div>
+          </div>
+        </aside>
+
+        <!-- Form -->
+        <div class="form-card">
+
+          <form [formGroup]="oAlumnoForm" (ngSubmit)="onSubmit()" novalidate>
+
+            <!-- ID -->
+            <div class="field-row">
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>ID del alumno</mat-label>
+                <input matInput formControlName="id" readonly placeholder="Id" />
+                <mat-hint align="end">Este valor no se puede cambiar</mat-hint>
+              </mat-form-field>
+            </div>
+
+            <!-- Nombre -->
+            <div class="field-row">
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Nombre</mat-label>
+                <input matInput formControlName="nombre" placeholder="Nombre…" />
+                <mat-hint align="start">Entre 3 y 50 caracteres</mat-hint>
+                <mat-error *ngIf="oAlumnoForm.get('nombre')?.hasError('required')">Este campo es
+                  obligatorio.</mat-error>
+                <mat-error *ngIf="oAlumnoForm.get('nombre')?.hasError('minlength')">El nombre es demasiado
+                  corto.</mat-error>
+                <mat-error *ngIf="oAlumnoForm.get('nombre')?.hasError('maxlength')">El nombre es demasiado
+                  largo.</mat-error>
+              </mat-form-field>
+            </div>
+
+            <!-- Apellido 1 -->
+            <div class="field-row">
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Apellido 1</mat-label>
+                <input matInput formControlName="ape1" placeholder="Apellido 1…" />
+                <mat-hint align="start">Entre 3 y 50 caracteres</mat-hint>
+                <mat-error *ngIf="oAlumnoForm.get('ape1')?.hasError('required')">Este campo es obligatorio.</mat-error>
+                <mat-error *ngIf="oAlumnoForm.get('ape1')?.hasError('minlength')">El apellido es demasiado
+                  corto.</mat-error>
+                <mat-error *ngIf="oAlumnoForm.get('ape1')?.hasError('maxlength')">El apellido es demasiado
+                  largo.</mat-error>
+              </mat-form-field>
+            </div>
+
+            <!-- Apellido 2 -->
+            <div class="field-row">
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Apellido 2</mat-label>
+                <input matInput formControlName="ape2" placeholder="Apellido 2…" />
+                <mat-hint align="start">Entre 3 y 50 caracteres</mat-hint>
+                <mat-error *ngIf="oAlumnoForm.get('ape2')?.hasError('required')">Este campo es obligatorio.</mat-error>
+                <mat-error *ngIf="oAlumnoForm.get('ape2')?.hasError('minlength')">El apellido es demasiado
+                  corto.</mat-error>
+                <mat-error *ngIf="oAlumnoForm.get('ape2')?.hasError('maxlength')">El apellido es demasiado
+                  largo.</mat-error>
+              </mat-form-field>
+            </div>
+
+            <!-- Email -->
+            <div class="field-row">
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Email</mat-label>
+                <input matInput formControlName="email" placeholder="Email…" />
+                <mat-hint align="start">Formato email</mat-hint>
+                <mat-error *ngIf="oAlumnoForm.get('email')?.hasError('required')">Debes introducir un email.</mat-error>
+                <mat-error *ngIf="oAlumnoForm.get('email')?.hasError('email')">Introduce un email válido.</mat-error>
+              </mat-form-field>
+            </div>
+            <!-- Sector (solo lectura) -->
+            <div class="field-row">
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Sector</mat-label>
+                <input matInput [value]="oAlumno?.sector?.nombre || ''" readonly placeholder="Sector…" />
+                <mat-hint align="end">Este valor no se puede cambiar</mat-hint>
+              </mat-form-field>
+            </div>
+
+
+            <!-- Acciones -->
+            <div class="actions-row">
+              <button class="btn btn-ghost" type="button" [routerLink]="['/admin','alumno','plist']">
+                <i class="bi bi-arrow-left"></i>
+                Volver al listado
+              </button>
+
+              <div class="actions-right">
+                <button class="btn btn-secondary" type="button" (click)="onReset()">
+                  <i class="bi bi-arrow-counterclockwise"></i>
+                  Deshacer cambios
+                </button>
+
+                <button class="btn btn-primary" type="submit" [disabled]="oAlumnoForm.invalid || loading">
+                  <i class="bi bi-floppy"></i>
+                  Guardar cambios
                 </button>
               </div>
             </div>
-          </div>
+
+          </form>
         </div>
+
+      </div>
+
+      <!-- Loading -->
+      <div class="loading-state" *ngIf="loading">
+        <div class="spinner-border" role="status"></div>
+        <p>Cargando datos del alumno…</p>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- MODAL Bootstrap -->
+  <div class="modal fade" [id]="'mimodal'" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">FormAndWork</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
+            (click)="hideModal()"></button>
+        </div>
+        <div class="modal-body">
+          <p>{{ strMessage }}</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" data-bs-dismiss="modal" (click)="hideModal()">
+            Cerrar
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>

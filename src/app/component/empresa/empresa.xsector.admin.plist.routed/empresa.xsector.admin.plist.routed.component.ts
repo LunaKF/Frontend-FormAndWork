@@ -1,137 +1,279 @@
-import { Component, OnInit } from '@angular/core';
-import { IEmpresa } from '../../../model/empresa.interface';
-import { EmpresaService } from '../../../service/empresa.service';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { IPage } from '../../../model/model.interface';
 import { FormsModule } from '@angular/forms';
-import { BotoneraService } from '../../../service/botonera.service';
-import { debounceTime, Subject } from 'rxjs';
-import { TrimPipe } from '../../../pipe/trim.pipe';
-import { SectorService } from '../../../service/sector.service';
-import { ISector } from '../../../model/sector.interface';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { HttpErrorResponse } from '@angular/common/http';
 
+import { debounceTime, Subject, Subscription } from 'rxjs';
 
+import { IEmpresa } from '../../../model/empresa.interface';
+import { IPage } from '../../../model/model.interface';
+import { ISector } from '../../../model/sector.interface';
+
+import { EmpresaService } from '../../../service/empresa.service';
+import { SectorService } from '../../../service/sector.service';
+import { BotoneraService } from '../../../service/botonera.service';
+import { SessionService } from '../../../service/session.service';
+
+import { TrimPipe } from '../../../pipe/trim.pipe';
 
 @Component({
   selector: 'app-empresa-xsector-admin-plist',
   templateUrl: './empresa.xsector.admin.plist.routed.component.html',
-  styleUrls: ['./empresa.xsector.admin.plist.routed.component.css'] ,
+  styleUrls: ['./empresa.xsector.admin.plist.routed.component.css'],
   standalone: true,
-  imports: [CommonModule, FormsModule, TrimPipe, RouterModule],
+  imports: [CommonModule, FormsModule, RouterModule, TrimPipe],
 })
-
-export class EmpresaXsectorAdminPlistComponent implements OnInit {
-
+export class EmpresaXsectorAdminPlistComponent implements OnInit, OnDestroy {
+  // data
   oPage: IPage<IEmpresa> | null = null;
   oSector: ISector | null = null;
-  //
-  nPage: number = 0; // 0-based server count
-  nRpp: number = 10;
-  //
-  strField: string = '';
-  strDir: string = '';
-  //
-  strFiltro: string = '';
-  //
+
+  // route param
+  sectorId = 0;
+
+  // paginación
+  nPage = 0;   // 0-based
+  nRpp = 12;   // 12 / 24 / 36
+
+  // filtro (como guía)
+  query = '';
+
+  // orden
+  strField = '';
+  strDir = '';
+
+  // botonera
   arrBotonera: string[] = [];
-  //
+
+  // sesión / rol
+  activeSession = false;
+  userEmail = '';
+  isAdmin = false;
+  isEmpresa = false;
+  isAlumno = false;
+
+  loading = true;
+
+  // si usuario toca RPP manualmente
+  private userSetRpp = false;
+
+  // debounce filtro
   private debounceSubject = new Subject<string>();
+  private subs: Subscription[] = [];
+
   constructor(
     private oEmpresaService: EmpresaService,
+    private oSectorService: SectorService,
     private oBotoneraService: BotoneraService,
     private oActivatedRoute: ActivatedRoute,
-    private oSectorService: SectorService,
-    private oRouter: Router
+    private oRouter: Router,
+    private oSessionService: SessionService
   ) {
-    // obtener el id de la ruta del cliente
-    this.oActivatedRoute.params.subscribe((params) => {
+    // estado inicial sesión
+    this.activeSession = this.oSessionService.isSessionActive();
+    if (this.activeSession) {
+      this.userEmail = this.oSessionService.getSessionEmail();
+      this.setRoleFromSession();
+    }
 
-      this.oSectorService.get(params['id']).subscribe({
-        next: (oSector: ISector) => {
-          this.oSector = oSector;
-          this.getPage(oSector.id);
-        },
-        error: (err: HttpErrorResponse) => {
-          console.log(err);
-        },
-      });
-    });
-
-    this.debounceSubject.pipe(debounceTime(10)).subscribe((value) => {
-      this.getPage(this.oSector?.id);
-    });
+    // debounce query (igual idea que los plists pro)
+    this.subs.push(
+      this.debounceSubject.pipe(debounceTime(200)).subscribe(() => {
+        this.nPage = 0;
+        this.getPage();
+      })
+    );
   }
 
-  ngOnInit() {
+  ngOnInit(): void {
+    this.sectorId = +this.oActivatedRoute.snapshot.params['id'] || 0;
+
+    // sesión en caliente
+    this.subs.push(
+      this.oSessionService.onLogin().subscribe({
+        next: () => {
+          this.activeSession = true;
+          this.userEmail = this.oSessionService.getSessionEmail();
+          this.setRoleFromSession();
+        },
+      })
+    );
+
+    this.subs.push(
+      this.oSessionService.onLogout().subscribe({
+        next: () => {
+          this.activeSession = false;
+          this.userEmail = '';
+          this.isAdmin = this.isEmpresa = this.isAlumno = false;
+        },
+      })
+    );
+
+    // rpp válido
+    this.syncRppToColumns();
+    window.addEventListener('resize', this.syncRppToColumns);
+
+    // cargar sector (para el hero)
+    this.loadSector();
+
+    // cargar empresas
     this.getPage();
   }
-  getPage(id: number = 0) {
+
+  ngOnDestroy(): void {
+    window.removeEventListener('resize', this.syncRppToColumns);
+    this.subs.forEach(s => s.unsubscribe());
+  }
+
+  // ========= ROLES =========
+  private setRoleFromSession(): void {
+    const tipo = (this.oSessionService.getSessionTipoUsuario() || '')
+      .toLowerCase()
+      .trim();
+
+    this.isAdmin = (tipo === 'admin' || tipo === 'administrador');
+    this.isEmpresa = (tipo === 'empresa');
+    this.isAlumno = (tipo === 'alumno');
+  }
+
+  // permisos (igual filosofía que guía)
+  get canManageEmpresa(): boolean {
+    return this.isAdmin;
+  }
+
+  get canOpenView(): boolean {
+    // si quieres que alumnos puedan abrir view, cambia a:
+    // return this.activeSession && (this.isAdmin || this.isAlumno);
+    return this.isAdmin;
+  }
+
+  // ========= RPP =========
+  private syncRppToColumns = () => {
+    if (this.userSetRpp) return;
+    if (![12, 24, 36].includes(this.nRpp)) this.nRpp = 12;
+  };
+
+  // ========= DATA =========
+  private loadSector(): void {
+    if (!this.sectorId) {
+      this.oSector = null;
+      return;
+    }
+
+    this.oSectorService.get(this.sectorId).subscribe({
+      next: (s: ISector) => (this.oSector = s),
+      error: () => (this.oSector = null),
+    });
+  }
+
+  getPage(): void {
+    if (!this.sectorId) {
+      this.loading = false;
+      this.oPage = { content: [], totalElements: 0, totalPages: 0, number: 0, numberOfElements: 0, size: this.nRpp, first: true, last: true, pageable: null as any, sort: null as any, empty: true };
+      return;
+    }
+
+    this.loading = true;
+
+    // backend: page x sector (filtro en cliente como en tu guía)
     this.oEmpresaService
-    .getPageXsector(this.nPage, this.nRpp, this.strField, this.strDir, this.strFiltro, id) //tomar el id de la url del cliente
-    .subscribe({
+      .getPageXsector(this.nPage, this.nRpp, this.strField, this.strDir, '', this.sectorId)
+      .subscribe({
         next: (oPageFromServer: IPage<IEmpresa>) => {
           this.oPage = oPageFromServer;
           this.arrBotonera = this.oBotoneraService.getBotonera(
             this.nPage,
             oPageFromServer.totalPages
           );
+          this.loading = false;
         },
         error: (err) => {
           console.log(err);
+          this.loading = false;
         },
       });
   }
 
-  edit(oEmpresa: IEmpresa) {
-    //navegar a la página de edición
-    this.oRouter.navigate(['admin/empresa/edit', oEmpresa.id]);
+  // ========= FILTRO (idéntico idea a guía) =========
+  get filteredEmpresas(): IEmpresa[] {
+    const q = (this.query || '').toLowerCase().trim();
+    const content = this.oPage?.content || [];
+
+    if (!q) return content;
+
+    return content.filter(e => {
+      const id = String(e.id || '');
+      const nombre = (e.nombre || '').toLowerCase();
+      const email = (e.email || '').toLowerCase();
+      return id.includes(q) || nombre.includes(q) || email.includes(q);
+    });
   }
 
-  view(oEmpresa: IEmpresa) {
-    //navegar a la página de edición
-    this.oRouter.navigate(['admin/empresa/view', oEmpresa.id]);
+  filter(): void {
+    this.debounceSubject.next(this.query);
   }
 
-  remove(oEmpresa: IEmpresa) {
-    this.oRouter.navigate(['admin/empresa/delete/', oEmpresa.id]);
+  // ========= SCROLL TOP =========
+  private scrollToTop(): void {
+    setTimeout(() => {
+      window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+    }, 0);
   }
 
-  goToPage(p: number) {
+  // ========= ACCIONES =========
+  view(e: IEmpresa): void {
+    if (!this.canOpenView) return;
+    this.oRouter.navigate(['admin', 'empresa', 'view', e.id]).then(() => this.scrollToTop());
+  }
+
+  edit(e: IEmpresa): void {
+    if (!this.canManageEmpresa) return;
+    this.oRouter.navigate(['admin', 'empresa', 'edit', e.id]).then(() => this.scrollToTop());
+  }
+
+  remove(e: IEmpresa): void {
+    if (!this.canManageEmpresa) return;
+    this.oRouter.navigate(['admin', 'empresa', 'delete', e.id]).then(() => this.scrollToTop());
+  }
+
+  // ========= PAGINACIÓN =========
+  goToPage(p: number): boolean {
     if (p) {
       this.nPage = p - 1;
-      this.getPage( this.oSector?.id);
+      this.getPage();
+      this.scrollToTop();
     }
     return false;
   }
 
-  goToNext() {
+  goToNext(): boolean {
     this.nPage++;
-    this.getPage( this.oSector?.id);
-    return false;
-  }
-
-  goToPrev() {
-    this.nPage--;
-    this.getPage( this.oSector?.id);
-    return false;
-  }
-
-  sort(field: string) {
-    this.strField = field;
-    this.strDir = this.strDir === 'asc' ? 'desc' : 'asc';
     this.getPage();
+    this.scrollToTop();
+    return false;
   }
 
-  goToRpp(nrpp: number) {
+  goToPrev(): boolean {
+    this.nPage--;
+    this.getPage();
+    this.scrollToTop();
+    return false;
+  }
+
+  goToRpp(nrpp: number): boolean {
+    this.userSetRpp = true;
     this.nPage = 0;
     this.nRpp = nrpp;
-    this.getPage( this.oSector?.id);
+    this.getPage();
+    this.scrollToTop();
     return false;
   }
 
-  filter(event: KeyboardEvent) {
-    this.debounceSubject.next(this.strFiltro);
+  hasMultiplePages(): boolean {
+    return (this.oPage?.totalPages || 0) > 1;
+  }
+
+  trackById(_: number, item: IEmpresa): number {
+    return item.id;
   }
 }

@@ -1,15 +1,17 @@
 import { Component, OnInit } from '@angular/core';
-import { IOferta } from '../../../model/oferta.interface';
-import { OfertaService } from '../../../service/oferta.service';
 import { CommonModule } from '@angular/common';
-import { IPage } from '../../../model/model.interface';
 import { FormsModule } from '@angular/forms';
-import { BotoneraService } from '../../../service/botonera.service';
-import { debounceTime, Subject } from 'rxjs';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+
+import { debounceTime, Subject } from 'rxjs';
+
 import { TrimPipe } from '../../../pipe/trim.pipe';
+import { IOferta } from '../../../model/oferta.interface';
+import { IPage } from '../../../model/model.interface';
 import { ISector } from '../../../model/sector.interface';
-import { HttpErrorResponse } from '@angular/common/http';
+
+import { OfertaService } from '../../../service/oferta.service';
+import { BotoneraService } from '../../../service/botonera.service';
 import { SectorService } from '../../../service/sector.service';
 import { SessionService } from '../../../service/session.service';
 
@@ -21,24 +23,26 @@ import { SessionService } from '../../../service/session.service';
   imports: [CommonModule, FormsModule, TrimPipe, RouterModule],
 })
 export class OfertaXsectorAdminPlistRoutedComponent implements OnInit {
-
-  // rol
+  // sesión / rol
+  activeSession = false;
+  userEmail = '';
   isAdmin = false;
+  isEmpresa = false;
+  isAlumno = false;
 
-  // datos
+  // data
   oPage: IPage<IOferta> | null = null;
   oSector: ISector | null = null;
+  sectorId = 0;
 
   // paginación
-  nPage: number = 0;    // 0-based
-  nRpp: number = 10;
-
-  // filtro
-  strFiltro: string = '';
-  private debounceSubject = new Subject<string>();
-
-  // botonera
+  nPage = 0; // 0-based
+  nRpp = 10; // 10 / 20 / 30
   arrBotonera: string[] = [];
+
+  // filtro cliente (como tu plist)
+  strFiltro = '';
+  private debounceSubject = new Subject<string>();
 
   loading = true;
 
@@ -50,45 +54,117 @@ export class OfertaXsectorAdminPlistRoutedComponent implements OnInit {
     private oRouter: Router,
     private oSessionService: SessionService
   ) {
-    // obtener el sector desde la ruta
+    // debounce filtro
+    this.debounceSubject.pipe(debounceTime(200)).subscribe(() => {
+      this.nPage = 0;
+      this.getPage();
+    });
+
+    // estado inicial sesión
+    this.activeSession = this.oSessionService.isSessionActive();
+    if (this.activeSession) {
+      this.userEmail = this.oSessionService.getSessionEmail();
+      this.setRoleFromSession();
+    }
+  }
+
+  ngOnInit(): void {
+    // sector desde la ruta
     this.oActivatedRoute.params.subscribe((params) => {
-      this.oSectorService.get(params['id']).subscribe({
-        next: (oSector: ISector) => {
-          this.oSector = oSector;
-          this.getPage(oSector.id);
+      this.sectorId = +(params['id'] || 0);
+
+      if (!this.sectorId) {
+        this.oSector = null;
+        this.getPage();
+        return;
+      }
+
+      this.oSectorService.get(this.sectorId).subscribe({
+        next: (s: ISector) => {
+          this.oSector = s;
+          this.getPage();
         },
-        error: (err: HttpErrorResponse) => console.log(err),
+        error: () => {
+          this.oSector = null;
+          this.getPage();
+        },
       });
     });
 
-    // filtro con debounce
-    this.debounceSubject.pipe(debounceTime(200)).subscribe(() => {
-      this.nPage = 0;
-      this.getPage(this.oSector?.id || 0);
+    // login/logout en caliente
+    this.oSessionService.onLogin().subscribe({
+      next: () => {
+        this.activeSession = true;
+        this.userEmail = this.oSessionService.getSessionEmail();
+        this.setRoleFromSession();
+        this.getPage();
+      },
+    });
+
+    this.oSessionService.onLogout().subscribe({
+      next: () => {
+        this.activeSession = false;
+        this.userEmail = '';
+        this.isAdmin = this.isEmpresa = this.isAlumno = false;
+        this.getPage();
+      },
     });
   }
 
-  ngOnInit() {
-    this.setRoleFromSession();
-    this.oSessionService.onLogin().subscribe({ next: () => this.setRoleFromSession() });
-    this.oSessionService.onLogout().subscribe({ next: () => this.isAdmin = false });
-  }
+  // ========= ROLES =========
+  private setRoleFromSession(): void {
+    const tipo = (this.oSessionService.getSessionTipoUsuario() || '')
+      .toLowerCase()
+      .trim();
 
-  private setRoleFromSession() {
-    const tipo = (this.oSessionService.getSessionTipoUsuario() || '').toLowerCase().trim();
     this.isAdmin = (tipo === 'admin' || tipo === 'administrador');
+    this.isEmpresa = (tipo === 'empresa');
+    this.isAlumno = (tipo === 'alumno');
   }
 
-  // si solo hay una página, no mostramos paginación
+  // ========= PERMISOS =========
+  get canOpenView(): boolean {
+    return this.activeSession && (this.isAdmin || this.isEmpresa || this.isAlumno);
+  }
+
+  get canManageOferta(): boolean {
+    // aquí lo dejamos como tu política típica:
+    // admin y empresa pueden gestionar
+    return this.activeSession && (this.isAdmin || this.isEmpresa);
+  }
+
+  get canSeeCandidaturas(): boolean {
+    return this.activeSession && (this.isAdmin || this.isEmpresa);
+  }
+
+  // ========= HELPERS =========
+  private scrollToTop(): void {
+    setTimeout(() => window.scrollTo({ top: 0, left: 0, behavior: 'auto' }), 0);
+  }
+
   hasMultiplePages(): boolean {
     return (this.oPage?.totalPages || 0) > 1;
   }
 
-  getPage(id: number = 0) {
+  get currentPage(): number {
+    return this.nPage + 1;
+  }
+
+  hasPrev(): boolean {
+    return this.currentPage > 1;
+  }
+
+  hasNext(): boolean {
+    return !!this.oPage && this.currentPage < (this.oPage.totalPages || 0);
+  }
+
+  // ========= DATA =========
+  getPage(): void {
     this.loading = true;
-    // SIN ORDENACIÓN: strField='' y strDir=''
+
+    // 👇 Importante: NO mandamos strFiltro al backend (filtramos en cliente)
     this.oOfertaService
-      .getPageXsector(this.nPage, this.nRpp, '', '', this.strFiltro, id)
+      .getPageXsector(this.nPage, this.nRpp, '', '', '', this.sectorId)
       .subscribe({
         next: (oPageFromServer: IPage<IOferta>) => {
           this.oPage = oPageFromServer;
@@ -99,30 +175,123 @@ export class OfertaXsectorAdminPlistRoutedComponent implements OnInit {
           this.loading = false;
         },
         error: (err) => {
-          console.log(err);
+          console.error(err);
           this.loading = false;
         },
       });
   }
 
-  // navegación
-  view(o: IOferta)  { this.oRouter.navigate(['admin/oferta/view',  o.id]); }
-  edit(o: IOferta)  { if (this.isAdmin) this.oRouter.navigate(['admin/oferta/edit',  o.id]); }
-  remove(o: IOferta){ if (this.isAdmin) this.oRouter.navigate(['admin/oferta/delete', o.id]); }
+  // ========= FILTRO CLIENTE =========
+  get filteredOfertas(): IOferta[] {
+    const q = (this.strFiltro || '').toLowerCase().trim();
+    const content = this.oPage?.content || [];
+    if (!q) return content;
 
-  goToPage(p: number) {
-    if (p) { this.nPage = p - 1; this.getPage(this.oSector?.id || 0); }
+    return content.filter(o => {
+      const titulo = (o.titulo || '').toLowerCase();
+      const desc = (o.descripcion || '').toLowerCase();
+      const sector = (o.sector?.nombre || '').toLowerCase();
+      const empresa = ((o as any).empresa?.nombre || '').toLowerCase(); // por si el typing no lo trae
+
+      return (
+        String(o.id).includes(q) ||
+        titulo.includes(q) ||
+        desc.includes(q) ||
+        sector.includes(q) ||
+        empresa.includes(q)
+      );
+    });
+  }
+
+  filter(): void {
+    this.debounceSubject.next(this.strFiltro);
+  }
+
+  // ========= ACCIONES =========
+  onCardClick(o: IOferta): void {
+    if (this.canOpenView) this.view(o);
+  }
+
+  create(): void {
+    if (!this.canManageOferta) return;
+    this.oRouter.navigate(['admin', 'oferta', 'create']).then(() => this.scrollToTop());
+  }
+
+  view(o: IOferta): void {
+    if (!this.canOpenView) return;
+    this.oRouter.navigate(['admin', 'oferta', 'view', o.id]).then(() => this.scrollToTop());
+  }
+
+  edit(o: IOferta): void {
+    if (!this.canManageOferta) return;
+    this.oRouter.navigate(['admin', 'oferta', 'edit', o.id]).then(() => this.scrollToTop());
+  }
+
+  remove(o: IOferta): void {
+    if (!this.canManageOferta) return;
+    this.oRouter.navigate(['admin', 'oferta', 'delete', o.id]).then(() => this.scrollToTop());
+  }
+
+  candidaturas(o: IOferta, ev?: MouseEvent): void {
+    ev?.stopPropagation();
+    if (!this.canSeeCandidaturas) return;
+
+    this.oRouter
+      .navigate(['admin', 'candidatura', 'xoferta', 'plist', o.id])
+      .then(() => this.scrollToTop());
+  }
+
+  // ========= UI HELPERS =========
+  excerpt(text: string | undefined | null, max = 160): string {
+    const t = (text || '').trim().replace(/\s+/g, ' ');
+    if (!t) return '—';
+    if (t.length <= max) return t;
+    return t.slice(0, max).trim() + '…';
+  }
+
+  // por si candidaturas viene raro en typing
+  getCandidaturasCount(o: IOferta | null | undefined): number {
+    const anyO = o as any;
+    return Number(anyO?.candidaturas ?? 0);
+  }
+
+  trackById(_: number, item: IOferta): number {
+    return item.id;
+  }
+
+  // paginación
+  goToPage(p: number): false {
+    if (p) {
+      this.nPage = p - 1;
+      this.getPage();
+      this.scrollToTop();
+    }
     return false;
   }
-  goToNext() { this.nPage++; this.getPage(this.oSector?.id || 0); return false; }
-  goToPrev() { this.nPage--; this.getPage(this.oSector?.id || 0); return false; }
 
-  goToRpp(nrpp: number) {
+  goToNext(): false {
+    if (this.hasNext()) {
+      this.nPage++;
+      this.getPage();
+      this.scrollToTop();
+    }
+    return false;
+  }
+
+  goToPrev(): false {
+    if (this.hasPrev()) {
+      this.nPage--;
+      this.getPage();
+      this.scrollToTop();
+    }
+    return false;
+  }
+
+  goToRpp(nrpp: number): false {
     this.nPage = 0;
     this.nRpp = nrpp;
-    this.getPage(this.oSector?.id || 0);
+    this.getPage();
+    this.scrollToTop();
     return false;
   }
-
-  filter() { this.debounceSubject.next(this.strFiltro); }
 }

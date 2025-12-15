@@ -66,7 +66,7 @@
 
       <div class="edit-layout" *ngIf="!loading">
 
-        <!-- Izquierda: resumen -->
+        <!-- Izquierda -->
         <aside class="summary-card">
           <div class="summary-avatar">
             <span>{{ initials(ofertaTitulo()) }}</span>
@@ -75,18 +75,15 @@
           <div class="summary-body">
             <h2 class="summary-name">{{ ofertaTitulo() }}</h2>
 
-            <!-- ID SOLO ADMIN -->
             <p class="summary-id" *ngIf="canSeeOfertaId">
               ID oferta: <strong>#{{ oOferta?.id }}</strong>
             </p>
 
-            <!-- Sector siempre -->
             <p class="summary-sector">
               <i class="bi bi-diagram-3"></i>
               {{ oOferta?.sector?.nombre || '—' }}
             </p>
 
-            <!-- Empresa (solo alumno/admin, empresa NO) -->
             <p class="summary-email" *ngIf="canSeeEmpresaName">
               <i class="bi bi-building"></i>
               {{ empresaNombre() }}
@@ -96,33 +93,19 @@
               <i class="bi bi-envelope"></i>
               {{ oOferta?.empresa?.email || '—' }}
             </p>
-
-            <p class="summary-hint" *ngIf="isAlumno && !isAdmin && !isEmpresa">
-              Pulsa en “Ver empresa” para abrir su ficha.
-            </p>
-
-            <p class="summary-hint" *ngIf="isEmpresa && !isAdmin">
-              Consejo: revisa la descripción y gestiona candidaturas si las hay.
-            </p>
-
-            <p class="summary-hint" *ngIf="isAdmin">
-              Accede a candidaturas por oferta y revisa la información de publicación.
-            </p>
           </div>
         </aside>
 
-        <!-- Derecha: ficha -->
+        <!-- Derecha -->
         <div class="form-card">
 
           <div class="detail-grid">
 
-            <!-- ID SOLO ADMIN -->
             <div class="detail-item" *ngIf="canSeeOfertaId">
               <div class="detail-label">ID</div>
               <div class="detail-value">#{{ oOferta?.id }}</div>
             </div>
 
-            <!-- Sector -->
             <div class="detail-item">
               <div class="detail-label">Sector</div>
               <div class="detail-value">
@@ -131,7 +114,6 @@
               </div>
             </div>
 
-            <!-- Empresa (solo alumno/admin) -->
             <div class="detail-item" *ngIf="canSeeEmpresaName">
               <div class="detail-label">Empresa</div>
               <div class="detail-value">
@@ -145,15 +127,6 @@
               </button>
             </div>
 
-            <div class="detail-item" *ngIf="canSeeEmpresaEmail">
-              <div class="detail-label">Email empresa</div>
-              <div class="detail-value">
-                <i class="bi bi-envelope"></i>
-                {{ oOferta?.empresa?.email || '—' }}
-              </div>
-            </div>
-
-            <!-- Descripción (ocupa ancho completo) -->
             <div class="detail-item wide">
               <div class="detail-label">Descripción</div>
               <div class="detail-value desc">
@@ -164,7 +137,7 @@
 
           </div>
 
-          <!-- Acciones -->
+          <!-- ACCIONES -->
           <div class="actions-row">
             <button class="btn btn-ghost" type="button" (click)="goBack()">
               <i class="bi bi-arrow-left"></i>
@@ -173,7 +146,18 @@
 
             <div class="actions-right">
 
-              <!-- Candidaturas por oferta (admin/empresa) -->
+              <!-- ✨ EDITAR OFERTA (ADMIN / EMPRESA PROPIETARIA) -->
+              <button
+                class="btn btn-secondary"
+                type="button"
+                *ngIf="canEditOferta"
+                (click)="editOferta()"
+              >
+                <i class="bi bi-pencil"></i>
+                Editar oferta
+              </button>
+
+              <!-- CANDIDATURAS -->
               <button
                 class="btn btn-secondary"
                 type="button"

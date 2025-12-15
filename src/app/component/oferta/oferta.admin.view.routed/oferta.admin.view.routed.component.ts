@@ -14,29 +14,19 @@ import { SessionService } from '../../../service/session.service';
   imports: [CommonModule, RouterModule],
 })
 export class OfertaAdminViewRoutedComponent implements OnInit {
-  id: number = 0;
 
-  oOferta: IOferta = {
-    id: 0,
-    titulo: '',
-    descripcion: '',
-    empresa: {
-      id: 0,
-      nombre: '',
-      email: '',
-      sector: { id: 0, nombre: '', alumnos: 0, empresas: 0, ofertas: 0 },
-      ofertas: 0,
-    },
-    sector: { id: 0, nombre: '', alumnos: 0, empresas: 0, ofertas: 0 },
-    candidaturas: 0,
-  };
+  id = 0;
+  loading = true;
+
+  oOferta!: IOferta;
 
   // roles
   isAdmin = false;
   isEmpresa = false;
   isAlumno = false;
 
-  loading = true;
+  // sesión
+  userEmail = '';
 
   constructor(
     private oActivatedRoute: ActivatedRoute,
@@ -49,58 +39,45 @@ export class OfertaAdminViewRoutedComponent implements OnInit {
     this.id = +this.oActivatedRoute.snapshot.params['id'];
 
     this.setRoleFromSession();
+    this.userEmail = (this.oSessionService.getSessionEmail() || '').toLowerCase();
 
-    this.oSessionService.onLogin().subscribe({
-      next: () => this.setRoleFromSession(),
-    });
-
-    this.oSessionService.onLogout().subscribe({
-      next: () => {
-        this.isAdmin = this.isEmpresa = this.isAlumno = false;
-      },
+    this.oSessionService.onLogin().subscribe(() => this.setRoleFromSession());
+    this.oSessionService.onLogout().subscribe(() => {
+      this.isAdmin = this.isEmpresa = this.isAlumno = false;
     });
 
     this.getOne();
   }
 
   private setRoleFromSession(): void {
-    const tipo = (this.oSessionService.getSessionTipoUsuario() || '')
-      .toLowerCase()
-      .trim();
-
+    const tipo = (this.oSessionService.getSessionTipoUsuario() || '').toLowerCase().trim();
     this.isAdmin = tipo === 'admin' || tipo === 'administrador';
     this.isEmpresa = tipo === 'empresa';
     this.isAlumno = tipo === 'alumno';
   }
 
-  private scrollToTop(): void {
-    setTimeout(() => window.scrollTo({ top: 0, left: 0, behavior: 'auto' }), 0);
-  }
-
   getOne(): void {
     this.loading = true;
 
-    // en tu TS anterior era get(this.id); mantengo eso
     this.oOfertaService.get(this.id).subscribe({
       next: (data: IOferta) => {
         this.oOferta = data;
         this.loading = false;
       },
-      error: (err) => {
-        console.error('Error cargando la oferta:', err);
+      error: err => {
+        console.error(err);
         this.loading = false;
-      },
+      }
     });
   }
 
-  // permisos
+  /* ===== PERMISOS ===== */
+
   get canSeeEmpresaEmail(): boolean {
-    // alumno y admin sí; empresa no
     return this.isAlumno || this.isAdmin;
   }
 
   get canSeeEmpresaName(): boolean {
-    // alumno y admin sí; empresa no (redundante)
     return this.isAlumno || this.isAdmin;
   }
 
@@ -112,7 +89,19 @@ export class OfertaAdminViewRoutedComponent implements OnInit {
     return this.isAdmin || this.isEmpresa;
   }
 
-  // helpers UI
+  get canEditOferta(): boolean {
+    if (this.isAdmin) return true;
+
+    if (this.isEmpresa) {
+      const ownerEmail = (this.oOferta?.empresa?.email || '').toLowerCase();
+      return ownerEmail === this.userEmail;
+    }
+
+    return false;
+  }
+
+  /* ===== HELPERS ===== */
+
   empresaNombre(): string {
     return this.oOferta?.empresa?.nombre || 'Empresa';
   }
@@ -125,24 +114,29 @@ export class OfertaAdminViewRoutedComponent implements OnInit {
     return (text || 'NA').substring(0, 2).toUpperCase();
   }
 
-  // navegación
+  /* ===== NAVEGACIÓN ===== */
+
   goBack(): void {
-    this.oRouter.navigate(['admin', 'oferta', 'plist']).then(() => this.scrollToTop());
+    this.oRouter.navigate(['admin', 'oferta', 'plist']);
   }
 
   goEmpresa(ev?: MouseEvent): void {
     if (ev) ev.stopPropagation();
-    const idEmpresa = this.oOferta?.empresa?.id || 0;
+    const idEmpresa = this.oOferta?.empresa?.id;
     if (!idEmpresa) return;
-    this.oRouter.navigate(['admin', 'empresa', 'view', idEmpresa]).then(() => this.scrollToTop());
+    this.oRouter.navigate(['admin', 'empresa', 'view', idEmpresa]);
   }
 
   goCandidaturas(ev?: MouseEvent): void {
     if (ev) ev.stopPropagation();
-    if (!this.oOferta?.id) return;
+    this.oRouter.navigate(['admin', 'candidatura', 'xoferta', 'plist', this.oOferta.id]);
+  }
 
-    this.oRouter
-      .navigate(['admin', 'candidatura', 'xoferta', 'plist', this.oOferta.id])
-      .then(() => this.scrollToTop());
+  editOferta(): void {
+    if (this.isAdmin) {
+      this.oRouter.navigate(['admin', 'oferta', 'edit', this.oOferta.id]);
+    } else if (this.isEmpresa) {
+      this.oRouter.navigate(['empresa', 'oferta', 'edit', this.oOferta.id]);
+    }
   }
 }

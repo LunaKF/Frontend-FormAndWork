@@ -118,16 +118,15 @@ export class OfertaService {
     return this.oHttp.get<IOferta>(URL);
   }
 
-  create(oOferta: IOferta): Observable<IOferta> {
-    let URL: string = '';
-    URL += this.serverURL;
-    return this.oHttp.put<IOferta>(URL, oOferta);
+create(oOferta: IOferta): Observable<IOferta> {
+    // Backend: @PostMapping("")  => POST /oferta
+    return this.oHttp.post<IOferta>(this.serverURL, oOferta, httpOptions);
   }
 
-  update(oOferta: IOferta): Observable<IOferta> {
-    let URL: string = '';
-    URL += this.serverURL;
-    return this.oHttp.put<IOferta>(URL, oOferta);
+
+ update(oOferta: IOferta): Observable<IOferta> {
+    // Backend: @PutMapping("/{id}")  => PUT /oferta/{id}
+    return this.oHttp.put<IOferta>(this.serverURL + '/' + oOferta.id, oOferta, httpOptions);
   }
 
   getOne(id: number): Observable<IOferta> {

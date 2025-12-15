@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
+import { debounceTime, Subject } from 'rxjs';
 
 import { TrimPipe } from '../../../pipe/trim.pipe';
 import { IOferta } from '../../../model/oferta.interface';
@@ -26,8 +27,9 @@ export class OfertaAdminPlistRoutedComponent implements OnInit {
   strField = '';
   strDir: 'asc' | 'desc' | '' = '';
 
-  /** Filtro (CLIENTE como Empresas ✅) */
+  /** Filtro */
   strFiltro = '';
+  private debounceSubject = new Subject<string>();
 
   /** Botonera */
   arrBotonera: string[] = [];
@@ -50,6 +52,11 @@ export class OfertaAdminPlistRoutedComponent implements OnInit {
     private oRouter: Router,
     private oSessionService: SessionService
   ) {
+    this.debounceSubject.pipe(debounceTime(300)).subscribe(() => {
+      this.nPage = 0;
+      this.getPage();
+    });
+
     this.activeSession = this.oSessionService.isSessionActive();
     if (this.activeSession) {
       this.userEmail = this.oSessionService.getSessionEmail();
@@ -130,10 +137,8 @@ export class OfertaAdminPlistRoutedComponent implements OnInit {
   getPage(): void {
     this.loading = true;
 
-    // ✅ IMPORTANTE: no mandamos strFiltro al backend (porque no funciona allí)
-    //    Filtramos en cliente igual que Empresas.
     this.oOfertaService
-      .getPage(this.nPage, this.nRpp, this.strField, this.strDir, '')
+      .getPage(this.nPage, this.nRpp, this.strField, this.strDir, this.strFiltro)
       .subscribe({
         next: (oPageFromServer: IPage<IOferta>) => {
           this.oPage = oPageFromServer;
@@ -148,28 +153,6 @@ export class OfertaAdminPlistRoutedComponent implements OnInit {
           this.loading = false;
         },
       });
-  }
-
-  // ========= FILTRO CLIENTE (igual idea que Empresas ✅) =========
-  get filteredOfertas(): IOferta[] {
-    const q = (this.strFiltro || '').toLowerCase().trim();
-    const content = this.oPage?.content || [];
-
-    if (!q) return content;
-
-    return content.filter(o => {
-      const titulo = (o.titulo || '').toLowerCase();
-      const desc = (o.descripcion || '').toLowerCase();
-      const sector = (o.sector?.nombre || '').toLowerCase();
-      const empresa = (o.empresa?.nombre || '').toLowerCase();
-
-      return (
-        titulo.includes(q) ||
-        desc.includes(q) ||
-        sector.includes(q) ||
-        empresa.includes(q)
-      );
-    });
   }
 
   // ========= BOTONERA =========
@@ -216,12 +199,18 @@ export class OfertaAdminPlistRoutedComponent implements OnInit {
     return false;
   }
 
+  // ========= FILTRO =========
+  filter(_: KeyboardEvent): void {
+    this.debounceSubject.next(this.strFiltro);
+  }
+
   // ========= CLICK CARD =========
   onCardClick(o: IOferta): void {
     if (this.canOpenView) this.view(o);
   }
 
   // ========= ACCIONES (RUTAS CORRECTAS ✅) =========
+  // OJO: en tus routes están dentro de /admin/...
   create(): void {
     if (this.canManageOferta) {
       this.oRouter.navigate(['admin', 'oferta', 'create']).then(() => this.scrollToTop());

@@ -1,69 +1,116 @@
-<div class="row justify-content-center m-3">
-  <div class="col-lg-7 col-md-10 col-sm-12">
-    <h1 class="my-5 text-center">
-      <i class="bi bi-trash"></i>
-      Borrar alumno
-      <i class="bi bi-person-circle"></i>
-    </h1>
-    <br />
-    <table class="table table-striped table-bordered my-5 text-center">
-      <tbody>
-        <tr class="text-center">
-          <th scope="row" class="bg-danger text-white text-end pe-5">Id</th>
-          <td class="text-start ps-5">{{ oAlumno!.id }}</td>
-        </tr>
-        <tr class="text-center">
-          <th scope="row" class="bg-primary text-white text-end pe-5">
-            Nombre
-          </th>
-          <td class="text-start ps-5">{{ oAlumno!.nombre }}</td>
-        </tr>
-        <tr class="text-center">
-          <th scope="row" class="bg-primary text-white text-end pe-5">
-            Correo
-          </th>
-          <td class="text-start ps-5">{{ oAlumno!.email }}</td>
-        </tr>
+<div class="delete-page">
+  <div class="container-xl py-4">
 
-        <tr class="text-center">
-          <th scope="row" class="bg-primary text-white text-end pe-5">
-            Sector
-          </th>
-          <td class="text-start ps-5">{{ oAlumno!.sector?.nombre }}</td>
-        </tr>
+    <div class="delete-card">
+      <div class="delete-head">
+        <div class="delete-icon">
+          <i class="bi bi-trash3"></i>
+        </div>
 
-      </tbody>
-    </table>
-  </div>
+        <div class="delete-titlewrap">
+          <h1 class="delete-title">Confirmar borrado de alumno</h1>
+          <p class="delete-subtitle">
+            Revisa toda la información antes de borrar definitivamente al alumno.
+          </p>
+        </div>
+      </div>
 
-  <div class="d-flex justify-content-center mt-4">
-    <p class="fs-3">¿Seguro que desea borrar al alumno con nombre "{{ oAlumno!.nombre }}"?</p>
-  </div>
+      <hr class="delete-sep" />
 
-  <div class="d-flex justify-content-center mt-4">
-    <button
-      class="btn btn-warning mt-4 mx-1"
-      [routerLink]="['/admin', 'alumno', 'plist']"
-    >
-      <i class="bi bi-list"></i>
-      Ir a listado de Alumnos
-    </button>
-    <button class="btn btn-danger mt-4 mx-1" (click)="delete()">
-      <i class="bi bi-trash"></i>
-      Borrar alumno
-    </button>
+      <!-- LOADING -->
+      <div class="loading-state" *ngIf="loading">
+        <div class="spinner-border" role="status"></div>
+        <p class="m-0">Cargando alumno…</p>
+      </div>
+
+      <!-- CONTENIDO -->
+      <ng-container *ngIf="!loading && oAlumno as a">
+
+        <div class="info-grid">
+
+          <div class="info-item">
+            <div class="info-label">ID</div>
+            <div class="info-value">#{{ a.id }}</div>
+          </div>
+
+          <div class="info-item">
+            <div class="info-label">Nombre completo</div>
+            <div class="info-value">
+              <i class="bi bi-person"></i>
+              {{ fullName(a) }}
+            </div>
+          </div>
+
+          <div class="info-item">
+            <div class="info-label">Email</div>
+            <div class="info-value">
+              <i class="bi bi-envelope"></i>
+              {{ a.email || '—' }}
+            </div>
+          </div>
+
+          <div class="info-item">
+            <div class="info-label">Sector</div>
+            <div class="info-value">
+              <i class="bi bi-diagram-3"></i>
+              {{ a.sector?.nombre || '—' }}
+            </div>
+          </div>
+
+        </div>
+
+        <div class="warning-box">
+          <i class="bi bi-exclamation-triangle"></i>
+          <div class="warning-text">
+            <p class="m-0">
+              <strong>¿Seguro que quieres borrar</strong>
+              al alumno <strong>"{{ fullName(a) }}"</strong>?
+            </p>
+            <small>Esta acción no se puede deshacer.</small>
+          </div>
+        </div>
+
+        <div class="actions-row">
+          <button class="btnx btn-ghost" type="button" [routerLink]="['/admin','alumno','plist']">
+            <i class="bi bi-arrow-left"></i>
+            Volver al listado
+          </button>
+
+          <div class="actions-right">
+            <button class="btnx btn-secondary" type="button" (click)="goCandidaturas()">
+              <i class="bi bi-send-check"></i>
+              Ver candidaturas
+              <span class="count-pill">{{ a.candidaturas || 0 }}</span>
+            </button>
+
+            <button class="btnx btn-danger" type="button" (click)="delete()" [disabled]="deleting">
+              <ng-container *ngIf="!deleting; else deletingTpl">
+                <i class="bi bi-trash"></i>
+                Borrar alumno
+              </ng-container>
+              <ng-template #deletingTpl>
+                <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                Borrando…
+              </ng-template>
+            </button>
+          </div>
+        </div>
+      </ng-container>
+
+      <!-- SI NO HAY ALUMNO -->
+      <div class="empty-state" *ngIf="!loading && !oAlumno">
+        <i class="bi bi-emoji-frown"></i>
+        <p class="m-0">No se ha podido cargar el alumno.</p>
+      </div>
+    </div>
   </div>
 </div>
 
-<div
-  class="modal fade"
-  [id]="'mimodal'"
-  tabindex="-1"
-  aria-labelledby="exampleModalLabel"
-  aria-hidden="true"
->
+<!-- MODAL -->
+<div class="modal fade" id="mimodal" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
+
       <div class="modal-header">
         <button
           type="button"
@@ -73,9 +120,11 @@
           (click)="hideModal()"
         ></button>
       </div>
+
       <div class="modal-body">
-        <p>{{ strMessage }}</p>
+        <p class="m-0">{{ strMessage }}</p>
       </div>
+
       <div class="modal-footer">
         <button
           type="button"

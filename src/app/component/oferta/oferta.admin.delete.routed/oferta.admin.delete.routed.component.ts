@@ -1,7 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { CommonModule } from '@angular/common';
+
 import { IOferta } from '../../../model/oferta.interface';
 import { OfertaService } from '../../../service/oferta.service';
+import { SessionService } from '../../../service/session.service';
 
 declare let bootstrap: any;
 
@@ -10,54 +13,119 @@ declare let bootstrap: any;
   templateUrl: './oferta.admin.delete.routed.component.html',
   styleUrls: ['./oferta.admin.delete.routed.component.css'],
   standalone: true,
-  imports: [RouterModule],
+  imports: [CommonModule, RouterModule],
 })
 export class OfertaAdminDeleteRoutedComponent implements OnInit {
-oOferta: IOferta | null = null;
-  strMessage: string = '';
+  oOferta: IOferta | null = null;
+
+  loading = true;
+  deleting = false;
+
+  strMessage = '';
   myModal: any;
+
+  // roles
+  isAdmin = false;
+  isEmpresa = false;
+  isAlumno = false;
+
   constructor(
     private oOfertaService: OfertaService,
     private oActivatedRoute: ActivatedRoute,
-    private oRouter: Router
+    private oRouter: Router,
+    private oSessionService: SessionService
   ) {}
 
   ngOnInit(): void {
-    let id = this.oActivatedRoute.snapshot.params['id'];
+    this.setRoleFromSession();
+
+    const id = Number(this.oActivatedRoute.snapshot.params['id']);
+    if (!id) {
+      this.loading = false;
+      this.showModal('ID de oferta inválido');
+      return;
+    }
+
     this.oOfertaService.get(id).subscribe({
       next: (oOferta: IOferta) => {
         this.oOferta = oOferta;
+        this.loading = false;
       },
-      error: (err) => {
+      error: () => {
+        this.loading = false;
         this.showModal('Error al cargar los datos de la oferta');
       },
     });
   }
 
-  showModal(mensaje: string) {
-    this.strMessage = mensaje;
-    this.myModal = new bootstrap.Modal(document.getElementById('mimodal'), {
-      keyboard: false,
-    });
-    this.myModal.show();
+  private setRoleFromSession(): void {
+    const tipo = (this.oSessionService.getSessionTipoUsuario() || '')
+      .toLowerCase()
+      .trim();
+
+    this.isAdmin = tipo === 'admin' || tipo === 'administrador';
+    this.isEmpresa = tipo === 'empresa';
+    this.isAlumno = tipo === 'alumno';
+  }
+
+  // ========= ACCIONES =========
+
+  goCandidaturas(): void {
+    if (!this.oOferta) return;
+    this.oRouter.navigate([
+      'admin',
+      'candidatura',
+      'xoferta',
+      'plist',
+      this.oOferta.id,
+    ]);
+  }
+
+  goEmpresa(): void {
+    if (!this.oOferta?.empresa) return;
+    this.oRouter.navigate([
+      'admin',
+      'empresa',
+      'view',
+      this.oOferta.empresa.id,
+    ]);
   }
 
   delete(): void {
-    this.oOfertaService.delete(this.oOferta!.id).subscribe({
-      next: (data) => {
+    if (!this.oOferta || this.deleting || this.isAlumno) return;
+
+    this.deleting = true;
+
+    this.oOfertaService.delete(this.oOferta.id).subscribe({
+      next: () => {
+        this.deleting = false;
         this.showModal(
-          'Oferta con id ' + this.oOferta!.id + ' ha sido borrada'
+          `La oferta "${this.oOferta!.titulo}" ha sido borrada correctamente`
         );
       },
-      error: (error) => {
+      error: () => {
+        this.deleting = false;
         this.showModal('Error al borrar la oferta');
       },
     });
   }
 
-  hideModal = () => {
-    this.myModal.hide();
-    this.oRouter.navigate(['/admin/oferta/plist']);
+  // ========= MODAL =========
+
+  showModal(mensaje: string): void {
+    this.strMessage = mensaje;
+    setTimeout(() => {
+      const el = document.getElementById('mimodal');
+      if (!el) return;
+      this.myModal = new bootstrap.Modal(el, { keyboard: false });
+      this.myModal.show();
+    });
   }
-  
+
+  hideModal = (): void => {
+    try {
+      this.myModal?.hide();
+    } catch {}
+    this.oRouter.navigate(['/admin/oferta/plist']);
+  };
 }

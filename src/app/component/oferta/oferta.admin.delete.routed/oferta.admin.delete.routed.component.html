@@ -1,98 +1,162 @@
-<div class="row justify-content-center m-3">
-  <div class="col-lg-7 col-md-10 col-sm-12">
-    <h1 class="my-5 text-center">
-      <i class="bi bi-trash"></i>
-      Borrar oferta de trabajo
-      <i class="bi bi-person-workspace"></i>
-    </h1>
-    <br />
-    <table class="table table-striped table-bordered my-5 text-center">
-      <tbody>
-        <tr class="text-center">
-          <th scope="row" class="bg-danger text-white text-end pe-5">Id</th>
-          <td class="text-start ps-5">{{ oOferta!.id }}</td>
-        </tr>
-        <tr class="text-center">
-          <th scope="row" class="bg-primary text-white text-end pe-5">
-            Título de la oferta
-          </th>
-          <td class="text-start ps-5">{{ oOferta!.titulo }}</td>
-        </tr>
-        <tr class="text-center">
-          <th scope="row" class="bg-primary text-white text-end pe-5">
-            Descripción de la oferta
-          </th>
-          <td class="text-start ps-5">{{ oOferta!.descripcion }}</td>
-        </tr>
+<div class="delete-page">
+  <div class="container-xl py-4">
 
-        <tr class="text-center">
-          <th scope="row" class="bg-primary text-white text-end pe-5">
-            Nombre de la empresa
-          </th>
-          <td class="text-start ps-5">{{ oOferta!.empresa?.nombre }}</td>
-        </tr>
+    <div class="delete-card">
 
-        <tr class="text-center">
-          <th scope="row" class="bg-primary text-white text-end pe-5">
-            Sector de la oferta
-          </th>
-          <td class="text-start ps-5">{{ oOferta!.sector?.nombre }}</td>
-        </tr>
+      <div class="delete-head">
+        <div class="delete-icon">
+          <i class="bi bi-trash3"></i>
+        </div>
 
-      </tbody>
-    </table>
-  </div>
+        <div>
+          <h1 class="delete-title">Confirmar borrado de oferta</h1>
+          <p class="delete-subtitle">
+            Revisa la información antes de eliminar la oferta definitivamente.
+          </p>
+        </div>
+      </div>
 
-  <div class="d-flex justify-content-center mt-4">
-    <p class="fs-3">¿Seguro que desea borrar la oferta "{{ oOferta!.titulo }}"?</p>
-  </div>
+      <hr class="delete-sep" />
 
-  <div class="d-flex justify-content-center mt-4">
-    <button
-      class="btn btn-warning mt-4 mx-1"
-      [routerLink]="['/admin', 'oferta', 'plist']"
-    >
-      <i class="bi bi-list"></i>
-      Ir a listado de Ofertas
-    </button>
-    <button class="btn btn-danger mt-4 mx-1" (click)="delete()">
-      <i class="bi bi-trash"></i>
-      Borrar oferta
-    </button>
+      <!-- LOADING -->
+      <div class="loading-state" *ngIf="loading">
+        <div class="spinner-border"></div>
+        <p>Cargando oferta…</p>
+      </div>
+
+      <!-- CONTENIDO -->
+      <ng-container *ngIf="!loading && oOferta as o">
+
+        <div class="info-grid">
+
+          <!-- ID SOLO ADMIN -->
+          <div class="info-item" *ngIf="isAdmin">
+            <div class="info-label">ID</div>
+            <div class="info-value">#{{ o.id }}</div>
+          </div>
+
+          <div class="info-item">
+            <div class="info-label">Título</div>
+            <div class="info-value">
+              <i class="bi bi-briefcase"></i>
+              {{ o.titulo }}
+            </div>
+          </div>
+
+          <div class="info-item wide">
+            <div class="info-label">Descripción</div>
+            <div class="info-value">{{ o.descripcion }}</div>
+          </div>
+
+          <!-- EMPRESA: admin y alumno -->
+          <div class="info-item" *ngIf="!isEmpresa">
+            <div class="info-label">Empresa</div>
+            <div class="info-value">
+              <i class="bi bi-building"></i>
+              {{ o.empresa?.nombre || '—' }}
+            </div>
+          </div>
+
+          <div class="info-item">
+            <div class="info-label">Sector</div>
+            <div class="info-value">
+              <i class="bi bi-diagram-3"></i>
+              {{ o.sector?.nombre || '—' }}
+            </div>
+          </div>
+
+          <div class="info-item">
+            <div class="info-label">Candidaturas</div>
+            <div class="info-value">
+              <i class="bi bi-people"></i>
+              {{ o.candidaturas || 0 }}
+            </div>
+          </div>
+        </div>
+
+        <!-- WARNING -->
+        <div class="warning-box">
+          <i class="bi bi-exclamation-triangle"></i>
+          <div>
+            <p>
+              <strong>¿Seguro que deseas borrar</strong>
+              la oferta <strong>"{{ o.titulo }}"</strong>?
+            </p>
+            <small>Esta acción no se puede deshacer.</small>
+          </div>
+        </div>
+
+        <!-- ACTIONS -->
+        <div class="actions-row">
+          <button class="btnx btn-ghost" [routerLink]="['/admin','oferta','plist']">
+            <i class="bi bi-arrow-left"></i>
+            Volver
+          </button>
+
+          <div class="actions-right">
+
+            <!-- Ver empresa SOLO alumno -->
+            <button
+              *ngIf="isAlumno"
+              class="btnx btn-secondary"
+              (click)="goEmpresa()"
+            >
+              <i class="bi bi-building"></i>
+              Ver empresa
+            </button>
+
+            <!-- Ver candidaturas SOLO empresa/admin -->
+            <button
+              *ngIf="isEmpresa || isAdmin"
+              class="btnx btn-secondary"
+              (click)="goCandidaturas()"
+            >
+              <i class="bi bi-people"></i>
+              Ver candidaturas
+              <span class="count-pill">{{ o.candidaturas || 0 }}</span>
+            </button>
+
+            <!-- Borrar: admin / empresa -->
+            <button
+              *ngIf="!isAlumno"
+              class="btnx btn-danger"
+              (click)="delete()"
+              [disabled]="deleting"
+            >
+              <span *ngIf="!deleting">
+                <i class="bi bi-trash"></i>
+                Borrar oferta
+              </span>
+              <span *ngIf="deleting">
+                <span class="spinner-border spinner-border-sm"></span>
+                Borrando…
+              </span>
+            </button>
+
+          </div>
+        </div>
+      </ng-container>
+    </div>
   </div>
 </div>
 
-<div
-  class="modal fade"
-  [id]="'mimodal'"
-  tabindex="-1"
-  aria-labelledby="exampleModalLabel"
-  aria-hidden="true"
->
+<!-- MODAL -->
+<div class="modal fade" id="mimodal" tabindex="-1">
   <div class="modal-dialog">
     <div class="modal-content">
+
       <div class="modal-header">
-        <button
-          type="button"
-          class="btn-close"
-          data-bs-dismiss="modal"
-          aria-label="Close"
-          (click)="hideModal()"
-        ></button>
+        <button class="btn-close" (click)="hideModal()"></button>
       </div>
+
       <div class="modal-body">
         <p>{{ strMessage }}</p>
       </div>
+
       <div class="modal-footer">
-        <button
-          type="button"
-          class="btn btn-primary"
-          data-bs-dismiss="modal"
-          (click)="hideModal()"
-        >
-          Cerrar
-        </button>
+        <button class="btn btn-primary" (click)="hideModal()">Cerrar</button>
       </div>
+
     </div>
   </div>
 </div>

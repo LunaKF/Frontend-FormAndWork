@@ -115,5 +115,12 @@ export class AlumnoService {
     return this.oHttp.delete(this.serverURL + '/' + id);
   }
 
+  getAll(): Observable<IAlumno[]> {
+    const URL = this.serverURL + '/all';
+    return this.oHttp.get<IAlumno[]>(URL, httpOptions);
+  }
 
 }
+
+
+

@@ -110,6 +110,11 @@ export class OfertaService {
     return this.oHttp.get<IPage<IOferta>>(URL, httpOptions);
   }
 
+  getAll(): Observable<IOferta[]> {
+    const URL = this.serverURL + '/all';
+    return this.oHttp.get<IOferta[]>(URL, httpOptions);
+  }
+
 
   get(id: number): Observable<IOferta> {
     let URL: string = '';

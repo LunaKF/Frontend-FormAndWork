@@ -1,0 +1,28 @@
+<div class="container-xl" style="max-width:720px; margin:2.4rem auto;">
+  <h1>Crear candidatura</h1>
+
+  <div *ngIf="error" class="alert alert-danger">{{ error }}</div>
+
+  <form (ngSubmit)="submit()">
+    <div class="mb-3">
+      <label class="form-label">Alumno</label>
+      <select class="form-control" [(ngModel)]="alumnoId" name="alumnoId" required>
+        <option [ngValue]="null" disabled selected>-- Selecciona un alumno --</option>
+        <option *ngFor="let a of alumnos" [ngValue]="a.id">{{ a.nombre }} {{ a.ape1 }} {{ a.ape2 || '' }}</option>
+      </select>
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">Oferta</label>
+      <select class="form-control" [(ngModel)]="ofertaId" name="ofertaId" required>
+        <option [ngValue]="null" disabled selected>-- Selecciona una oferta --</option>
+        <option *ngFor="let o of ofertas" [ngValue]="o.id">{{ o.titulo }}</option>
+      </select>
+    </div>
+
+    <div class="d-flex gap-2">
+      <button class="btn btn-primary" type="submit" [disabled]="loading">{{ loading ? 'Creando...' : 'Crear' }}</button>
+      <button class="btn btn-secondary" type="button" (click)="cancel()" [disabled]="loading">Cancelar</button>
+    </div>
+  </form>
+</div>

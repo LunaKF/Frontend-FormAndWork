@@ -118,7 +118,7 @@ export class CandidaturaService {
   create(oCandidatura: ICandidatura): Observable<ICandidatura> {
     let URL: string = '';
     URL += this.serverURL;
-    return this.oHttp.put<ICandidatura>(URL, oCandidatura);
+    return this.oHttp.put<ICandidatura>(URL, oCandidatura, httpOptions);
   }
 
   update(oCandidatura: ICandidatura): Observable<ICandidatura> {

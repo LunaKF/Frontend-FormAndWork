@@ -51,6 +51,12 @@ export class CandidaturaAdminPlistRoutedComponent implements OnInit {
     });
   }
 
+  create(): void {
+    if (this.isAdmin) {
+      this.oRouter.navigate(['admin', 'candidatura', 'create']).then(() => this.scrollToTop());
+    }
+  }
+
   ngOnInit() {
     this.setRoleFromSession();
 

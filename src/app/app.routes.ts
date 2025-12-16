@@ -36,6 +36,7 @@ import { OfertaXsectorAdminPlistRoutedComponent } from './component/oferta/ofert
 import { CandidaturaAdminPlistRoutedComponent } from './component/candidatura/candidatura.admin.plist.routed/candidatura.admin.plist.routed.component';
 import { CandidaturaAdminViewRoutedComponent } from './component/candidatura/candidatura.admin.view.routed/candidatura.admin.view.routed.component';
 import { CandidaturaAdminDeleteRoutedComponent } from './component/candidatura/candidatura.admin.delete.routed/candidatura.admin.delete.routed.component';
+import { CandidaturaAdminCreateRoutedComponent } from './component/candidatura/candidatura.admin.create.routed/candidatura.admin.create.routed.component';
 import { CandidaturaXofertaAdminPlistRoutedComponent } from './component/candidatura/candidatura.xoferta.admin.plist.routed/candidatura.xoferta.admin.plist.routed.component';
 import { CandidaturaXalumnoAdminPlistRoutedComponent } from './component/candidatura/candidatura.xalumno.admin.plist.routed/candidatura.xalumno.admin.plist.routed.component';
 
@@ -102,6 +103,7 @@ export const routes: Routes = [
       { path: 'oferta/delete/:id', component: OfertaAdminDeleteRoutedComponent, canActivate: [AdminEmpresaGuard] },
 
       { path: 'candidatura/plist', component: CandidaturaAdminPlistRoutedComponent },
+      { path: 'candidatura/create', component: CandidaturaAdminCreateRoutedComponent, canActivate: [AdminGuard] },
       { path: 'candidatura/view/:id', component: CandidaturaAdminViewRoutedComponent },
       { path: 'candidatura/delete/:id', component: CandidaturaAdminDeleteRoutedComponent , canActivate: [AdminAlumnoGuard]},
 

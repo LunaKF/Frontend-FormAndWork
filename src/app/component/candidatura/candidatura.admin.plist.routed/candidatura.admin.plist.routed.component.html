@@ -64,6 +64,11 @@
             <button type="button" class="pill-rpp" [class.active]="nRpp === 36" (click)="goToRpp(36)">36</button>
 
           </div>
+          <!-- CTA Crear candidatura (solo admins) -->
+          <button *ngIf="isAdmin" class="btn-cta" type="button" (click)="create()">
+            <span class="btn-cta-bg"></span>
+            <span class="btn-cta-label"><i class="bi bi-plus-lg"></i> Nueva candidatura</span>
+          </button>
         </div>
 
       </div>

@@ -28,7 +28,7 @@
       <p class="empresa-subtitle">
         Explora las ofertas disponibles en FormAndWork.
         @if (!activeSession) {
-          <strong> Inicia sesión para ver los detalles.</strong>
+        <strong> Inicia sesión para ver los detalles.</strong>
         }
       </p>
 
@@ -42,23 +42,17 @@
         <div class="toolbar-left">
           <div class="searchbox">
             <i class="bi bi-search"></i>
-            <input
-              type="text"
-              class="form-control"
-              placeholder="Buscar por título, descripción, sector o empresa…"
-              [(ngModel)]="strFiltro"
-              (keyup)="filter($event)"
-              aria-label="Buscar ofertas"
-            />
+            <input type="text" class="form-control" placeholder="Buscar por título, descripción, sector o empresa…"
+              [(ngModel)]="strFiltro" (keyup)="filter($event)" aria-label="Buscar ofertas" />
           </div>
 
           <div class="chips">
             <span class="chip" [class.chip-muted]="!(strFiltro.length>0)">
               <i class="bi bi-funnel"></i>
               @if (strFiltro.length>0) {
-                Filtro: <strong>{{ strFiltro }}</strong>
+              Filtro: <strong>{{ strFiltro }}</strong>
               } @else {
-                Sin filtro activo
+              Sin filtro activo
               }
             </span>
 
@@ -110,17 +104,11 @@
 
       <!-- Cards -->
       <div class="offer-list" *ngIf="!loading">
-        <article
-          class="offer-card"
-          *ngFor="let oferta of (oPage?.content ?? []); trackBy: trackById"
-          [class.clickable]="canOpenView"
-          tabindex="0"
-          (click)="onCardClick(oferta)"
-          (keydown.enter)="onCardClick(oferta)"
-          (keydown.space)="$event.preventDefault(); onCardClick(oferta)"
+        <article class="offer-card" *ngFor="let oferta of (oPage?.content ?? []); trackBy: trackById"
+          [class.clickable]="canOpenView" tabindex="0" (click)="onCardClick(oferta)"
+          (keydown.enter)="onCardClick(oferta)" (keydown.space)="$event.preventDefault(); onCardClick(oferta)"
           [attr.aria-label]="canOpenView ? ('Abrir oferta ' + (oferta?.titulo || '')) : 'Inicia sesión para ver detalles'"
-          [title]="canOpenView ? ('Ver ' + (oferta?.titulo || '')) : 'Inicia sesión para ver los detalles'"
-        >
+          [title]="canOpenView ? ('Ver ' + (oferta?.titulo || '')) : 'Inicia sesión para ver los detalles'">
           <div class="offer-top">
             <div class="offer-avatar" aria-hidden="true">
               <i class="bi bi-briefcase"></i>
@@ -128,7 +116,12 @@
 
             <div class="offer-main">
               <div class="offer-head">
-                <h2 class="offer-title">{{ oferta.titulo | trim: 60 }}</h2>
+                <h2 class="offer-title">{{ oferta.titulo | trim: 60 }}
+                  <!-- ID SOLO VISIBLE PARA ADMIN -->
+                  <div class="tag soft" *ngIf="canManageOferta">
+                    <span class="offer-id">ID: {{ oferta.id }}</span>
+                  </div>
+                </h2>
 
                 <div class="offer-tags">
                   <span class="tag">
@@ -141,7 +134,9 @@
                     <i class="bi bi-building"></i>
                     {{ oferta.empresa?.nombre || 'Empresa' }}
                   </span>
+
                 </div>
+
               </div>
 
               <p class="offer-desc">
@@ -151,14 +146,9 @@
 
             <div class="offer-side">
               <!-- Candidaturas: SOLO admin/empresa -->
-              <button
-                *ngIf="canSeeCandidaturas"
-                type="button"
-                class="pill-action"
-                (click)="candidaturas(oferta, $event)"
-                [class.disabled]="!(oferta.candidaturas>0)"
-                [attr.aria-label]="'Ver candidaturas de ' + (oferta?.titulo || '')"
-              >
+              <button *ngIf="canSeeCandidaturas" type="button" class="pill-action"
+                (click)="candidaturas(oferta, $event)" [class.disabled]="!(oferta.candidaturas>0)"
+                [attr.aria-label]="'Ver candidaturas de ' + (oferta?.titulo || '')">
                 <i class="bi bi-people"></i>
                 <span class="pill-label">Candidaturas</span>
                 <span class="pill-count">{{ oferta.candidaturas || 0 }}</span>
@@ -198,16 +188,12 @@
 
           <li class="page-item" *ngFor="let pag of arrBotonera">
             @if (pag === '...') {
-              <span class="page-link dots" aria-hidden="true">…</span>
+            <span class="page-link dots" aria-hidden="true">…</span>
             } @else {
-              <a
-                class="page-link"
-                href="#"
-                (click)="$event.preventDefault(); goToPage(+pag)"
-                [class.active]="currentPage === +pag"
-              >
-                {{ pag }}
-              </a>
+            <a class="page-link" href="#" (click)="$event.preventDefault(); goToPage(+pag)"
+              [class.active]="currentPage === +pag">
+              {{ pag }}
+            </a>
             }
           </li>
 

@@ -1,111 +1,253 @@
-<div class="container mt-5 d-flex align-items-center justify-content-center">
-  <div class="row">
-    <div class="col text-center">
-      <h2 class="my-2">
-        <i class="bi bi-plus-square"></i>
-        Creación de la Oferta
-        <i class="bi bi-person-circle"></i>
-      </h2>
-      <form [formGroup]="oOfertaForm!" (ngSubmit)="onSubmit()" novalidate>
-        <div class="row mt-4">
-          <mat-form-field>
-            <mat-label>Titulo de la Oferta</mat-label>
-            <input matInput formControlName="titulo" placeholder="Titulo de la Oferta..." />
-            <mat-hint align="start">De 3 caracteres a 255 caracteres</mat-hint>
-            <mat-error *ngIf="oOfertaForm?.get('titulo')?.hasError('required')">Este campo es obligatorio</mat-error>
-            <mat-error *ngIf="oOfertaForm?.get('titulo')?.hasError('minlength')">El titulo debe ser más
-              largo</mat-error>
-            <mat-error *ngIf="oOfertaForm?.get('titulo')?.hasError('maxlength')">El titulo debe ser más
-              corto</mat-error>
-          </mat-form-field>
-        </div>
+<div class="oferta-create-page">
 
-        <div class="row mt-4">
-          <mat-form-field>
-            <mat-label>Decripcion de la Oferta</mat-label>
-            <input matInput formControlName="descripcion" placeholder="descripcion de la Oferta..." />
-            <mat-hint align="start">De 3 caracteres a 555 caracteres</mat-hint>
-            <mat-error *ngIf="oOfertaForm?.get('descripcion')?.hasError('required')">Este campo es obligatorio</mat-error>
-            <mat-error *ngIf="oOfertaForm?.get('descripcion')?.hasError('minlength')">El titulo debe ser más
-              largo</mat-error>
-            <mat-error *ngIf="oOfertaForm?.get('descripcion')?.hasError('maxlength')">El titulo debe ser más
-              corto</mat-error>
-          </mat-form-field>
-        </div>
+  <!-- BANNER ROL -->
+  <div class="role-banner" *ngIf="isAdmin || isEmpresa">
+    <div class="container-xl role-banner-inner">
 
-        <div formGroupName="sector">
-          <div class="row mt-4">
-            <mat-form-field>
-              <mat-label>SECTORES</mat-label>
-              <div class="d-flex justify-content-end">
-                <button class="btn btn-primary" (click)="showSectorSelectorModal()">
-                  <i class="bi bi-search"></i>
-                  Buscar
-                </button>
-              </div>
-              <div class="d-flex justify-content-start">
-              </div>
-              {{ oSector?.id }} - {{ oSector?.nombre }}
-              <input matInput formControlName="id" placeholder="sector" />
-            </mat-form-field>
+      <span class="role-chip" *ngIf="isAdmin">
+        <i class="bi bi-shield-lock"></i>
+        Modo administración activo
+      </span>
+
+      <span class="role-chip soft" *ngIf="isEmpresa && !isAdmin">
+        <i class="bi bi-building"></i>
+        Panel de empresa
+      </span>
+
+      <span class="role-text" *ngIf="isAdmin">
+        Estás creando una nueva oferta. Como admin puedes elegir la empresa y el sector.
+      </span>
+
+      <span class="role-text" *ngIf="isEmpresa && !isAdmin">
+        Estás creando una oferta para tu empresa. La empresa queda bloqueada automáticamente.
+      </span>
+
+    </div>
+  </div>
+
+  <!-- HERO -->
+  <section class="oferta-hero">
+    <div class="oferta-hero-overlay"></div>
+
+    <div class="container-xl oferta-hero-inner">
+      <h1 class="oferta-title">Crear oferta</h1>
+
+      <p class="oferta-subtitle" *ngIf="isAdmin">
+        Publica una nueva oferta y asigna empresa + sector. Revisa la descripción antes de guardar.
+      </p>
+
+      <p class="oferta-subtitle" *ngIf="isEmpresa && !isAdmin">
+        Publica una nueva oferta para tu empresa. Selecciona el sector y completa los datos.
+      </p>
+    </div>
+  </section>
+
+  <!-- CONTENIDO -->
+  <section class="oferta-create">
+    <div class="container-xl">
+
+      <div class="edit-layout" *ngIf="oOfertaForm">
+
+        <!-- Columna izquierda: resumen / preview -->
+        <aside class="summary-card">
+          <div class="summary-avatar">
+            <span>
+              {{
+                ((oOfertaForm.get('titulo')?.value ?? 'OF') + '')
+                  .substring(0, 2)
+                  .toUpperCase()
+              }}
+            </span>
           </div>
-        </div>
 
-        <div formGroupName="empresa">
-          <div class="row mt-4">
-            <mat-form-field>
-              <mat-label>EMPRESAS</mat-label>
-              <div class="d-flex justify-content-end">
-                <button class="btn btn-primary" (click)="showEmpresaSelectorModal()">
-                  <i class="bi bi-search"></i>
-                  Buscar
-                </button>
-              </div>
-              <div class="d-flex justify-content-start">
-              </div>
-              {{ oEmpresa?.id }} - {{ oEmpresa?.nombre }}
-              <input matInput formControlName="id" placeholder="empresa" />
-            </mat-form-field>
+          <div class="summary-body">
+            <h2 class="summary-name">
+              {{ oOfertaForm.get('titulo')?.value || 'Nueva oferta' }}
+            </h2>
+
+            <p class="summary-company">
+              <i class="bi bi-building"></i>
+              {{ oEmpresa?.nombre || 'Empresa pendiente' }}
+            </p>
+
+            <p class="summary-sector">
+              <i class="bi bi-diagram-3"></i>
+              {{ oSector?.nombre || 'Sector pendiente' }}
+            </p>
+
+            <p class="summary-desc">
+              <i class="bi bi-card-text"></i>
+              {{ oOfertaForm.get('descripcion')?.value || 'Descripción pendiente' }}
+            </p>
+
+            <p class="summary-hint">
+              Esto es una vista previa. La oferta se creará al guardar.
+            </p>
           </div>
-        </div>
+        </aside>
 
-        <br />
+        <!-- Columna derecha: formulario -->
+        <div class="form-card" *ngIf="oOfertaForm">
+          <form [formGroup]="oOfertaForm" (ngSubmit)="onSubmit()" novalidate>
 
-        <button class="btn btn-warning mt-4 mx-1" [routerLink]="['/admin', 'oferta', 'plist']">
-          <i class="bi bi-list"></i>
-          Ir a listado de Ofertas
-        </button>
+            <!-- Título -->
+            <div class="field-row">
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Título de la oferta</mat-label>
+                <input matInput formControlName="titulo" placeholder="Ej: Prácticas DAW / Junior Frontend..." />
+                <mat-hint align="start">Entre 3 y 255 caracteres</mat-hint>
 
-        <button class="btn btn-secondary mt-4 mx-1" (click)="onReset()">
-          <i class="bi bi-x-lg"></i>
-          Reset
-        </button>
+                <mat-error *ngIf="oOfertaForm.get('titulo')?.hasError('required')">
+                  Este campo es obligatorio.
+                </mat-error>
+                <mat-error *ngIf="oOfertaForm.get('titulo')?.hasError('minlength')">
+                  El título es demasiado corto.
+                </mat-error>
+                <mat-error *ngIf="oOfertaForm.get('titulo')?.hasError('maxlength')">
+                  El título es demasiado largo.
+                </mat-error>
+              </mat-form-field>
+            </div>
 
-        <button class="btn btn-primary mt-4 mx-1" type="submit" [disabled]="!oOfertaForm?.valid">
-          <i class="bi bi-floppy"></i>
-          Guardar
-        </button>
-        
-        <div class="modal fade" [id]="'mimodal'" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-          <div class="modal-dialog">
-            <div class="modal-content">
-              <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">FormAndWork</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
-                  (click)="hideModal()"></button>
+            <!-- Descripción -->
+            <div class="field-row">
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Descripción</mat-label>
+                <textarea
+                  matInput
+                  formControlName="descripcion"
+                  rows="6"
+                  placeholder="Describe tareas, requisitos, modalidad, horario, etc."></textarea>
+
+                <mat-hint align="start">Entre 5 y 555 caracteres</mat-hint>
+
+                <mat-error *ngIf="oOfertaForm.get('descripcion')?.hasError('required')">
+                  Este campo es obligatorio.
+                </mat-error>
+                <mat-error *ngIf="oOfertaForm.get('descripcion')?.hasError('minlength')">
+                  La descripción es demasiado corta.
+                </mat-error>
+                <mat-error *ngIf="oOfertaForm.get('descripcion')?.hasError('maxlength')">
+                  La descripción es demasiado larga.
+                </mat-error>
+              </mat-form-field>
+            </div>
+
+            <!-- Sector -->
+            <div formGroupName="sector">
+              <div class="field-row">
+                <label class="field-label">Sector</label>
+
+                <div class="selector-row">
+                  <button type="button" class="btn btn-outline-primary" (click)="showSectorSelectorModal()">
+                    <i class="bi bi-search"></i>
+                    Buscar sector
+                  </button>
+
+                  <span class="chip" *ngIf="oSector?.id">
+                    <i class="bi bi-diagram-3"></i>
+                    {{ oSector?.nombre }}
+                  </span>
+                </div>
+
+                <input type="hidden" formControlName="id" />
+                <input type="hidden" formControlName="nombre" />
               </div>
-              <div class="modal-body">
-                <p>{{ strMessage }}</p>
+            </div>
+
+            <!-- Empresa (solo admin elige) -->
+            <div formGroupName="empresa">
+              <div class="field-row">
+                <label class="field-label">
+                  Empresa
+                  <span class="role-mini" *ngIf="isEmpresa && !isAdmin">
+                    (bloqueada)
+                  </span>
+                </label>
+
+                <div class="selector-row">
+                  <button
+                    type="button"
+                    class="btn btn-outline-primary"
+                    (click)="showEmpresaSelectorModal()"
+                    *ngIf="isAdmin">
+                    <i class="bi bi-search"></i>
+                    Buscar empresa
+                  </button>
+
+                  <span class="chip" *ngIf="oEmpresa?.id">
+                    <i class="bi bi-building"></i>
+                    {{ oEmpresa?.nombre }}
+                  </span>
+
+                  <span class="chip subtle" *ngIf="oEmpresa?.email">
+                    <i class="bi bi-envelope"></i>
+                    {{ oEmpresa?.email }}
+                  </span>
+                </div>
+
+                <input type="hidden" formControlName="id" />
+                <input type="hidden" formControlName="nombre" />
+                <input type="hidden" formControlName="email" />
               </div>
-              <div class="modal-footer">
-                <button type="button" class="btn btn-primary" data-bs-dismiss="modal" (click)="hideModal()">
-                  Cerrar
+            </div>
+
+            <!-- Acciones -->
+            <div class="actions-row">
+              <button class="btn btn-ghost" type="button" [routerLink]="backLink">
+                <i class="bi bi-arrow-left"></i>
+                Volver al listado
+              </button>
+
+              <div class="actions-right">
+                <button class="btn btn-secondary" type="button" (click)="onReset()">
+                  <i class="bi bi-arrow-counterclockwise"></i>
+                  Limpiar formulario
+                </button>
+
+                <button
+                  class="btn btn-primary"
+                  type="submit"
+                  [disabled]="oOfertaForm.invalid || isAlumno">
+                  <i class="bi bi-floppy"></i>
+                  Crear oferta
                 </button>
               </div>
             </div>
-          </div>
+
+          </form>
         </div>
-      </form>
+
+      </div>
+
+      <!-- Loading (si lo quieres usar) -->
+      <div class="loading-state" *ngIf="loading">
+        <div class="spinner-border" role="status"></div>
+        <p>Preparando formulario…</p>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- MODAL Bootstrap -->
+  <div class="modal fade" [id]="'mimodal'" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">FormAndWork</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
+            (click)="hideModal()"></button>
+        </div>
+        <div class="modal-body">
+          <p>{{ strMessage }}</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" data-bs-dismiss="modal" (click)="hideModal()">
+            Cerrar
+          </button>
+        </div>
+      </div>
     </div>
   </div>
+
 </div>

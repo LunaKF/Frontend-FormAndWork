@@ -1,28 +1,218 @@
-<div class="container-xl" style="max-width:720px; margin:2.4rem auto;">
-  <h1>Crear candidatura</h1>
+<div class="empresa-edit-page">
 
-  <div *ngIf="error" class="alert alert-danger">{{ error }}</div>
+  <!-- BANNER ROL -->
+  <div class="role-banner" *ngIf="isAdmin || isEmpresa || isAlumno">
+    <div class="container-xl role-banner-inner">
 
-  <form (ngSubmit)="submit()">
-    <div class="mb-3">
-      <label class="form-label">Alumno</label>
-      <select class="form-control" [(ngModel)]="alumnoId" name="alumnoId" required>
-        <option [ngValue]="null" disabled selected>-- Selecciona un alumno --</option>
-        <option *ngFor="let a of alumnos" [ngValue]="a.id">{{ a.nombre }} {{ a.ape1 }} {{ a.ape2 || '' }}</option>
-      </select>
+      <span class="role-chip" *ngIf="isAdmin">
+        <i class="bi bi-shield-lock"></i>
+        Modo administración activo
+      </span>
+
+      <span class="role-chip soft" *ngIf="isEmpresa && !isAdmin">
+        <i class="bi bi-building"></i>
+        Panel de empresa
+      </span>
+
+      <span class="role-chip soft" *ngIf="isAlumno && !isAdmin && !isEmpresa">
+        <i class="bi bi-mortarboard"></i>
+        Vista de alumno
+      </span>
+
+      <span class="role-text" *ngIf="isAdmin">
+        Estás creando una candidatura manualmente. Selecciona alumno y oferta antes de guardar.
+      </span>
+
+      <span class="role-text" *ngIf="!isAdmin">
+        Esta sección es solo para administración.
+      </span>
     </div>
+  </div>
 
-    <div class="mb-3">
-      <label class="form-label">Oferta</label>
-      <select class="form-control" [(ngModel)]="ofertaId" name="ofertaId" required>
-        <option [ngValue]="null" disabled selected>-- Selecciona una oferta --</option>
-        <option *ngFor="let o of ofertas" [ngValue]="o.id">{{ o.titulo }}</option>
-      </select>
-    </div>
+  <!-- HERO -->
+  <section class="empresa-hero">
+    <div class="empresa-hero-overlay"></div>
 
-    <div class="d-flex gap-2">
-      <button class="btn btn-primary" type="submit" [disabled]="loading">{{ loading ? 'Creando...' : 'Crear' }}</button>
-      <button class="btn btn-secondary" type="button" (click)="cancel()" [disabled]="loading">Cancelar</button>
+    <div class="container-xl empresa-hero-inner">
+      <h1 class="empresa-title">Crear candidatura</h1>
+
+      <p class="empresa-subtitle" *ngIf="isAdmin">
+        Vincula un alumno con una oferta desde el panel de administración.
+        Útil para pruebas o gestión manual.
+      </p>
+
+      <p class="empresa-subtitle" *ngIf="!isAdmin">
+        No tienes permisos para crear candidaturas desde aquí.
+      </p>
     </div>
-  </form>
+  </section>
+
+  <!-- CONTENIDO -->
+  <section class="empresa-edit">
+    <div class="container-xl">
+
+      <!-- Loading datos -->
+      <div class="loading-state" *ngIf="loadingData">
+        <div class="spinner-border" role="status"></div>
+        <p>Cargando alumnos y ofertas…</p>
+      </div>
+
+      <div class="edit-layout" *ngIf="!loadingData">
+
+        <!-- Columna izquierda: preview -->
+        <aside class="summary-card">
+          <div class="summary-avatar">
+            <span>{{ initials(alumnoNombre()) }}</span>
+          </div>
+
+          <div class="summary-body">
+            <h2 class="summary-name">{{ alumnoNombre() }}</h2>
+
+            <p class="summary-email">
+              <i class="bi bi-envelope"></i>
+              {{ alumnoEmail() }}
+            </p>
+
+            <p class="summary-sector">
+              <i class="bi bi-briefcase"></i>
+              {{ ofertaTitulo() }}
+            </p>
+
+            <p class="summary-sector">
+              <i class="bi bi-building"></i>
+              {{ ofertaEmpresaNombre() }}
+            </p>
+
+            <p class="summary-hint" *ngIf="isAdmin">
+              Vista previa: la candidatura se creará al guardar.
+            </p>
+          </div>
+        </aside>
+
+        <!-- Columna derecha: form -->
+        <div class="form-card">
+
+          <form [formGroup]="oCandidaturaForm" (ngSubmit)="submit()" novalidate>
+
+            <!-- Buscador alumno -->
+            <div class="field-row">
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Buscar alumno</mat-label>
+                <input matInput [formControl]="alumnoFilter" placeholder="Nombre, email, sector o ID…" />
+              </mat-form-field>
+            </div>
+
+            <!-- Alumno -->
+            <div class="field-row">
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Alumno</mat-label>
+
+                <mat-select formControlName="alumnoId" placeholder="Selecciona un alumno…">
+                  <mat-option [value]="null" disabled>-- Selecciona un alumno --</mat-option>
+
+                  <mat-option *ngFor="let a of alumnosView" [value]="a.id">
+                    <div class="opt">
+                      <div class="opt-main">
+                        {{ a.nombre }} {{ a.ape1 }} {{ a.ape2 || '' }}
+                      </div>
+                      <div class="opt-sub">
+                        {{ a.email }}
+                        <span *ngIf="a.sector?.nombre"> · {{ a.sector?.nombre }}</span>
+                        · ID: {{ a.id }}
+                      </div>
+                    </div>
+                  </mat-option>
+                </mat-select>
+
+                <mat-hint align="start">Obligatorio</mat-hint>
+                <mat-error *ngIf="oCandidaturaForm.get('alumnoId')?.hasError('required')">
+                  Debes seleccionar un alumno.
+                </mat-error>
+              </mat-form-field>
+            </div>
+
+            <!-- Buscador oferta -->
+            <div class="field-row">
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Buscar oferta</mat-label>
+                <input matInput [formControl]="ofertaFilter" placeholder="Título, empresa, sector o ID…" />
+              </mat-form-field>
+            </div>
+
+            <!-- Oferta -->
+            <div class="field-row">
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Oferta</mat-label>
+
+                <mat-select formControlName="ofertaId" placeholder="Selecciona una oferta…">
+                  <mat-option [value]="null" disabled>-- Selecciona una oferta --</mat-option>
+
+                  <mat-option *ngFor="let o of ofertasView" [value]="o.id">
+                    <div class="opt">
+                      <div class="opt-main">{{ o.titulo }}</div>
+                      <div class="opt-sub">
+                        {{ o.empresa?.nombre || 'Empresa' }}
+                        <span *ngIf="o.sector?.nombre"> · {{ o.sector?.nombre }}</span>
+                        · ID: {{ o.id }}
+                      </div>
+                    </div>
+                  </mat-option>
+                </mat-select>
+
+                <mat-hint align="start">Obligatorio</mat-hint>
+                <mat-error *ngIf="oCandidaturaForm.get('ofertaId')?.hasError('required')">
+                  Debes seleccionar una oferta.
+                </mat-error>
+              </mat-form-field>
+            </div>
+
+            <!-- Acciones -->
+            <div class="actions-row">
+              <button class="btn btn-ghost" type="button" (click)="cancel()">
+                <i class="bi bi-arrow-left"></i>
+                Volver al listado
+              </button>
+
+              <div class="actions-right">
+                <button class="btn btn-secondary" type="button" (click)="onReset()" [disabled]="loading">
+                  <i class="bi bi-arrow-counterclockwise"></i>
+                  Limpiar
+                </button>
+
+                <button class="btn btn-primary" type="submit"
+                  [disabled]="oCandidaturaForm.invalid || loading || !isAdmin">
+                  <i class="bi bi-floppy"></i>
+                  {{ loading ? 'Creando…' : 'Crear candidatura' }}
+                </button>
+              </div>
+            </div>
+
+          </form>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- MODAL Bootstrap -->
+  <div class="modal fade" [id]="'mimodal'" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">FormAndWork</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
+            (click)="hideModal()"></button>
+        </div>
+        <div class="modal-body">
+          <p>{{ strMessage }}</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" data-bs-dismiss="modal" (click)="hideModal()">
+            Cerrar
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
 </div>

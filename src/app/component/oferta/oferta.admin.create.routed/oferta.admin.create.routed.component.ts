@@ -72,13 +72,7 @@ export class OfertaAdminCreateRoutedComponent implements OnInit {
     private oSessionService: SessionService,
     private oRouter: Router
   ) {
-    const tipo = (this.oSessionService.getSessionTipoUsuario() || '')
-      .toLowerCase()
-      .trim();
-
-    this.isAdmin = tipo === 'admin' || tipo === 'administrador';
-    this.isEmpresa = tipo === 'empresa';
-    this.isAlumno = tipo === 'alumno';
+    this.refreshRoleFlags();
 
     this.backLink = this.isEmpresa
       ? ['/empresa', 'oferta', 'plist']
@@ -92,12 +86,7 @@ export class OfertaAdminCreateRoutedComponent implements OnInit {
     // por si cambia sesión “en caliente”
     this.oSessionService.onLogin().subscribe({
       next: () => {
-        const tipo = (this.oSessionService.getSessionTipoUsuario() || '')
-          .toLowerCase()
-          .trim();
-        this.isAdmin = tipo === 'admin' || tipo === 'administrador';
-        this.isEmpresa = tipo === 'empresa';
-        this.isAlumno = tipo === 'alumno';
+        this.refreshRoleFlags();
 
         this.backLink = this.isEmpresa
           ? ['/empresa', 'oferta', 'plist']
@@ -119,10 +108,18 @@ export class OfertaAdminCreateRoutedComponent implements OnInit {
     }
   }
 
+  private refreshRoleFlags(): void {
+    const tipo = (this.oSessionService.getSessionTipoUsuario() || '')
+      .toLowerCase()
+      .trim();
+
+    this.isAdmin = tipo === 'admin' || tipo === 'administrador';
+    this.isEmpresa = tipo === 'empresa';
+    this.isAlumno = tipo === 'alumno';
+  }
+
   createForm() {
     this.oOfertaForm = new FormGroup({
-      // NO incluimos id: en create no se manda
-
       titulo: new FormControl('', [
         Validators.required,
         Validators.minLength(3),
@@ -150,32 +147,39 @@ export class OfertaAdminCreateRoutedComponent implements OnInit {
 
   /**
    * EMPRESA: auto-rellenar y bloquear empresa
-   * Ajusta el método getSessionId() si en tu SessionService se llama distinto.
+   * ✅ FIX: lo hacemos por email del token, no por id (porque tu getSessionId puede ser 0)
    */
-  private lockEmpresaFromSession() {
-    const empresaId = (this.oSessionService as any).getSessionId?.() ?? 0; // <-- AJUSTA AQUÍ si hace falta
-    if (!empresaId || Number(empresaId) <= 0) {
-      // fallback: si no tienes id en sesión, deja el form inválido y lo verás al probar
-      return;
-    }
+  private lockEmpresaFromSession(): void {
+    const email = (this.oSessionService.getSessionEmail() || '').trim();
+    if (!email) return;
 
-    this.oEmpresaService.get(Number(empresaId)).subscribe({
+    this.loading = true;
+
+    this.oEmpresaService.getEmpresaByEmail(email).subscribe({
       next: (e: IEmpresa) => {
+        this.loading = false;
         this.oEmpresa = e;
 
+        // rellenar form
         this.oOfertaForm?.get('empresa')?.patchValue({
           id: e.id,
           nombre: e.nombre,
           email: e.email,
         });
 
-        // bloquear empresa (para que no pueda tocar nada)
+        // bloquear empresa (solo UI; en payload la enviamos con getRawValue)
         this.oOfertaForm?.get('empresa.id')?.disable({ emitEvent: false });
         this.oOfertaForm?.get('empresa.nombre')?.disable({ emitEvent: false });
         this.oOfertaForm?.get('empresa.email')?.disable({ emitEvent: false });
+
+        // importante: refresca validación
+        this.oOfertaForm?.updateValueAndValidity({ emitEvent: false });
       },
-      error: () => {
-        // si falla, simplemente no bloqueamos (verás el form inválido)
+      error: (err) => {
+        this.loading = false;
+        console.error('No se pudo cargar la empresa por email', err);
+        // si no carga, el form quedará inválido y lo notarás con "Empresa pendiente"
+        this.showModal('No se pudo cargar tu empresa. Revisa sesión o backend /empresa/email/{email}.');
       },
     });
   }
@@ -186,13 +190,18 @@ export class OfertaAdminCreateRoutedComponent implements OnInit {
     this.oSector = {} as ISector;
     this.oEmpresa = {} as IEmpresa;
 
-    // dejamos estructura de subgrupos en blanco
+    // reset estructura
     this.oOfertaForm?.get('sector')?.patchValue({ id: '', nombre: '' });
     this.oOfertaForm?.get('empresa')?.patchValue({
       id: '',
       nombre: '',
       email: '',
     });
+
+    // reactivar controles por si estaban disabled antes
+    this.oOfertaForm?.get('empresa.id')?.enable({ emitEvent: false });
+    this.oOfertaForm?.get('empresa.nombre')?.enable({ emitEvent: false });
+    this.oOfertaForm?.get('empresa.email')?.enable({ emitEvent: false });
 
     // si es empresa, volvemos a bloquear sobre sí misma
     if (this.isEmpresa) this.lockEmpresaFromSession();
@@ -221,7 +230,6 @@ export class OfertaAdminCreateRoutedComponent implements OnInit {
     this.myModal?.hide();
 
     if (this.oOferta?.id) {
-      // para simplificar, lo mando a admin view (ajusta ruta si tienes view de empresa)
       this.oRouter.navigate(['/admin/oferta/view/' + this.oOferta.id]);
     } else {
       this.oRouter.navigate(this.backLink);
@@ -229,16 +237,23 @@ export class OfertaAdminCreateRoutedComponent implements OnInit {
   };
 
   onSubmit() {
-    if (!this.oOfertaForm || this.oOfertaForm.invalid) {
+    if (!this.oOfertaForm) {
+      this.showModal('Formulario no inicializado');
+      return;
+    }
+
+    // DEBUG útil (si algo vuelve a fallar)
+    // console.log('VALID?', this.oOfertaForm.valid, this.oOfertaForm.getRawValue(), this.oOfertaForm.errors);
+
+    if (this.oOfertaForm.invalid) {
       this.showModal('Formulario inválido');
       return;
     }
 
-    // 👇 IMPORTANTÍSIMO:
-    // getRawValue() incluye los campos disabled (empresa.* cuando rol=empresa)
+    // ✅ getRawValue incluye campos disabled (empresa.* cuando rol=empresa)
     const payload = this.oOfertaForm.getRawValue();
 
-    // seguridad extra: empresa NO puede inventarse otra empresa
+    // ✅ seguridad extra: empresa no puede inventarse otra empresa
     if (this.isEmpresa) {
       payload.empresa = {
         id: this.oEmpresa?.id,
@@ -247,17 +262,14 @@ export class OfertaAdminCreateRoutedComponent implements OnInit {
       } as any;
     }
 
-    // (opcional) si quieres asegurar que sector/empresa tengan nombre siempre:
-    // aquí podrías revalidar o hacer get() por id, pero no lo toco.
-
     this.oOfertaService.create(payload).subscribe({
       next: (oOferta: IOferta) => {
         this.oOferta = oOferta;
         this.showModal('Oferta creada con el id: ' + this.oOferta.id);
       },
       error: (err) => {
-        this.showModal('Error al crear la Oferta');
         console.log(err);
+        this.showModal('Error al crear la Oferta');
       },
     });
   }

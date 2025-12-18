@@ -186,20 +186,19 @@ export class OfertaAdminEditRoutedComponent implements OnInit {
 
     const { titulo, descripcion, sectorId } = this.oOfertaForm.getRawValue();
 
-    // ✅ payload: empresa SIEMPRE la original
-    const payload: IOferta = {
-      ...this.oOferta,
-      titulo: titulo ?? '',
-      descripcion: descripcion ?? '',
-      sector: { ...(this.oOferta.sector ?? {}), id: sectorId! },
-      empresa: this.oOferta.empresa, // inmutable
-      id: this.oOferta.id            // inmutable
+    // ✅ CLAVE: payload LIMPIO (solo IDs para empresa/sector)
+    const payload: any = {
+      id: this.oOferta.id, // el backend lo pisa con el path, pero no molesta
+      titulo: (titulo ?? '').trim(),
+      descripcion: (descripcion ?? '').trim(),
+      empresa: { id: this.oOferta.empresa?.id }, // SOLO ID
+      sector: { id: sectorId }                   // SOLO ID
     };
 
     this.loading = true;
 
     this.ofertaService.update(payload).subscribe({
-      next: oUpd => {
+      next: (oUpd) => {
         this.oOferta = oUpd;
 
         // refrescar textos
@@ -210,13 +209,14 @@ export class OfertaAdminEditRoutedComponent implements OnInit {
         this.loading = false;
         this.showModal(`Oferta actualizada correctamente`);
       },
-      error: err => {
+      error: (err) => {
         console.error(err);
         this.loading = false;
         this.showModal('Error al actualizar la oferta');
       }
     });
   }
+
 
   showModal(msg: string): void {
     this.strMessage = msg;

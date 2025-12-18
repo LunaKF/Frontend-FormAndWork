@@ -53,9 +53,9 @@
           <div class="summary-avatar">
             <span>
               {{
-                ((oOfertaForm.get('titulo')?.value ?? 'OF') + '')
-                  .substring(0, 2)
-                  .toUpperCase()
+              ((oOfertaForm.get('titulo')?.value ?? 'OF') + '')
+              .substring(0, 2)
+              .toUpperCase()
               }}
             </span>
           </div>
@@ -113,10 +113,7 @@
             <div class="field-row">
               <mat-form-field appearance="outline" class="full-width">
                 <mat-label>Descripción</mat-label>
-                <textarea
-                  matInput
-                  formControlName="descripcion"
-                  rows="6"
+                <textarea matInput formControlName="descripcion" rows="6"
                   placeholder="Describe tareas, requisitos, modalidad, horario, etc."></textarea>
 
                 <mat-hint align="start">Entre 5 y 555 caracteres</mat-hint>
@@ -166,10 +163,7 @@
                 </label>
 
                 <div class="selector-row">
-                  <button
-                    type="button"
-                    class="btn btn-outline-primary"
-                    (click)="showEmpresaSelectorModal()"
+                  <button type="button" class="btn btn-outline-primary" (click)="showEmpresaSelectorModal()"
                     *ngIf="isAdmin">
                     <i class="bi bi-search"></i>
                     Buscar empresa
@@ -204,14 +198,11 @@
                   <i class="bi bi-arrow-counterclockwise"></i>
                   Limpiar formulario
                 </button>
-
-                <button
-                  class="btn btn-primary"
-                  type="submit"
-                  [disabled]="oOfertaForm.invalid || isAlumno">
+                <button class="btn btn-primary" type="submit" [disabled]="oOfertaForm.invalid || isAlumno || loading">
                   <i class="bi bi-floppy"></i>
                   Crear oferta
                 </button>
+
               </div>
             </div>
 

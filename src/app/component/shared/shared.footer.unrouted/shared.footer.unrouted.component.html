@@ -116,26 +116,6 @@
       <div class="footer-user" *ngIf="activeSession">
         <p class="footer-user-label">Sesión iniciada</p>
         <p class="footer-user-email">{{ userEmail }}</p>
-
-        <div class="footer-user-links">
-          <a
-            *ngIf="isAlumno"
-            routerLink="/alumno/misperfiles"
-            class="footer-link subtle"
-            >Mi perfil de alumno</a
-          >
-          <a
-            *ngIf="isEmpresa"
-            class="footer-link subtle"
-            >Panel de empresa</a
-          >
-          <a
-            *ngIf="isAdmin"
-            routerLink="/admin/dashboard"
-            class="footer-link subtle"
-            >Panel de administración</a
-          >
-        </div>
       </div>
     </div>
   </div>
